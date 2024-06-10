@@ -107,9 +107,10 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   const [relatedName, setRelatedName] = useState('');
   const [RelatedNameLvalue, setRelatedNameLvalue] = useState('');
   useEffect(() => {
-
+    console.log(GLOBAL.selectItem,'GLOBAL.selectItem')
+    console.log(GLOBAL.TaskName,'GLOBAL.TaskName')
     const unsubscribe = navigation.addListener("focus", () => {
-      setColorChangestatus(GLOBAL.header_backgroundColor)
+
       if (GLOBAL.selectItem === 1 && GLOBAL.TaskName === "") {
         My_TaskList();
       } else if (GLOBAL.selectItem === 2 && GLOBAL.TaskName === "") {
@@ -280,8 +281,6 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       });
     }
     setunitList(A);
-
-    //console.log(categoryId,'categoryId',seacrhId,'seacrhId')
     if (GLOBAL.TaskRelatedNameId !== "") {
       let seacrhId=A?.find(p =>p.label ===GLOBAL.FilterUnit_name)?.value;
       const categoryId= SubCategory_List.find((p)=>p.categoryLevel==='4')?.value
@@ -522,9 +521,9 @@ function Task_Management({ navigation, navigation: { goBack } }) {
           setselectedrelatedname({ label: "Feature", value: "4", _index: 4 });
         }
       }
-    } else {
+    }
+    else {
       let json = JSON.parse(await AsyncStorage.getItem(GLOBAL.All_Task));
-
       let Task_List = [];
       for (let item in json) {
         let obj = json?.[item];
@@ -571,6 +570,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
         // else {
         setMudolList(Task_List);
         Make_Week_Filter_List(Task_List);
+        console.log(Task_List,'Task_List')
         setmodules(Task_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
         // }
       } else {
@@ -761,6 +761,10 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     setshowModalDelete(true);
   };
   const Navigate_Url = (Url) => {
+    GLOBAL.FilterTime === false
+    GLOBAL.FilterStatus === false
+    GLOBAL.FilterPriority === false
+    GLOBAL.FilterCategory === false
     if (Url === "ProfileStack") {
       navigation.navigate(Url);
     } else {
@@ -960,7 +964,6 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   const Task_subcategory =async (value) => {
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.Task_subcategory + `userId=${GLOBAL.UserInformation?.userId}&categoryId=${value}`).then(json => {
-
         let A = [];
         let dataList=[]
         for (let item in json?.subCategories) {
@@ -1005,10 +1008,8 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     const Day = date.getDate();
     const Month = date.getMonth();
     let Task_List = [];
-
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.My_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
-
         for (let item in json?.tasks) {
           let obj = json?.tasks?.[item];
           let taskPriorityColor = "";
@@ -1085,7 +1086,6 @@ function Task_Management({ navigation, navigation: { goBack } }) {
           setmodules("");
         }
         setShowMessage(false);
-
       });
     }
   };
@@ -1533,7 +1533,6 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   const renderSectionHeader = () => (
     <>
       {showWarning === true && <Warningmessage />}
-
       <View style={Styles.infobox}>
         {
           modules !== "" && <TouchableOpacity style={Styles.Width30} onPress={() => setvisibleguide(!visibleguide)}>
@@ -1860,11 +1859,19 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     GLOBAL.FilterUnit_name = "";
     GLOBAL.FilterSection_name = "";
     GLOBAL.FilterFeature_name = "";
-
+    GLOBAL.FilterTime === false
+    GLOBAL.FilterStatus === false
+    GLOBAL.FilterPriority === false
+    GLOBAL.FilterCategory === false
     if (GLOBAL.TaskName !== "") {
       GLOBAL.TaskName = "";
       Navigate_Url(GLOBAL.Url_Navigate);
-    } else {
+    }
+    else if (GLOBAL.TaskRelatedCheck!=='') {
+      GLOBAL.TaskRelatedCheck = "";
+      Navigate_Url(GLOBAL.Url_Navigate);
+    }
+    else {
       GLOBAL.TaskName = "";
       goBack();
     }

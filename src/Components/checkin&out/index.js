@@ -5,6 +5,7 @@ import Check_structure from './Check_structure'
 import Inspection from './Inspection';
 import InspectionUnits from './InspectionUnits'
 import Task_managementStack2 from "../taskmanagementscreen/index2";
+import Task_managementStack3 from "../taskmanagementscreen/index3";
 function Check_structureStack() {
   return (
     <Stack.Navigator
@@ -15,6 +16,7 @@ function Check_structureStack() {
       <Stack.Screen name="Inspection" component={Inspection}/>
       <Stack.Screen name="InspectionUnits" component={InspectionUnits}/>
       <Stack.Screen name="Task_managementStack2"  component={Task_managementStack2}/>
+      <Stack.Screen name="Task_managementStack3"  component={Task_managementStack3}/>
     </Stack.Navigator>
 
   );

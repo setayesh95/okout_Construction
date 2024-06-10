@@ -163,7 +163,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
       formData.append("userId",  GLOBAL.UserInformation?.userId);
       formData.append("categoryId", categoryId);
       formData.append("workTypeId", WorkTypeId);
-      if(categoryId==='1'||categoryId==='2') {
+      if(categoryId==='1'||categoryId==='2'||categoryId==='16') {
         formData.append("relatedId", relatedId);
         formData.append("relatedName", selectedrelatedname.label);
       }
@@ -181,11 +181,10 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
       else
         formData.append("parentTaskId", null);
         formData.append("assignedTo", null);
-
+        console.log(formData,'formData')
       if (GLOBAL.isConnected=== false) {
         Add_Task_Offline(value,TodayDate);
       }
-
       if (ImageSourceviewarray.length !== 0) {
         for (let i = 0; i < ImageSourceviewarray?.length; i++) {
           idsArray = ImageSourceviewarray[i];
@@ -195,41 +194,35 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
             name: idsArray.fileName,
           });
         }
-
         writePostApi("POST", Api.AddTask, formData, ImageSourceviewarray).then(json => {
-
           if (json) {
             if (json?.status === true) {
               My_TaskList_server();
-
               setMessage(json?.msg);
               setShowMessage(true);
               setImageSourceviewarray([]);
-              setCategoryId(0)
-              setRelatedId(0)
-              setShowBtn(true)
-              // setTimeout(function(){ setShowMessage(false)}, 2000)
-
+              setCategoryId(0);
+              setRelatedId(0);
+              setShowBtn(true);
+              //setTimeout(function(){ setShowMessage(false)}, 2000)
             }
           }
           else {
             setMessage("Your task successfully added");
             setShowMessage(true);
-            setShowButton(true)
+            setShowButton(true);
             setImageSourceviewarray([]);
-            setCategoryId(0)
-            setRelatedId(0)
-            setShowBtn(true)
-            // setTimeout(function(){ setShowMessage(false)}, 2000)
-            // navigation.navigate('Task_Management')
-
+            setCategoryId(0);
+            setRelatedId(0);
+            setShowBtn(true);
+            //setTimeout(function(){ setShowMessage(false)}, 2000)
+            //navigation.navigate('Task_Management')
           }
         });
       }
       else {
         writePostApi("POST", Api.AddTask, formData).then(json => {
           if (json) {
-
             if (json?.status === true) {
               My_TaskList_server();
               setMessage(json?.msg);
@@ -247,8 +240,8 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
             setCategoryId(0)
             setRelatedId(0)
             setShowBtn(true)
-            // setTimeout(function(){ setShowMessage(false)}, 2000)
-            // navigation.navigate('Task_Management')
+            //setTimeout(function(){ setShowMessage(false)}, 2000)
+            //navigation.navigate('Task_Management')
           }
         });
       }
@@ -855,6 +848,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
       await AsyncStorage.removeItem(GLOBAL.sectionId_Last_Info);
       await AsyncStorage.removeItem(GLOBAL.featureId_Last_Info);
       GLOBAL.TaskRelatedNameId=''
+      GLOBAL.TaskRelatedCheck=''
     }
   }
 

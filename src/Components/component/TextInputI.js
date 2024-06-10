@@ -928,6 +928,15 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
     if( GLOBAL.TaskRelatedNameId!==''){
       getInfo()
     }
+    console.log(GLOBAL.TaskRelatedCheck,'GLOBAL.TaskRelatedCheck')
+    if(GLOBAL.TaskRelatedCheck!==''){
+      console.log(GLOBAL.relatedName,'GLOBAL.relatedName')
+      setCategoryId(GLOBAL?.categoryId);
+      setSelectedcategory({label:"rental",value:"16",_index:2});
+      setRelatedId(GLOBAL.relatedId)
+      setselectedrelatedname({label:GLOBAL.relatedName,value:"0",_index:0})
+      Task_WorkTypeList(GLOBAL?.categoryId);
+    }
     if(numberValue === 25)
     setResults(value?.taskDescription)
     LogBox.ignoreLogs(['new NativeEventEmitter']);

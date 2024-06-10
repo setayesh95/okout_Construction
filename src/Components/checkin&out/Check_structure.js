@@ -42,7 +42,6 @@ function Taskstructure({ navigation, navigation: { goBack } }) {
   const RentalUnits = async () => {
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.RentalUnits + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
-        console.log(json,'json')
        writeDataStorage(GLOBAL.RentalUnits_List, json?.allSiteInfo);
       });
     }
@@ -56,14 +55,17 @@ function Taskstructure({ navigation, navigation: { goBack } }) {
   };
   const Navigate_Between_Modules = (constModule_Id) => {
     if (constModule_Id === "1") {
-
-      //GLOBAL.route = "structure";
-      //Navigate_Url("Project_structureStack")
+      GLOBAL.relatedName='checkin'
+      GLOBAL.route = "Check in";
+      Navigate_Url("Inspection")
 
     } else if (constModule_Id === "2") {
+      GLOBAL.relatedName='checkout'
+      GLOBAL.route = "Check out";
+      Navigate_Url("Inspection")
 
-      //Navigate_Url("Task_managementStack")
     } else if (constModule_Id === "3") {
+      GLOBAL.relatedName='inspection'
       GLOBAL.route = "Inspection";
       Navigate_Url("Inspection")
     }

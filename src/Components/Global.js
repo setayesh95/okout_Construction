@@ -225,6 +225,8 @@ module.exports = {
   SelectId:'',
   SelectName:'',
   RelatedNameLvalue:"",
-  relatedName:""
+  relatedName:"",
+  relatedId:0,
+  TaskRelatedCheck:"",
 
 };

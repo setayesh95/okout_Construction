@@ -12,11 +12,9 @@ import Entypo from "react-native-vector-icons/Entypo";
 import { Dropdown } from "react-native-element-dropdown";
 import { TextInputI } from "./TextInputI";
 import { Content } from "native-base";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import DatePicker from "react-native-date-picker";
 import Moment from "moment";
 import DocumentPicker from 'react-native-document-picker';
-import ImagePicker from "react-native-image-crop-picker";
 import LinearGradient from "react-native-linear-gradient";
 const GLOBAL = require("../Global");
 function Doc_List_Item({
@@ -44,7 +42,6 @@ function Doc_List_Item({
   const [modaldata, setmodaldata] = useState(false);
   const [type, settype] = useState('');
   const [filename, setfilename] = useState('');
-
   const [RecipientName,setRecipientName]=useState('');
   const [RecipientId,setRecipientId]=useState('')
   useEffect(()=>{
@@ -54,7 +51,6 @@ function Doc_List_Item({
   }, [value]);
 
   const ClickManagement = (item) => {
-
     if(item?.label=== "Auto Approval") {
       setName(value.name)
       setmodaldata(false)
@@ -114,7 +110,6 @@ function Doc_List_Item({
         allowMultiSelection: false,
         type: [DocumentPicker.types.docx,DocumentPicker.types.doc,DocumentPicker.types.pdf],
       });
-      console.log(res,'res')
       setfilename(res?.[0]?.name)
       for (let item in res) {
         let obj = res[item];
@@ -149,7 +144,6 @@ function Doc_List_Item({
     }
   }
   const SubDirectory_changes=()=>{
-
   }
   return (
     <>
@@ -330,7 +324,6 @@ function Doc_List_Item({
                              setOpen(false)
                              setDate(date);
                              setDateFormat(Moment(date)?.format('YYYY-MM-DD H:mm:ss'))
-                             console.log(DateFormat,'DateFormatDateFormatDateFormat')
                            }}
                            textColor={GLOBAL.OFFICIAL_BLUE_COLOR}
                            onCancel={() => {
@@ -345,7 +338,7 @@ function Doc_List_Item({
                              setOpenEnd(false)
                              setDateEnd(date);
                              setDateFormatEnd(Moment(date)?.format('YYYY-MM-DD H:mm:ss'))
-                             console.log(DateFormat,'DateFormatDateFormatDateFormat')
+
                            }}
                            textColor={GLOBAL.OFFICIAL_BLUE_COLOR}
                            onCancel={() => {
@@ -425,40 +418,31 @@ function Doc_List_Item({
               </TouchableOpacity>
             </LinearGradient>
           }
-          <LinearGradient   colors={['#a39898','#786b6b','#382e2e']} style={Styles.btnListfirst}>
 
             {
-              value.task === '0' || value.task === 0 ?
-
-                <TouchableOpacity onPress={() => {
-                  if(Screen==='Inspec')
-                    GLOBAL.Url_Navigate = 'Inspection'
-                  else {
-                    GLOBAL.Url_Navigate = 'InspectionUnits'
-                  }
-                  Navigate_Url("Task_managementStack2");
-                }}>
-                  <Text style={[Styles.txt_left2, { fontSize: normalize(14) }]}>task : {value.task}</Text>
-                </TouchableOpacity> :
-                <TouchableOpacity onPress={() => {
-                  // GLOBAL.TaskName = value.unitName;
-                  // GLOBAL.RelatedName = 'unit';
-                  // GLOBAL.RelatedId = value.unitId;
-                  // GLOBAL.TaskRelatedNameId = '2';
-                  // GLOBAL.categoryId = '1';
-                  // GLOBAL.UnitId = value.unitId;
-                  if(Screen==='Inspec')
-                  GLOBAL.Url_Navigate = 'Inspection'
-                  else {
-                    GLOBAL.Url_Navigate = 'InspectionUnits'
-                  }
-                  Navigate_Url("Task_managementStack2");
-                }}>
-                  <Text style={[Styles.txt_left2, { fontSize: normalize(14) }]}> task : {value.task}</Text>
-                </TouchableOpacity>
-
-            }
-          </LinearGradient>
+              Screen === 'InspectionUnits' &&
+            <LinearGradient   colors={['#a39898','#786b6b','#382e2e']} style={Styles.btnListfirst}>
+                  <TouchableOpacity onPress={() => {
+                    if(value.task==='0'||value.task===0) {
+                      GLOBAL.TaskRelatedCheck = "Add";
+                      GLOBAL.categoryId = "16";
+                      GLOBAL.relatedId = value.Id;
+                      GLOBAL.Url_Navigate = "InspectionUnits";
+                      Navigate_Url("Task_managementStack2");
+                    }
+                    else {
+                      GLOBAL.TaskRelatedCheck = "Add";
+                      GLOBAL.categoryId = "16";
+                      GLOBAL.relatedId = value.Id;
+                      GLOBAL.TaskName=GLOBAL.relatedName
+                      GLOBAL.Url_Navigate = "InspectionUnits";
+                      Navigate_Url("Task_managementStack3");
+                    }
+                  }}>
+                    <Text style={[Styles.txt_left2, { fontSize: normalize(14) }]}>task : {value.task}</Text>
+                  </TouchableOpacity>
+            </LinearGradient>
+          }
         </View>
       </View>
       </View>:

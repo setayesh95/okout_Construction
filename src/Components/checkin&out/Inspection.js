@@ -103,7 +103,7 @@ function Inspection({ navigation, navigation: { goBack } }) {
   }
   return (
     <Container  style={{backgroundColor:GLOBAL.backgroundColor}}>
-      <Header colors={["#59a890", "#417f73", "#0B2B26"]} StatusColor={"#58a78f"} onPress={goBack} Title={"Inspection"} />
+      <Header colors={["#59a890", "#417f73", "#0B2B26"]} StatusColor={"#58a78f"} onPress={goBack} Title={GLOBAL.route} />
       <View style={Styles.containerList}>
         {showModalDelete &&
         <LogOutModal setshowModalDelete={setshowModalDelete} showModalDelete={showModalDelete} LogOut={LogOut} />
