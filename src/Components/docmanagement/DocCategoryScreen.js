@@ -58,6 +58,7 @@ function DocCategoryScreen({ navigation, navigation: { goBack } }) {
   const get_document= async () => {
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.get_document + `userId=${GLOBAL.UserInformation?.userId}&sectionId=${GLOBAL.DocID}`).then(json => {
+
         let getDoc = [];
         let data = [];
         json?.sections?.forEach((obj) => {

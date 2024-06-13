@@ -89,6 +89,7 @@ function Doc_Management({ navigation, navigation: { goBack } }) {
       getDoc.push({
         Id: obj?.sectionId,
         name: obj?.sectionTitle,
+        documents:obj?.documents
       });
     });
     json?.sectionMenu?.forEach((obj) => {

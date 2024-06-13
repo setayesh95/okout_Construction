@@ -79,6 +79,7 @@ module.exports = {
   siteId_Last_Info:'@MySuperStore:siteId_Last_Info',
   unitId_Last_Info:'@MySuperStore:unitId_Last_Info',
   sectionId_Last_Info:'@MySuperStore:sectionId_Last_Info',
+  EMAIL_KEY:'@MySuperStore:EMAIL_KEY',
   featureId_Last_Info:'@MySuperStore:featureId_Last_Info',
   Theme_Color:'@MySuperStore:Theme',
   RelatedList:'@MySuperStore:RelatedList',

@@ -33,7 +33,7 @@ let D=[]
 function AddNewTask({ navigation, navigation: { goBack } }) {
   const [showModalDelete, setshowModalDelete] = useState(false);
   const [value, setValue] = useState(null);
-  const [selectedcategory, setSelectedcategory] = useState('');
+  const [selectedcategory, setSelectedcategory] = useState({label:"snag",value:"2",_index:1});
   const [selectedrelated,setSelectedrelated] = useState('');
   const [Cheked,setCheked] = useState(false);
   const [Taskcategory, setTaskcategory] = useState([]);
@@ -79,8 +79,34 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
   const [priorityId, setpriorityId] = useState("2");
   useEffect(()=>{
       Task_category();
-     Task_priority()
+     Task_priority();
+    Task_WorkTypeList(2)
   }, []);
+  const Task_WorkTypeList =async (Id) => {
+    let WorkType_Info =JSON.parse(await AsyncStorage.getItem(GLOBAL.WorkType_Last_Info));
+    if (GLOBAL.isConnected === true){
+      readOnlineApi(Api.Task_WorkType+`userId=${GLOBAL.UserInformation?.userId}&categoryId=${Id}`).then(json => {
+        let A = [];
+
+        for (let item in json?.workTypeList) {
+          let obj = json?.workTypeList?.[item];
+          A.push({
+            value: obj.workTypeId,
+            label: obj. workTypeName,
+          });
+        }
+        if(WorkType_Info!==''||WorkType_Info!==null){
+          setselectedWorkType({
+            label:A?.find(p => parseInt(p.value) ===parseInt(WorkType_Info))?.label,
+            value:A?.find(p =>parseInt(p.value) ===parseInt(WorkType_Info))?.value,
+            _index:A?.findIndex(p =>parseInt(p.value) ===parseInt(WorkType_Info)),
+          });
+          setWorkTypeId(WorkType_Info);
+        }
+        setTaskWorkType(A);
+      });
+    }
+  };
   const Task_priority = async () => {
       let json = JSON.parse(await AsyncStorage.getItem(GLOBAL.priorities));
       let A = [];
@@ -91,6 +117,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
           label: obj.priorityTitle,
         });
       }
+      console.log(A,'AAAA')
       setTaskpriority(A);
   };
   const Task_category =async () => {
@@ -105,6 +132,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
         });
       }
       setTaskcategory(A);
+
   };
 
   const Navigate_Url= (Url) => {
@@ -134,7 +162,6 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
   ///get  task list when user come from project or Dyb///
   const My_TaskList_server = async () => {
       readOnlineApi(Api.My_TaskList+`userId=${GLOBAL.UserInformation?.userId}`).then(json => {
-
         DataStorage(json?.tasks)
       });
   };
@@ -163,7 +190,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
       formData.append("userId",  GLOBAL.UserInformation?.userId);
       formData.append("categoryId", categoryId);
       formData.append("workTypeId", WorkTypeId);
-      if(categoryId==='1'||categoryId==='2'||categoryId==='16') {
+      if(categoryId==='1'||categoryId==='2'||categoryId==='4') {
         formData.append("relatedId", relatedId);
         formData.append("relatedName", selectedrelatedname.label);
       }
@@ -551,8 +578,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
           taskId: GLOBAL.TaskId,
           attachmentUrl: obj?.uri,
         });
-      },
-    );
+      });
     List_attachments = C;
     if(GLOBAL.TaskName!=='')
       Update_taskNumoffline()
@@ -870,13 +896,13 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
           </View>
           : null}
       {showWarning===true&&  <Warningmessage/>}
-        <Content >
+        <Content>
           <View style={Styles.container}>
             <View style={Styles.Center_margin_Bottom}>
               {showModalDelete &&
               <LogOutModal setshowModalDelete={setshowModalDelete} showModalDelete={showModalDelete} LogOut={LogOut}/>
               }
-              { ShowWarningMessage===true&&
+              {ShowWarningMessage===true&&
               <View style={Styles.flashMessageWarning4}>
                 <View style={Styles.flashMessageWarning6}>
                   <View  style={{ width: "10%",alignItems:'center',justifyContent:'flex-start' }}>
@@ -892,8 +918,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
                   <LinearGradient colors={["#9ab3fd", "#82a2ff", "#4B75FCFF"]} style={Styles.btnListDelete}>
                     <TouchableOpacity onPress={() => {
                       setShowBackBtn(false)
-                      setShowWarningMessage(false);
-                    }}>
+                      setShowWarningMessage(false)}}>
                       <Text style={[Styles.txt_left2, { fontSize: normalize(14) }]}> No</Text>
                     </TouchableOpacity>
                   </LinearGradient>
@@ -901,15 +926,11 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
                     <TouchableOpacity onPress={() => {
                       setShowWarningMessage(false);
                       setShowBackBtn(true);
-                      navigation.navigate('Task_Management')
-                    }}>
+                      navigation.navigate('Task_Management')}}>
                       <Text style={[Styles.txt_left2, { fontSize: normalize(14) }]}> Yes</Text>
                     </TouchableOpacity>
                   </LinearGradient>
                 </View>
-                {/*<View style={Styles.CancelBtnLeftAlignwarn}>*/}
-                {/*  <AntDesign name={"closecircleo"} size={20} color={"#fff"} />*/}
-                {/*</View>*/}
               </View>
               }
               <View style={[Styles.With100NoFlex]}>
@@ -942,7 +963,6 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
               </View>
             </View>
           </View>
-
         </Content>
         <Modalize ref={modalizeRef} withHandle={false} modalStyle={Styles.ModalizeDetalStyle}>
           {renderContent()}

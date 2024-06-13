@@ -270,10 +270,28 @@ function Doc_List_Item({
         Screen==='category'||  Screen==='Doc'?
       <View  style={Styles.ItemDetailBox}>
         <View style={Styles.With90}>
-          <TouchableOpacity  onPress={() => SeeDetail(value)} style={{ width: "55%" ,flexDirection:'row'}}>
-            <Entypo size={normalize(18)} color={Colors.button} name={'folder'} style={{ margin: 7,}}/>
-            <Text style={[Styles.txt_left]}>{value.name}</Text>
-          </TouchableOpacity>
+          <View style={{ width: "55%"}}>
+            <TouchableOpacity  onPress={() => SeeDetail(value)} style={{ width: "100%" ,flexDirection:'row'}}>
+              <Entypo size={normalize(18)} color={Colors.button} name={'folder'} style={{ margin: 7,}}/>
+              <Text style={[Styles.txt_left]}>{value.name}</Text>
+            </TouchableOpacity>
+            {
+              Screen==='Doc'&&value.documents &&
+            <LinearGradient   colors={["#4d78a5", "#375e89", "#27405c"]} style={Styles.btnListdoc}>
+              <TouchableOpacity onPress={()=> {
+                GLOBAL.documents= value?.documents;
+                if(GLOBAL.Projectdocinfo==='')
+                  GLOBAL.SubCategoryTitle=value.name
+                else
+                  GLOBAL.SubCategoryTitle=GLOBAL.Projectdocinfo+' / '+value.name
+                Navigate_Url("DocSubCategoryScreen");
+              }}  style={Styles.With100DYBbtn} >
+                <Text  style={Styles.txtcenter}> document </Text>
+              </TouchableOpacity>
+            </LinearGradient>
+            }
+          </View>
+
           <View style={{ width: "45%" }}>
             {/*{(data?.length !== 0 &&*/}
             {/*  <Dropdown*/}
@@ -424,15 +442,17 @@ function Doc_List_Item({
             <LinearGradient   colors={['#a39898','#786b6b','#382e2e']} style={Styles.btnListfirst}>
                   <TouchableOpacity onPress={() => {
                     if(value.task==='0'||value.task===0) {
+                      GLOBAL.selectItem = 1;
                       GLOBAL.TaskRelatedCheck = "Add";
-                      GLOBAL.categoryId = "16";
+                      GLOBAL.categoryId = "4";
                       GLOBAL.relatedId = value.Id;
                       GLOBAL.Url_Navigate = "InspectionUnits";
                       Navigate_Url("Task_managementStack2");
                     }
                     else {
                       GLOBAL.TaskRelatedCheck = "Add";
-                      GLOBAL.categoryId = "16";
+                      GLOBAL.selectItem = 1;
+                      GLOBAL.categoryId = "4";
                       GLOBAL.relatedId = value.Id;
                       GLOBAL.TaskName=GLOBAL.relatedName
                       GLOBAL.Url_Navigate = "InspectionUnits";

@@ -1542,6 +1542,13 @@ paddingHorizontal:7,
       marginRight: normalize(7),
       flexDirection:'row',alignItems:'center',justifyContent:'center'
     },
+  btnListdoc:
+    {
+      backgroundColor: "rgb(55,167,239)", filter: "blur(15)", width: "55%", paddingVertical: normalize(7),
+      borderRadius: normalize(6),
+      marginLeft: normalize(5),
+      flexDirection:'row',alignItems:'center',justifyContent:'center',marginTop:normalize(12)
+    },
   btnListedit:
     {
       width: "37%", paddingVertical: normalize(5),

@@ -141,9 +141,6 @@ function TextInputI({ GeoAddressCity,
   const videoError = error => {
 
   }
-  const onBuffer=(e)=>{
-
-  }
   const Task_subcategory =async (value) => {
 
     writeDataStorage(GLOBAL.Category_Last_Info,value);
@@ -361,6 +358,7 @@ function TextInputI({ GeoAddressCity,
     orgkey: Yup.string().required("please! Orgkey?")
   });
   const validationSchema7 = Yup.object().shape({
+    email: Yup.string().required("please! email?"),
     password: Yup.string()
       .required()
       .min(4, "pretty sure this will be hacked"),
@@ -928,13 +926,13 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
     if( GLOBAL.TaskRelatedNameId!==''){
       getInfo()
     }
-    console.log(GLOBAL.TaskRelatedCheck,'GLOBAL.TaskRelatedCheck')
+
     if(GLOBAL.TaskRelatedCheck!==''){
-      console.log(GLOBAL.relatedName,'GLOBAL.relatedName')
       setCategoryId(GLOBAL?.categoryId);
-      setSelectedcategory({label:"rental",value:"16",_index:2});
+      setSelectedcategory({label:"Maintenance",value:"4",_index:2});
       setRelatedId(GLOBAL.relatedId)
       setselectedrelatedname({label:GLOBAL.relatedName,value:"0",_index:0})
+    
       Task_WorkTypeList(GLOBAL?.categoryId);
     }
     if(numberValue === 25)
@@ -2602,6 +2600,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
       <View>
         <Formik
           initialValues={{
+            email: "",
             password: "",
             confirmpassword: "",
           }}
@@ -2611,35 +2610,66 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
           validationSchema={validationSchema7}>
           {({ values, handleChange, errors, setFieldTouched, touched, isValid, handleSubmit }) => (
             <View style={styles.formContainer}>
-              <Text style={[Styles.txt]}>New Password</Text>
+              <Text style={[Styles.txtLightColor]}>Email</Text>
               <View style={[{
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
                 borderWidth: 1,
-                borderColor: 'red',
+                borderColor:GLOBAL.OFFICIAL_Button,
                 borderRadius: normalize(6),
                 padding: 12,
                 marginBottom: 5,
-                width: width - 50,
-                paddingVertical: 2,
-                color:'#fff',
+                width:'100%',
+                paddingVertical: 4,
+                color: GLOBAL.OFFICIAL_BLUE_COLOR,
+                fontFamily:'TisaSansProBoldItalic',
+              }]}>
+                <TextInput
+                  value={values.email}
+                  style={[{
+                    width:'100%',
+                    paddingVertical: 5,
+                  }]}
+                  onChangeText={handleChange("email")}
+                  onFocus={() => setFieldTouched("email")}
+                  secureTextEntry={securetText}
+                  placeholderTextColor={'#fff'}
+                />
+              </View>
+              {touched.email && errors.email &&
+              <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.email}</Text>
+              }
+              <Text style={[Styles.txt]}>New Password</Text>
+              <View style={[{
                 justifyContent: "center",
                 flexDirection: "row",
                 alignItems: "center",
+                borderWidth: 1,
+                borderColor:GLOBAL.OFFICIAL_Button,
+                borderRadius: normalize(6),
+                padding: 12,
+                marginBottom: 5,
+                width:'100%',
+                paddingVertical: 4,
+                color: GLOBAL.OFFICIAL_BLUE_COLOR,
+                fontFamily:'TisaSansProBoldItalic',
               }]}>
                 <TextInput
                   value={values.password}
                   style={[{
-                    width: width - 100,
-                    paddingVertical: 5, color:'#fff',
+                    width: '96%',
+                    paddingVertical: 5,
                   }]}
                   onChangeText={handleChange("password")}
                   onFocus={() => setFieldTouched("password")}
                   secureTextEntry={securetText}
-                  placeholderTextColor={'#fff'}
+                  placeholderTextColor={GLOBAL.OFFICIAL_BLUE_COLOR}
                 />
                 <View style={[{}]}>
                   <TouchableOpacity
                     onPress={onpress}>
-                    <Feather name={iconsecuret} size={15} color={'#fff'} />
+                    <Feather name={iconsecuret} size={15} color={GLOBAL.OFFICIAL_BLUE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -2648,55 +2678,42 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
               }
               <Text style={[Styles.txt]}>Confirm Password</Text>
               <View style={[
-                values.password !== "" ?
-                  values.password !== values.confirmpassword ?
+                touched.confirmpassword && errors.confirmpassword ?
                     {
                       borderWidth: 1,
                       borderColor:'red',
-                      borderRadius: normalize(6),
-                      padding: 12,
-                      marginBottom: 5,
-                      width: width - 50,
-                      paddingVertical: 2,
-                      color:'#fff',
+                      color: GLOBAL.OFFICIAL_BLUE_COLOR,
                       justifyContent: "center",
                       flexDirection: "row",
                       alignItems: "center",
+                      borderRadius: normalize(6),
+                      padding: 12,
+                      marginBottom: 5,
+                      width:'100%',
+                      paddingVertical: 4,
+                      fontFamily:'TisaSansProBoldItalic',
                     } :
                     {
-                      borderWidth: 1,
-                      borderColor: "#22C55E"
-                      ,
-                      borderRadius: normalize(6),
-                      padding: 12,
-                      marginBottom: 5,
-                      width: width - 50,
-                      paddingVertical: 2,
-                      color: '#fff',
                       justifyContent: "center",
                       flexDirection: "row",
                       alignItems: "center",
-                    } :
-                  {
-                    borderWidth: 1,
-                    borderColor: 'red',
-                    borderRadius: normalize(6),
-                    padding: 12,
-                    marginBottom: 5,
-                    width: width - 50,
-                    paddingVertical: 2,
-                    color: '#fff',
-                    justifyContent: "center",
-                    flexDirection: "row",
-                    alignItems: "center",
-                  },
+                      borderWidth: 1,
+                      borderColor:GLOBAL.OFFICIAL_Button,
+                      borderRadius: normalize(6),
+                      padding: 12,
+                      marginBottom: 5,
+                      width:'100%',
+                      paddingVertical: 4,
+                      color: GLOBAL.OFFICIAL_BLUE_COLOR,
+                      fontFamily:'TisaSansProBoldItalic',
+                    }
               ]}>
 
                 <TextInput
                   value={values.confirmpassword}
                   style={[{
-                    width: width - 100,
-                    paddingVertical: 6, color: '#fff',
+                    width: '100%',
+                    paddingVertical: 5,
                   }]}
                   onChangeText={handleChange("confirmpassword")}
                   //placeholder="Password"
@@ -2706,11 +2723,8 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                 />
                 <View style={[{}]}>
                   {
-                    values.password !== "" ?
-                      values.password !== values.confirmpassword ?
+                    touched.confirmpassword && errors.confirmpassword &&
                         <AntDesign name={"closecircleo"} size={20} color={"red"} />
-                        : <AntDesign name={"checkcircleo"} size={20} color={'red'} /> :
-                      <AntDesign name={"closecircleo"} size={20} color={"red"} />
                   }
                 </View>
               </View>
@@ -2718,17 +2732,18 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
               <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.confirmpassword}</Text>
               }
               <View style={[Styles.ViewItems_center, {}]}>
-                <ButtonI
-                  style={[Styles.btn, {
-                    flexDirection: "row",
-                    width: width - 50,
-                    paddingVertical: 5,
-                    marginTop: normalize(40),
-                  }]}
-                  onpress={handleSubmit}
-                  categoriIcon={""}
-                  title={tittlebtn}
-                  styleTxt={Styles.txt} sizeIcon={27} />
+                <ButtonI style={[Styles.btn, {
+                  //margin: normalize(15),
+                  flexDirection: "row",
+                  width: '100%',
+                  paddingVertical: 2,
+                  marginTop: normalize(30),
+                }]}//handleSubmit
+                         onpress={handleSubmit}
+                         categoriIcon={""}
+                         title={tittlebtn}
+                  colorsArray={["#4d78a5", "#375e89", "#27405c"]}
+                  styleTxt={Styles.txtbtn2} sizeIcon={27} />
               </View>
 
             </View>
@@ -2816,7 +2831,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={!isFocus ? 'Select categoryddddddd' : '...'}
+                placeholder={!isFocus ? 'Select category' : '...'}
                 searchPlaceholder="Search..."
                 value={selectedcategory}
                 containerStyle={Styles.containerStyle}
@@ -2824,6 +2839,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
                 onChange={item=> {
+
                   setSelectedcategory(item);
                   setCategoryId(item.value);
                   Task_RelatedList(item.value)
@@ -3098,6 +3114,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
+                  disabled={true}
                   placeholder={!isFocus ? 'Select category' : '...'}
                   searchPlaceholder="Search..."
                   value={selectedcategory}
@@ -3106,6 +3123,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   onFocus={() => setIsFocus(true)}
                   onBlur={() => setIsFocus(false)}
                   onChange={item=> {
+                    console.log(item,'item')
                     setSelectedcategory(item);
                     setCategoryId(item.value);
                     writeDataStorage(GLOBAL.Category_Last_Info,item.value);

@@ -181,7 +181,6 @@ function Home_meno({ navigation }) {
   const My_TaskList = async () => {
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.My_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
-        console.log(json,'json')
         writeDataStorage(GLOBAL.All_Task, json?.tasks);
       });
     }
