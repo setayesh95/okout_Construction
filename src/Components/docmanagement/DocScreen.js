@@ -73,6 +73,7 @@ function Doc_Management({ navigation, navigation: { goBack } }) {
   );
   const SeeDetail = (value) => {
     GLOBAL.DocID = value.Id;
+    GLOBAL.documents=value.documents;
     GLOBAL.DocSubCategoryTitle=value.name
     navigation.navigate("DocCategoryScreen");
   };
@@ -89,7 +90,8 @@ function Doc_Management({ navigation, navigation: { goBack } }) {
       getDoc.push({
         Id: obj?.sectionId,
         name: obj?.sectionTitle,
-        documents:obj?.documents
+        documents:obj?.documents,
+        type:'Cat'
       });
     });
     json?.sectionMenu?.forEach((obj) => {
@@ -98,10 +100,10 @@ function Doc_Management({ navigation, navigation: { goBack } }) {
         label: obj?.name,
       });
     });
-
     setdata(data)
     setmodules(getDoc)
   }
+
   return (
     <Container  style={{backgroundColor:GLOBAL.backgroundColor}}>
       <Header colors={["#8bc3f8", "#4a7fb3", "#1c3045"]}

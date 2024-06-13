@@ -5,13 +5,15 @@ import { FlatList, PermissionsAndroid, Text, View,Alert,Linking } from "react-na
 import { Styles } from "../Styles";
 import { LogOutModal } from "../component/LogOutModal";
 import { Footer1 } from "../component/Footer";
-import { removeDataStorage } from "../Get_Location";
+import { removeDataStorage, writeDataStorage } from "../Get_Location";
 import Doc_List_Item from "../component/Doc_List_Item";
 import FileViewer from "react-native-file-viewer";
 const Photoes = require("../Photoes");
 const Api = require("../Api");
 const GLOBAL = require("../Global");
 import RNFetchBlob from 'rn-fetch-blob';
+import { readOnlineApi } from "../ReadPostApi";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 function DocSubCategoryScreen({ navigation, navigation: { goBack } }) {
   const [showModalDelete, setshowModalDelete] = useState(false);
   const [modules, setmodules] = useState([]);
@@ -23,10 +25,12 @@ function DocSubCategoryScreen({ navigation, navigation: { goBack } }) {
     get_document()
   }, []);
   const get_document= async () => {
-    console.log(GLOBAL.doc_sectionId,'GLOBAL.doc_sectionId')
 
+    if (GLOBAL.isConnected === true) {
+      readOnlineApi(Api.get_document + `userId=${GLOBAL.UserInformation?.userId}&sectionId=${GLOBAL.DocID}`).then(json => {
+        console.log(json,'json')
         let getDoc = [];
-      GLOBAL.documents?.forEach((obj) => {
+        GLOBAL.documents?.forEach((obj) => {
           getDoc.push({
             Id: obj?.documentId,
             name: obj?.documentTitle,
@@ -38,29 +42,52 @@ function DocSubCategoryScreen({ navigation, navigation: { goBack } }) {
             documentName:obj.documentUrl.split("/")?.[4]
           });
         });
-    const NewDoc =  getDoc.map((obj, i) => {
-      const dataList=[{ value: 0,
-        label:'Open',},{ value:1,
-        label:'Download'}];
-      const statusList=[]
-      // obj?.documentMenu?.forEach((obj) => {
-      //   dataList.push({
-      //         value: obj?.id,
-      //         label: obj?.name,
-      //   });
-      // });
-      obj?.documentStatus?.forEach((obj) => {
-        statusList.push({
+        const NewDoc =  getDoc.map((obj, i) => {
+          const dataList=[{ value: 0,
+            label:'Open',},{ value:1,
+            label:'Download'}];
+          const statusList=[]
+          // obj?.documentMenu?.forEach((obj) => {
+          //   dataList.push({
+          //         value: obj?.id,
+          //         label: obj?.name,
+          //   });
+          // });
+          obj?.documentStatus?.forEach((obj) => {
+            statusList.push({
               value: obj?.id,
               label: obj?.name,
+            });
+          });
+          return {
+            ...obj,data:dataList,status:statusList
+          };
+        });
+        console.log(NewDoc,'NewDoc')
+        setmodules(NewDoc)
+
+      });
+    }
+    else {
+      let json = JSON.parse(await AsyncStorage.getItem(GLOBAL.Get_Docmanage));
+      let getDoc = [];
+      let data = [];
+      json?.sections?.forEach((obj) => {
+        getDoc.push({
+          Id: obj?.sectionId,
+          name: obj?.sectionTitle,
+          documents:obj?.documents
         });
       });
-      return {
-        ...obj,data:dataList,status:statusList
-      };
-    });
-    console.log(NewDoc,'NewDoc')
-        setmodules(NewDoc)
+      json?.sectionMenu?.forEach((obj) => {
+        data.push({
+          value: obj?.id,
+          label: obj?.name,
+        });
+      });
+      setdata(data)
+      setmodules(getDoc)
+    }
 
 
   };

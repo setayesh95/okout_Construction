@@ -357,8 +357,13 @@ function TextInputI({ GeoAddressCity,
       .min(4, "pretty sure this will be hacked"),
     orgkey: Yup.string().required("please! Orgkey?")
   });
+  const validationSchema22 = Yup.object().shape({
+
+    orgkey: Yup.string().required("please! Orgkey?"),
+    email: Yup.string().required("please! email?").email("well that's not an email")
+  });
   const validationSchema7 = Yup.object().shape({
-    email: Yup.string().required("please! email?"),
+    OTPNumber: Yup.string().required("please! OTP Number?"),
     password: Yup.string()
       .required()
       .min(4, "pretty sure this will be hacked"),
@@ -932,7 +937,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
       setSelectedcategory({label:"Maintenance",value:"4",_index:2});
       setRelatedId(GLOBAL.relatedId)
       setselectedrelatedname({label:GLOBAL.relatedName,value:"0",_index:0})
-    
+
       Task_WorkTypeList(GLOBAL?.categoryId);
     }
     if(numberValue === 25)
@@ -2396,7 +2401,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   paddingVertical: 2,
                   borderRadius: normalize(6),
                   color: GLOBAL.OFFICIAL_BLUE_COLOR,
-                  fontFamily:'TisaSansProBoldItalic',
+                  fontFamily:'OpenSansBold',
                 }]}
                 onChangeText={handleChange("username")}
                 onFocus={() => setFieldTouched("username")}
@@ -2424,7 +2429,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   style={[{
                     width: '97%',
                     paddingVertical: 3, color: GLOBAL.OFFICIAL_BLUE_COLOR,
-                    fontFamily:'TisaSansProBoldItalic',
+                    fontFamily:'OpenSansBold',
                   }]}
                   onChangeText={handleChange("password")}
                   onFocus={() => setFieldTouched("password")}
@@ -2484,133 +2489,18 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
       <View style={{ flex: 1 }}>
         <Formik
           initialValues={{
+            orgkey: "",
             email: "",
-            password: "",
           }}
           onSubmit={values => {
             onChangeText(values);
           }}
-          validationSchema={validationSchema6}
+          validationSchema={validationSchema22}
         >
           {({ values, handleChange, errors, setFieldTouched, touched, isValid, handleSubmit }) => (
-            <View>
-
-              <Text style={[Styles.txtLightColor]}>Email</Text>
-              <TextInput
-                value={values.email}
-                style={[inputStyle, { paddingVertical: 6 }]}
-                onChangeText={handleChange("email")}
-                onFocus={() => setFieldTouched("email")}
-                placeholderTextColor={'#fff'} />
-              {touched.email && errors.email &&
-              <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.email}</Text>
-              }
-              <Text style={[Styles.txtLightColor]}>Password</Text>
-              <View style={{
-                borderWidth: 1,
-                borderColor: '#fff',
-                borderRadius: normalize(6),
-                padding: 12,
-                marginBottom: 5,
-                width: width - 50,
-                paddingVertical: 3,
-                color: '#fff',
-                justifyContent: "center",
-                flexDirection: "row",
-                alignItems: "center",
-              }}>
-                <TextInput
-                  value={values.password}
-                  style={ {
-                    width: width - 100,
-                    paddingVertical: 3, color: '#000',
-                  }}
-                  onChangeText={handleChange("password")}
-                  // placeholder="Password"
-                  onFocus={() => setFieldTouched("password")}
-                  secureTextEntry={securetText}
-                  placeholderTextColor={'#fff'} />
-                <View style={[{}]}>
-                  <TouchableOpacity
-                    onPress={onpress}>
-                    <Feather name={iconsecuret} size={15} color={'#fff'} />
-                  </TouchableOpacity>
-                </View>
-              </View>
-              {touched.password && errors.password &&
-              <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.password}</Text>
-              }
-              <View style={[{
-                flexDirection: "row", marginTop: 5, width: width - 50,
-              }]}>
-                <View style={{ flexDirection: "row", width: "60%", alignItems: "center" }}>
-                  <CheckBox checked={Cheked} color={GLOBAL.OFFICIAL_backgroundItem} onPress={ChangeChecked} style={{
-                    borderWidth: 0.90,
-                    borderColor: "#424867",
-                    borderRadius: 4,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    paddingBottom: 1,
-                  }} />
-                  <Text style={[Styles.txt, { color: GLOBAL.OFFICIAL_Button, marginRight: "auto", marginLeft: 20 }]}>Remember
-                    Me!</Text>
-                </View>
-                <TouchableOpacity style={{ width: "40%" }}
-                                  onPress={Pinrecovery}>
-                  <Text style={[Styles.txt, { color:GLOBAL.OFFICIAL_Button, marginLeft: "auto" }]}>Forgot Password ?</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={[Styles.ViewItems_center]}>
-                <ButtonI style={[Styles.btn, {
-                  //margin: normalize(15),
-                  flexDirection: "row",
-                  width: width - 53,
-                  paddingVertical: 2,
-                  marginTop: normalize(30),
-                }]}
-                         onpress={handleSubmit}
-                         categoriIcon={""}
-                         title={tittlebtn}
-                         styleTxt={Styles.txt} sizeIcon={27} />
-              </View>
-              <View style={[Styles.ViewItems_center, { flex: 0.4, marginTop: 7 }]}>
-                <View style={[Styles.linearView, {}]}>
-                  <View style={[Styles.liner, { width: width - 25 }]} />
-                  <Text style={[Styles.txtLightColor, { fontSize: normalize(13) }]}>{'Okout'}</Text>
-                  <View style={[Styles.liner, { width: width - 25 }]} />
-                </View>
-              </View>
-
-              <TouchableOpacity onPress={emailOnpress}
-                                style={[Styles.ViewItems_center, { marginTop: 10, flexDirection: "row" }]}>
-                <Text style={[Styles.txt, { fontSize: normalize(13) }]}>Don't have an account ?
-
-                </Text>
-                <Text style={[Styles.txt, { color: GLOBAL.OFFICIAL_Button, marginLeft: 3 }]}>Sign Up</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </Formik>
-      </View>
-
-    );
-  }
-  else if (numberValue === 9) {
-    return (
-      <View>
-        <Formik
-          initialValues={{
-            email: "",
-            password: "",
-            confirmpassword: "",
-          }}
-          onSubmit={values => {
-            onChangeText(values);
-          }}
-          validationSchema={validationSchema7}>
-          {({ values, handleChange, errors, setFieldTouched, touched, isValid, handleSubmit }) => (
             <View style={styles.formContainer}>
-              <Text style={[Styles.txtLightColor]}>Email</Text>
+              <Text style={[Styles.txtLightColor]}>Org key</Text>
+
               <View style={[{
                 justifyContent: "center",
                 alignItems: "center",
@@ -2623,21 +2513,138 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                 width:'100%',
                 paddingVertical: 4,
                 color: GLOBAL.OFFICIAL_BLUE_COLOR,
-                fontFamily:'TisaSansProBoldItalic',
               }]}>
                 <TextInput
-                  value={values.email}
+                  value={values.orgkey}
+                  style={[{
+                    width: '97%',
+                    paddingVertical: 5, color:GLOBAL.OFFICIAL_BLUE_COLOR,
+                    fontFamily:'OpenSansBold',
+                  }]}
+                  onChangeText={handleChange("orgkey")}
+                  onFocus={() => setFieldTouched("orgkey")}
+                  onBlur={()=>{
+                    if(values?.orgkey!=='')
+                      checkOrgCode(values?.orgkey)
+                  }}
+                  placeholderTextColor={'#fff'} />
+                <View style={[{}]}>
+                  <View>
+                    <Feather name={iconcheck} size={15} color={GLOBAL.OFFICIAL_BLUE_COLOR} />
+                  </View>
+                </View>
+              </View>
+              {touched.orgkey && errors.orgkey &&
+              <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.orgkey}</Text>
+              }
+              <Text style={[Styles.txtLightColor]}>Email</Text>
+
+                <View style={[{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "row",
+                  borderWidth: 1,
+                  borderColor:GLOBAL.OFFICIAL_Button,
+                  borderRadius: normalize(6),
+                  padding: 12,
+                  marginBottom: 5,
+                  width:'100%',
+                  paddingVertical: 4,
+                }]}>
+                  <TextInput
+
+                    style={[{
+                      width:'100%',
+                      paddingVertical: 5,
+                      color:GLOBAL.OFFICIAL_BLUE_COLOR,
+                      fontFamily:'OpenSansBold',
+                    }]}
+                    value={values.email}
+                onChangeText={handleChange("email")}
+                onFocus={() => setFieldTouched("email")}
+                placeholderTextColor={'#fff'} />
+                </View>
+              {touched.email && errors.email &&
+              <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.email}</Text>
+              }
+
+
+              <View style={[Styles.ViewItems_center]}>
+                    {/*<ButtonI style={[Styles.btn, {*/}
+                    {/*  //margin: normalize(15),*/}
+                    {/*  width: width /2.5,*/}
+                    {/*  paddingVertical: 2,*/}
+                    {/*  marginTop: normalize(30),*/}
+                    {/*}]}*/}
+                    {/*         colorsArray={["#4d78a5", "#375e89", "#27405c"]}*/}
+                    {/*         onpress={handleSubmit}*/}
+                    {/*         categoriIcon={""}*/}
+                    {/*         title={tittlebtn}*/}
+                    {/*         styleTxt={Styles.txtbtn2} sizeIcon={27} />*/}
+              </View>
+              <View style={[Styles.ViewItems_center]}>
+                <ButtonI style={[Styles.btn, {
+                  //margin: normalize(15),
+                  flexDirection: "row",
+                  width: '100%',
+                  paddingVertical: 2,
+                  marginTop: normalize(30),
+                }]}//handleSubmit
+                         onpress={handleSubmit}
+                         categoriIcon={""}
+                         title={tittlebtn}
+                         colorsArray={["#4d78a5", "#375e89", "#27405c"]}
+                         styleTxt={[Styles.txtbtn2,{fontSize: normalize(16),}]} sizeIcon={27} />
+              </View>
+            </View>
+          )}
+        </Formik>
+      </View>
+
+    );
+  }
+  else if (numberValue === 9) {
+    return (
+      <View>
+        <Formik
+          initialValues={{
+            OTPNumber: "",
+            password: "",
+            confirmpassword: "",
+          }}
+          onSubmit={values => {
+            onChangeText(values);
+          }}
+          validationSchema={validationSchema7}>
+          {({ values, handleChange, errors, setFieldTouched, touched, isValid, handleSubmit }) => (
+            <View style={styles.formContainer}>
+              <Text style={[Styles.txtLightColor]}>OTP Number</Text>
+              <View style={[{
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+                borderWidth: 1,
+                borderColor:GLOBAL.OFFICIAL_Button,
+                borderRadius: normalize(6),
+                padding: 12,
+                marginBottom: 5,
+                width:'100%',
+                paddingVertical: 4,
+                color: GLOBAL.OFFICIAL_BLUE_COLOR,
+                fontFamily:'OpenSansBold',
+              }]}>
+                <TextInput
+                  value={values.OTPNumber}
                   style={[{
                     width:'100%',
                     paddingVertical: 5,
                   }]}
-                  onChangeText={handleChange("email")}
-                  onFocus={() => setFieldTouched("email")}
-                  secureTextEntry={securetText}
+                  onChangeText={handleChange("OTPNumber")}
+                  onFocus={() => setFieldTouched("OTPNumber")}
                   placeholderTextColor={'#fff'}
                 />
               </View>
-              {touched.email && errors.email &&
+              {touched.OTPNumber && errors.OTPNumber &&
               <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.email}</Text>
               }
               <Text style={[Styles.txt]}>New Password</Text>

@@ -45,7 +45,9 @@ module.exports = {
    DeleteFeature:`api/ApiConstruction/deleteFeature`,
    CreateFeature:`api/ApiConstruction/addFeature`,
    UpdateBuildNote:`api/ApiConstruction/updateBuildNote`,
-   gtCountry:`api/ApiGetCommonInfo/getCountry`
+   gtCountry:`api/ApiGetCommonInfo/getCountry`,
+   Reset_Password:`api/ApiGetCommonInfo/requestNewPassword `,
+ Update_Password:`api/ApiGetCommonInfo/updatePassword`,
 
 }
 

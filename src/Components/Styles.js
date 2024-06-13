@@ -71,6 +71,12 @@ const Styles = StyleSheet.create({
     fontSize: normalize(15),
     fontFamily:'OpenSansBold',
   },
+  txtPassword: {
+    color: GLOBAL.OFFICIAL_BLUE_COLOR,
+    fontSize: normalize(15),
+    fontFamily:'OpenSansBold',
+    marginTop:normalize(45)
+  },
   txtMenu: {
     color: GLOBAL.OFFICIAL_BLUE_COLOR,
     fontSize: normalize(14),

@@ -19,6 +19,8 @@ import ThemChangeStack from '../colorChangescreen/index';
 import DocmanagementStack from '../docmanagement/index'
 import DocmanagementStack2 from '../docmanagement/index2';
 import Check_structureStack from '../checkin&out/index'
+import ForgotPassword from "../loginscreen/ForgotPassword";
+import ForgotPasswordOTP from "../loginscreen/ForgotPasswordOTP";
 const Drawer = createDrawerNavigator();
 const width = Dimensions.get("window").width;
 
@@ -37,6 +39,8 @@ function Home_Navigation() {
         <Stack.Screen name="DocmanagementStack" component={DocmanagementStack} />
         <Stack.Screen name="DocmanagementStack2" component={DocmanagementStack2} />
    <Stack.Screen name="Check_structureStack" component={Check_structureStack} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword}/>
+        <Stack.Screen name="ForgotPasswordOTP" component={ForgotPasswordOTP}/>
 
       </Stack.Navigator>
   );

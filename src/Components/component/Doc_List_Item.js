@@ -269,54 +269,99 @@ function Doc_List_Item({
       </View>:
         Screen==='category'||  Screen==='Doc'?
       <View  style={Styles.ItemDetailBox}>
-        <View style={Styles.With90}>
-          <View style={{ width: "55%"}}>
-            <TouchableOpacity  onPress={() => SeeDetail(value)} style={{ width: "100%" ,flexDirection:'row'}}>
-              <Entypo size={normalize(18)} color={Colors.button} name={'folder'} style={{ margin: 7,}}/>
-              <Text style={[Styles.txt_left]}>{value.name}</Text>
-            </TouchableOpacity>
-            {
-              Screen==='Doc'&&value.documents &&
-            <LinearGradient   colors={["#4d78a5", "#375e89", "#27405c"]} style={Styles.btnListdoc}>
-              <TouchableOpacity onPress={()=> {
-                GLOBAL.documents= value?.documents;
-                if(GLOBAL.Projectdocinfo==='')
-                  GLOBAL.SubCategoryTitle=value.name
-                else
-                  GLOBAL.SubCategoryTitle=GLOBAL.Projectdocinfo+' / '+value.name
-                Navigate_Url("DocSubCategoryScreen");
-              }}  style={Styles.With100DYBbtn} >
-                <Text  style={Styles.txtcenter}> document </Text>
-              </TouchableOpacity>
-            </LinearGradient>
-            }
-          </View>
+        {
+          value.type==='Cat'?
+            <View style={Styles.With90}>
+              <View style={{ width: "55%"}}>
+                <TouchableOpacity  onPress={() => SeeDetail(value)} style={{ width: "100%" ,flexDirection:'row'}}>
+                  <Entypo size={normalize(18)} color={Colors.button} name={'folder'} style={{ margin: 7,}}/>
+                  <Text style={[Styles.txt_left]}>{value.name}</Text>
+                </TouchableOpacity>
+                {/*{*/}
+                {/*  Screen==='Doc'&&value.documents &&*/}
+                {/*<LinearGradient   colors={["#4d78a5", "#375e89", "#27405c"]} style={Styles.btnListdoc}>*/}
+                {/*  <TouchableOpacity onPress={()=> {*/}
+                {/*    GLOBAL.documents= value?.documents;*/}
+                {/*    if(GLOBAL.Projectdocinfo==='')*/}
+                {/*      GLOBAL.SubCategoryTitle=value.name*/}
+                {/*    else*/}
+                {/*      GLOBAL.SubCategoryTitle=GLOBAL.Projectdocinfo+' / '+value.name*/}
+                {/*    Navigate_Url("DocSubCategoryScreen");*/}
+                {/*  }}  style={Styles.With100DYBbtn} >*/}
+                {/*    <Text  style={Styles.txtcenter}> document </Text>*/}
+                {/*  </TouchableOpacity>*/}
+                {/*</LinearGradient>*/}
+                {/*}*/}
+              </View>
 
-          <View style={{ width: "45%" }}>
-            {/*{(data?.length !== 0 &&*/}
-            {/*  <Dropdown*/}
-            {/*    containerStyle={Styles.DropDown}*/}
-            {/*    selectedTextStyle={Styles.selectedTextStyle}*/}
-            {/*    labelField="label"*/}
-            {/*    valueField="value"*/}
-            {/*    data={data}*/}
-            {/*    activeColor={Colors.Light}*/}
-            {/*    maxHeight={300}*/}
-            {/*    renderItem={renderItem}*/}
-            {/*    renderRightIcon={()=>(*/}
-            {/*      <View style={Styles.DropDownIcon}>*/}
-            {/*        <AntDesign name="ellipsis1" size={normalize(25)} color={GLOBAL.OFFICIAL_BLUE_COLOR}/>*/}
-            {/*      </View>*/}
-            {/*    )}*/}
-            {/*    onFocus={() => setIsFocus(true)}*/}
-            {/*    onBlur={()  => setIsFocus(false)}*/}
-            {/*    onChange={item=>{*/}
-            {/*      ClickManagement(item);*/}
-            {/*    }}*/}
-            {/*  />*/}
-            {/*)}*/}
-          </View>
-        </View>
+              <View style={{ width: "45%" }}>
+                {/*{(data?.length !== 0 &&*/}
+                {/*  <Dropdown*/}
+                {/*    containerStyle={Styles.DropDown}*/}
+                {/*    selectedTextStyle={Styles.selectedTextStyle}*/}
+                {/*    labelField="label"*/}
+                {/*    valueField="value"*/}
+                {/*    data={data}*/}
+                {/*    activeColor={Colors.Light}*/}
+                {/*    maxHeight={300}*/}
+                {/*    renderItem={renderItem}*/}
+                {/*    renderRightIcon={()=>(*/}
+                {/*      <View style={Styles.DropDownIcon}>*/}
+                {/*        <AntDesign name="ellipsis1" size={normalize(25)} color={GLOBAL.OFFICIAL_BLUE_COLOR}/>*/}
+                {/*      </View>*/}
+                {/*    )}*/}
+                {/*    onFocus={() => setIsFocus(true)}*/}
+                {/*    onBlur={()  => setIsFocus(false)}*/}
+                {/*    onChange={item=>{*/}
+                {/*      ClickManagement(item);*/}
+                {/*    }}*/}
+                {/*  />*/}
+                {/*)}*/}
+              </View>
+            </View>:
+            <View style={Styles.With90}>
+              <TouchableOpacity  onPress={()=>  download(value.documentUrl,value.documentName)}   style={{ width: "55%" }}>
+                <View   style={{ width: "100%",flexDirection:'row' }}>
+                  <AntDesign size={normalize(18)} color={Colors.button} name={'filetext1'} style={{ marginTop: 7,marginRight:5}}/>
+                  <Text style={[Styles.txt_left]}>{value.name}</Text>
+                </View>
+                <View style={Styles.TaskListStyle}>
+                  <Text style={[Styles.txt_left_task]}>Status : {value.documentStatusTitle}</Text>
+                </View>
+                <View style={Styles.TaskListStyle}>
+                  <Text style={[Styles.txt_left_task]}>Version : {value.documentVersion}</Text>
+                </View>
+              </TouchableOpacity>
+              <View style={{ width: "45%" }}>
+                {(value?.data?.length !== 0 &&
+                  <Dropdown
+                    containerStyle={Styles.DropDown}
+                    selectedTextStyle={Styles.selectedTextStyle}
+                    labelField="label"
+                    valueField="value"
+                    data={value?.data}
+                    activeColor={Colors.Light}
+                    maxHeight={300}
+                    renderItem={renderItem}
+                    renderRightIcon={()=>(
+                      <View style={Styles.DropDownIcon}>
+                        <AntDesign name="ellipsis1" size={normalize(25)} color={GLOBAL.OFFICIAL_BLUE_COLOR}/>
+                      </View>
+                    )}
+                    onFocus={() => setIsFocus(true)}
+                    onBlur={()  => setIsFocus(false)}
+                    onChange={item=>{
+                      ClickManagement(item);
+                    }}
+                  />
+                )}
+                {/*<View style={{marginLeft:'auto',marginTop:15 }}>*/}
+                {/*<Entypo size={normalize(25)} color={Colors.button} name={'heart-outlined'}/>*/}
+                {/*</View>*/}
+              </View>
+            </View>
+        }
+
         <Modal
           animationType="slide"
           transparent={true}

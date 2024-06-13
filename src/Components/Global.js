@@ -229,5 +229,6 @@ module.exports = {
   relatedName:"",
   relatedId:0,
   TaskRelatedCheck:"",
-
+  OrgKeyValue:'',
+  Email:''
 };
