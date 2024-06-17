@@ -931,7 +931,8 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
     if( GLOBAL.TaskRelatedNameId!==''){
       getInfo()
     }
-
+    setcategoryEntityShow('y');
+    Task_subcategory(1);
     if(GLOBAL.TaskRelatedCheck!==''){
       setCategoryId(GLOBAL?.categoryId);
       setSelectedcategory({label:"Maintenance",value:"4",_index:2});
@@ -3102,6 +3103,10 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   onChangeText={handleChange("Title")}
                   onFocus={() => setFieldTouched("Title")}
                   multiline={true}
+                  onBlur={() => {
+                    if(values.Title!=='')
+                    setShowBackBtn(false);
+                  }}
                   placeholderTextColor={"#fff"} />
                 {touched.Title && errors.Title &&
                 <Text style={{ fontSize: 12, color: "#FF0D10",marginTop:normalize(10) }}>{errors.Title}</Text>
@@ -3130,7 +3135,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   onFocus={() => setIsFocus(true)}
                   onBlur={() => setIsFocus(false)}
                   onChange={item=> {
-                    console.log(item,'item')
+                    setShowBackBtn(false)
                     setSelectedcategory(item);
                     setCategoryId(item.value);
                     writeDataStorage(GLOBAL.Category_Last_Info,item.value);
@@ -3170,6 +3175,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   onFocus={() => setIsFocus(true)}
                   onBlur={() => setIsFocus(false)}
                   onChange={item=> {
+                    setShowBackBtn(false)
                     setselectedWorkType(item);
                     setWorkTypeId(item.value);
                     writeDataStorage(GLOBAL.WorkType_Last_Info,item.value)
@@ -3203,6 +3209,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   onFocus={() => setIsFocus(true)}
                   onBlur={() => setIsFocus(false)}
                   onChange={item=> {
+                    setShowBackBtn(false)
                     setselectedpriority(item);
                     setpriorityId(item.value);
                     writeDataStorage(GLOBAL.priorityId_Last_Info,item.value)
@@ -3237,6 +3244,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                       onFocus={() => setIsFocusrelated(true)}
                       onBlur={() => setIsFocusrelated(false)}
                       onChange={item=> {
+                        setShowBackBtn(false)
                         FindCategoryId(item)
                         setselectedrelatedname(item);
                         setTaskRelatedNameId(item.value);
@@ -3270,6 +3278,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                         onFocus={() => setIsFocusrelated(true)}
                         onBlur={() => setIsFocusrelated(false)}
                         onChange={item=> {
+                          setShowBackBtn(false)
                           writeDataStorage(GLOBAL.projectId_Last_Info,item.value)
                           GLOBAL.ProjectId=item.value;
                           if(RelatedNameLvalue==='project') {
@@ -3308,6 +3317,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                           onFocus={() => setIsFocusrelated(true)}
                           onBlur={() => setIsFocusrelated(false)}
                           onChange={item=> {
+                            setShowBackBtn(false)
                             GLOBAL.SiteId=item.value;
                             writeDataStorage(GLOBAL.siteId_Last_Info,item.value)
                             if(RelatedNameLvalue==='Site') {
@@ -3347,6 +3357,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                         onFocus={() => setIsFocusrelated(true)}
                         onBlur={() => setIsFocusrelated(false)}
                         onChange={item=> {
+                          setShowBackBtn(false)
                           writeDataStorage(GLOBAL.unitId_Last_Info,item.value)
                           GLOBAL.UnitId=item.value
                           if(RelatedNameLvalue==='Unit') {
@@ -3387,6 +3398,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                         onFocus={() => setIsFocusrelated(true)}
                         onBlur={() => setIsFocusrelated(false)}
                         onChange={item=> {
+                          setShowBackBtn(false)
                           writeDataStorage(GLOBAL.sectionId_Last_Info,item.value)
                           GLOBAL.SectionId=item.value
                           if(RelatedNameLvalue==='Section') {
@@ -3427,6 +3439,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                         onFocus={() => setIsFocusrelated(true)}
                         onBlur={() => setIsFocusrelated(false)}
                         onChange={item=> {
+                          setShowBackBtn(false)
                           writeDataStorage(GLOBAL.featureId_Last_Info,item.value)
                           if(RelatedNameLvalue==='Feature') {
                             setselectedfeatureName(item);
@@ -3484,6 +3497,10 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                     onChangeText={handleChange("TaskNote")}
                     onFocus={() => setFieldTouched("TaskNote")}
                     multiline={true}
+                    onBlur={() => {
+                      if(values.TaskNote!=='')
+                        setShowBackBtn(false);
+                    }}
                     placeholderTextColor={'#fff'} />
                   {
                     started===''&&end===''?

@@ -81,6 +81,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
       Task_category();
      Task_priority();
     Task_WorkTypeList(2)
+
   }, []);
   const Task_WorkTypeList =async (Id) => {
     let WorkType_Info =JSON.parse(await AsyncStorage.getItem(GLOBAL.WorkType_Last_Info));
@@ -936,7 +937,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
               <View style={[Styles.With100NoFlex]}>
                 <TextInputI onChangeText={(value) => {
                   AddTask(value);
-                }} numberValue={24} modules={modules} Taskpriority={Taskpriority}  setTaskpriority={setTaskpriority}
+                }} numberValue={24} modules={modules} Taskpriority={Taskpriority}  setTaskpriority={setTaskpriority} setShowBackBtn={setShowBackBtn}
                             ChangeChecked={(value) => ChangeChecked(value)} Cheked={Cheked} setRelatedName={setRelatedName}
                             tittlebtn={"Add Task"} onOpen={onOpen} DeleteImage={DeleteImage} uploadType={uploadType}
                             value={value} ImageSourceviewarray={ImageSourceviewarray} setImageSourceviewarray={setImageSourceviewarray}

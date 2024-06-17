@@ -32,7 +32,7 @@ function Profile( { navigation, navigation: { goBack }}) {
   const [ShowMessage, setShowMessage] = useState(false);
   const [Message, setMessage] = useState("");
   useEffect( () => {
-    setVersionCheck('1.0.38');
+    setVersionCheck('1.0.39');
     const date=new Date();
     const Day=date.getDate();
     const Month=date.getMonth()+1;

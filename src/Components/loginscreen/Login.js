@@ -52,7 +52,7 @@ function LogIn({ navigation }) {
     const Second=date.getSeconds();
     const Full=`${Year}-${Month}-${Day} ${Hour}:${Minute}:${Second}`;
     setShowDate(Full);
-    setVersionCheck('1.0.38');
+    setVersionCheck('1.0.39');
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
     return ()=> {
       BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
