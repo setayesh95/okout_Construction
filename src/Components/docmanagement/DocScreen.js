@@ -101,7 +101,10 @@ function Doc_Management({ navigation, navigation: { goBack } }) {
       });
     });
     setdata(data)
+    if (getDoc?.length !== 0)
     setmodules(getDoc)
+    else
+      setmodules("");
   }
 
   return (
@@ -113,6 +116,12 @@ function Doc_Management({ navigation, navigation: { goBack } }) {
         <LogOutModal setshowModalDelete={setshowModalDelete} showModalDelete={showModalDelete} LogOut={LogOut} />
         }
         {
+          modules.length=== 0 ?
+            <View style={Styles.With90CenterVertical}>
+              <Text style={Styles.EmptyText}>
+                Loading ...
+              </Text>
+            </View>:
           modules !== "" ?
             <View style={[Styles.Center_margin_Bottom3]}>
               {modules && (
@@ -131,7 +140,7 @@ function Doc_Management({ navigation, navigation: { goBack } }) {
             </View> :
             <View style={Styles.With90CenterVertical}>
               <Text style={Styles.EmptyText}>
-                " No Document defined "
+                " No document assigned "
               </Text>
             </View>
         }

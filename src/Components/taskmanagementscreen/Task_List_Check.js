@@ -29,7 +29,7 @@ const data2 = [];
 const dataassigned = [];
 const data3 = [{ label: "Reopen", value: "5", Icon: "retweet" }];
 
-function Task_Management({ navigation, navigation: { goBack } }) {
+function Task_List_Check({ navigation, navigation: { goBack } }) {
   const [modules, setmodules] = useState([]);
   const [showModalDelete, setshowModalDelete] = useState(false);
   const [Cheked, setCheked] = useState(false);
@@ -81,7 +81,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       id: 2,
       Filtername: "Normal",
       Icon: "podium",
-    }, { id: 3, Filtername: "Category", Icon: "feature-search-outline" }]);
+    }, { id: 3, Filtername: "Related Name", Icon: "feature-search-outline" }]);
   const [reasons, setreasons] = useState([]);
   const [RelatedNameList, setRelatedNameList] = useState([]);
   const [TaskRelatedNameId, setTaskRelatedNameId] = useState("");
@@ -108,19 +108,13 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   const [RelatedNameLvalue, setRelatedNameLvalue] = useState('');
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
-      console.log(GLOBAL.TaskName,'GLOBAL.TaskName')
+
       if (GLOBAL.selectItem === 1 && GLOBAL.TaskName === "") {
-        console.log('My_TaskList')
         My_TaskList();
       } else if (GLOBAL.selectItem === 2 && GLOBAL.TaskName === "") {
-        console.log('Assigned_TaskList')
         Assigned_TaskList();
       } else if (GLOBAL.TaskName !== "") {
         getrelatedTask();
-        console.log('getrelatedTask')
-      }
-      else if(GLOBAL.selectItem === 1 &&GLOBAL.Url_Navigate === "InspectionUnits"){
-        My_TaskList();
       }
     });
     Task_status();
@@ -485,7 +479,6 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   ///get user add task list from asyncStorage///
   const My_TaskList = async () => {
     if (GLOBAL?.FilterTime === true || GLOBAL?.FilterStatus === true || GLOBAL?.FilterPriority === true || GLOBAL.FilterCategory === true) {
-      console.log('if')
       setmodules(GLOBAL?.FilterList);
       setMudolList(GLOBAL.List);
       setDateAll(GLOBAL.FilterTime_name);
@@ -528,12 +521,11 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       }
     }
     else {
-      console.log('else')
       let json = JSON.parse(await AsyncStorage.getItem(GLOBAL.All_Task));
       let Task_List = [];
-      console.log(json,'json')
       for (let item in json) {
         let obj = json?.[item];
+
         const Year = obj?.taskCreatedOn?.split(" ");
         const Day = Year?.[0]?.split("-");
         const W = Day?.[2]?.split(" ");
@@ -569,18 +561,20 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       }
       if (Task_List?.length !== 0) {
         Task_List?.sort(dateComparison_data);
+        // if(GLOBAL.TaskName!==''){
+        //   setMudolList(Task_List);
+        //   Make_Week_Filter_List(Task_List);
+        //   setmodules(Task_List?.filter((p) => p?.taskRelatedNameRef === GLOBAL.TaskName));
+        // }
+        // else {
         setMudolList(Task_List);
         Make_Week_Filter_List(Task_List);
-        console.log(GLOBAL.Url_Navigate,'GLOBAL.Url_Navigate')
-          if(GLOBAL.Url_Navigate==='InspectionUnits')
-            setmodules(Task_List?.filter((p) => p?.taskRelatedName === GLOBAL.relatedName&&p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"))
-          else
-           setmodules(Task_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
-        }
-       else {
+        console.log(Task_List,'Task_List')
+        setmodules(Task_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+        // }
+      } else {
         setmodules("");
       }
-      console.log(Task_List,'Task_List')
     }
   };
   ///compare  arrays by date and sort According to Year///
@@ -869,6 +863,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
           statusColorCode: "#bd04ae",
           Icon: "status",
         };
+        console.log( json?.taskStatus,' json?.taskStatus')
         let status_List_Copy = [];
         for (let item in json?.taskStatus) {
           let obj = json?.taskStatus?.[item];
@@ -2590,4 +2585,4 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   );
 }
 
-export default Task_Management;
+export default Task_List_Check;

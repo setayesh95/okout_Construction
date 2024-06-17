@@ -117,7 +117,6 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
           label: obj.priorityTitle,
         });
       }
-      console.log(A,'AAAA')
       setTaskpriority(A);
   };
   const Task_category =async () => {
@@ -156,6 +155,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
   const DataStorage=async (tasks)=>{
       getAllProjectInfo();
       getAllProjectInfo_dyb();
+    setShowMessage(false);
     await writeDataStorage(GLOBAL.All_Task,tasks);
     navigation.navigate('Task_Management')
   }
@@ -873,8 +873,8 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
       await AsyncStorage.removeItem(GLOBAL.unitId_Last_Info);
       await AsyncStorage.removeItem(GLOBAL.sectionId_Last_Info);
       await AsyncStorage.removeItem(GLOBAL.featureId_Last_Info);
-      GLOBAL.TaskRelatedNameId=''
-      GLOBAL.TaskRelatedCheck=''
+      // GLOBAL.TaskRelatedNameId=''
+      // GLOBAL.TaskRelatedCheck=''
     }
   }
 

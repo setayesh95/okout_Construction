@@ -487,21 +487,22 @@ function Doc_List_Item({
             <LinearGradient   colors={['#a39898','#786b6b','#382e2e']} style={Styles.btnListfirst}>
                   <TouchableOpacity onPress={() => {
                     if(value.task==='0'||value.task===0) {
-                      GLOBAL.selectItem = 1;
+                      GLOBAL.selectItem = 1
                       GLOBAL.TaskRelatedCheck = "Add";
                       GLOBAL.categoryId = "4";
                       GLOBAL.relatedId = value.Id;
+                      //GLOBAL.TaskName=GLOBAL.relatedName
                       GLOBAL.Url_Navigate = "InspectionUnits";
-                      Navigate_Url("Task_managementStack2");
+                      Navigate_Url("Task_managementStack3");
                     }
                     else {
                       GLOBAL.TaskRelatedCheck = "Add";
                       GLOBAL.selectItem = 1;
                       GLOBAL.categoryId = "4";
                       GLOBAL.relatedId = value.Id;
-                      GLOBAL.TaskName=GLOBAL.relatedName
+                      //GLOBAL.TaskName=GLOBAL.relatedName
                       GLOBAL.Url_Navigate = "InspectionUnits";
-                      Navigate_Url("Task_managementStack3");
+                      Navigate_Url("Task_managementStack2");
                     }
                   }}>
                     <Text style={[Styles.txt_left2, { fontSize: normalize(14) }]}>task : {value.task}</Text>

@@ -16,7 +16,7 @@ const Api = require("../Api");
 const GLOBAL = require("../Global");
 function DocCategoryScreen({ navigation, navigation: { goBack } }) {
   const [showModalDelete, setshowModalDelete] = useState(false);
-  const [modules, setmodules] = useState('');
+  const [modules, setmodules] = useState('Empty');
   const [ShowMessage, setShowMessage] = useState(false);
   const [ShowMessageDelete, setShowMessageDelete] = useState(false);
   const [Message, setMessage] = useState("");
@@ -37,7 +37,6 @@ function DocCategoryScreen({ navigation, navigation: { goBack } }) {
         let data_New = [];
         let getDoc = [];
         let data = [];
-        console.log(json,'json')
         json?.sections?.forEach((obj) => {
           getDoc.push({
             Id: obj?.sectionId,
@@ -54,7 +53,10 @@ function DocCategoryScreen({ navigation, navigation: { goBack } }) {
           });
         });
         setdata(data)
-        setmodules(getDoc)
+        if (getDoc?.length !== 0)
+          setmodules(getDoc)
+        else  if (getDoc?.length === 0)
+          setmodules("");
       });
 
     }
@@ -63,6 +65,7 @@ function DocCategoryScreen({ navigation, navigation: { goBack } }) {
   const get_document= async () => {
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.get_document + `userId=${GLOBAL.UserInformation?.userId}&sectionId=${GLOBAL.DocID}`).then(json => {
+        console.log(json)
         let getDoc = [];
         let data = [];
         let data_New = [];
@@ -115,11 +118,19 @@ if(GLOBAL.documents) {
       data: obj.data, status: obj.status,
     });
   });
+  if (data_New?.length !== 0)
+    setmodules(data_New)
+  else
+    setmodules("");
 
-  setmodules(data_New)
 }
 else {
-  setmodules(getDoc)
+
+  if (getDoc?.length !== 0)
+    setmodules(getDoc)
+  else
+    setmodules("");
+
 }
         json?.sectionMenu?.forEach((obj) => {
           data.push({
@@ -185,11 +196,18 @@ else {
             data: obj.data, status: obj.status,
           });
         });
+        if (data_New?.length !== 0)
+          setmodules(data_New)
 
-        setmodules(data_New)
+        else  if (data_New?.length === 0)
+          setmodules("");
+
       }
       else {
-        setmodules(getDoc)
+        if (getDoc?.length !== 0)
+          setmodules(getDoc)
+        else  if (getDoc?.length === 0)
+          setmodules("");
       }
       json?.sectionMenu?.forEach((obj) => {
         data.push({
@@ -325,6 +343,12 @@ else {
         <LogOutModal setshowModalDelete={setshowModalDelete} showModalDelete={showModalDelete} LogOut={LogOut} />
         }
         {
+          modules=== 'Empty' ?
+            <View style={Styles.With90CenterVertical}>
+              <Text style={Styles.EmptyText}>
+                Loading ...
+              </Text>
+            </View>:
           modules !== "" ?
             <View style={[Styles.Center_margin_Bottom3]}>
               {modules && (
@@ -341,9 +365,10 @@ else {
                 />
               )}
             </View> :
+
             <View style={Styles.With90CenterVertical}>
               <Text style={Styles.EmptyText}>
-                " No Document defined "
+                " No document assigned "
               </Text>
             </View>
         }
