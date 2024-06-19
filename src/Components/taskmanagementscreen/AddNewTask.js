@@ -240,6 +240,16 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
               setShowBtn(true);
               //setTimeout(function(){ setShowMessage(false)}, 2000)
             }
+            else{
+              setMessage(json?.msg);
+              setShowMessage(true);
+              setShowButton(true)
+              setShowBtn(true)
+              const timerId = setInterval(() => {
+                setShowMessage(false);
+              }, 4115);
+              return () => clearInterval(timerId);
+            }
           }
           else {
             setMessage("Your task successfully added");
@@ -272,6 +282,10 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
               setShowMessage(true);
               setShowButton(true)
               setShowBtn(true)
+              const timerId = setInterval(() => {
+                setShowMessage(false);
+              }, 4115);
+              return () => clearInterval(timerId);
             }
           }
           else {
