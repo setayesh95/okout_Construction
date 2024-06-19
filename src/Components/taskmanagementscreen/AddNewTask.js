@@ -52,6 +52,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
   const [ImageSourceviewarray, setImageSourceviewarray] = useState([]);
   const [RelatedNameList, setRelatedNameList] = useState([]);
   const [ShowMessage, setShowMessage] = useState(false);
+  const [ShowMessagetype, setShowMessagetype] = useState('');
   const [Message, setMessage] = useState("");
   const [error, setErrors] = useState("");
   const [TaskRelated, setTaskRelated] = useState([]);
@@ -228,6 +229,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
         }
         writePostApi("POST", Api.AddTask, formData, ImageSourceviewarray).then(json => {
           if (json) {
+            setShowMessagetype(json?.status);
             if (json?.status === true) {
               My_TaskList_server();
               setMessage(json?.msg);
@@ -254,6 +256,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
       }
       else {
         writePostApi("POST", Api.AddTask, formData).then(json => {
+          console.log(json,'json')
           if (json) {
             if (json?.status === true) {
               My_TaskList_server();
@@ -262,6 +265,12 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
               setShowButton(true)
               setCategoryId(0)
               setRelatedId(0)
+              setShowBtn(true)
+            }
+            else{
+              setMessage(json?.msg);
+              setShowMessage(true);
+              setShowButton(true)
               setShowBtn(true)
             }
           }
@@ -915,7 +924,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
                 Title={"Add New Task"} />
         {ShowMessage === true ?
           <View style={{ width: "100%", alignItems: "center", justifyContent: "center" }}>
-            <View style={Styles.flashMessageSuccsess}>
+            <View style={ShowMessagetype===true?Styles.flashMessageSuccsess:Styles.flashMessage}>
               <View style={{ width: "10%" }} />
               <View style={{ width: "80%" }}>
                 <Text style={Styles.AlertTxt}>
