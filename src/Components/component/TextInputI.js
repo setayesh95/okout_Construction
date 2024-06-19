@@ -14,6 +14,7 @@ import { Styles } from "../Styles";
 import { CheckBox } from "native-base";
 import normalize from "react-native-normalize";
 import { ButtonI } from "./ButtonI";
+import {TaskImages} from './TaskImages'
 import {Taskdropdown} from './Taskdropdown'
 import Video, {VideoRef} from 'react-native-video';
 const { width: viewportWidth } = Dimensions.get('window');
@@ -140,6 +141,9 @@ function TextInputI({ GeoAddressCity,
   const [Title, setTitle] = useState('');
   const videoError = error => {
 
+  }
+  const  navigatebtn=()=>{
+    setShowBackBtn(false)
   }
   const Task_subcategory =async (value) => {
 
@@ -3101,7 +3105,11 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   value={values.Title}
                   style={[Styles.inputStyleTask,{borderColor: GLOBAL.footertext_backgroundColor, color:GLOBAL.footertext_backgroundColor,}]}
                   onChangeText={handleChange("Title")}
-                  onFocus={() => setFieldTouched("Title")}
+                  onFocus={() => {
+                    setFieldTouched("Title");
+                    if(values.Title!=='')
+                      setShowBackBtn(false);
+                  }}
                   multiline={true}
                   onBlur={() => {
                     if(values.Title!=='')
@@ -3110,6 +3118,10 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   placeholderTextColor={"#fff"} />
                 {touched.Title && errors.Title &&
                 <Text style={{ fontSize: 12, color: "#FF0D10",marginTop:normalize(10) }}>{errors.Title}</Text>
+                }
+                {
+                  touched.Title && !errors.Title&&
+                 navigatebtn()
                 }
                 {tasktitleerro===true &&
                 <Text style={{ fontSize: 12, color: "#FF0D10",marginTop:normalize(10) }}>task Title ! Please?</Text>
@@ -3463,7 +3475,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                         return (
                           <Taskdropdown value={value} key={key} getLists={getLists} SubCategory_List={categoryLevellist} setRelatedId={setRelatedId} entityIdList={entityIdList}  setEntityIdList={setEntityIdList}
                                textStyle={Styles.txtLightColor22}  dropdownStyle={Styles.dropdowntask}   placeholderStyle={Styles.placeholderStyle}
-                                        selectedTextStyle={Styles.selectedTextStyle}
+                                        selectedTextStyle={Styles.selectedTextStyle}  setShowBackBtn={ setShowBackBtn}
                                         containerStyle={Styles.containerStyle} setRelatedName={setRelatedName}
 
                                         />
@@ -3495,7 +3507,11 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                       ,color: GLOBAL.footertext_backgroundColor
                     }]}
                     onChangeText={handleChange("TaskNote")}
-                    onFocus={() => setFieldTouched("TaskNote")}
+                    onFocus={() => {
+                      setFieldTouched("TaskNote");
+                      if(values.TaskNote!=='')
+                        setShowBackBtn(false);
+                    }}
                     multiline={true}
                     onBlur={() => {
                       if(values.TaskNote!=='')
@@ -3515,6 +3531,10 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   }
 
                 </View>
+                {
+                  touched.TaskNote && !errors.TaskNote&&
+                  navigatebtn()
+                }
                 {touched.TaskNote && errors.TaskNote &&
                 <Text style={{ fontSize: 12, color: "#FF0D10",marginTop:normalize(10) }}>{errors.TaskNote}</Text>
                 }
@@ -3533,33 +3553,34 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                       {
                         ImageSourceviewarray.map((value,key) => {
                           return (
-                            <View key={key} style={Styles.UnitDetailImageBoxFeatureStyle2}>
-                              {
-                                value.type==='video/mp4'?
-                                  <>
-                                    <TouchableOpacity onPress={()=>DeleteImage(value.uri)} style={Styles.UnitDetailAddTextBox234}>
-                                      <MaterialCommunityIcons name={"delete"} size={17} color={'#fff'} />
-                                    </TouchableOpacity>
-                                    <Video
-                                      source={{ uri: value.uri }}
-                                      onError={videoError}
-                                      controls={true}
-                                      resizeMode="cover"
-                                      autoplay={false}
-                                      style={{width:190, height: normalize(200),zIndex:0,borderRadius:normalize(6)}}
-                                    />
-                                  </>:
-                                  <ImageBackground source={{uri:value.uri}}
-                                                   imageStyle={{borderRadius:normalize(6)}}
-                                                   style={Styles.UnitDetailImagestyle}
-                                                   resizeMode="stretch">
-                                    <TouchableOpacity onPress={()=>DeleteImage(value.uri)} style={Styles.UnitDetailAddTextBox}>
-                                      <MaterialCommunityIcons name={"delete"} size={17} color={'#fff'} />
-                                    </TouchableOpacity>
-                                  </ImageBackground>
-                              }
-
-                            </View>
+                            <TaskImages key={key} value={value} DeleteImage={DeleteImage} />
+                            // <View key={key} style={Styles.UnitDetailImageBoxFeatureStyle2}>
+                            //   {
+                            //     value.type==='video/mp4'?
+                            //       <>
+                            //         <TouchableOpacity onPress={()=>DeleteImage(value.uri)} style={Styles.UnitDetailAddTextBox234}>
+                            //           <MaterialCommunityIcons name={"delete"} size={17} color={'#fff'} />
+                            //         </TouchableOpacity>
+                            //         <Video
+                            //           source={{ uri: value.uri }}
+                            //           onError={videoError}
+                            //           controls={true}
+                            //           resizeMode="cover"
+                            //           autoplay={false}
+                            //           style={{width:190, height: normalize(200),zIndex:0,borderRadius:normalize(6)}}
+                            //         />
+                            //       </>:
+                            //       <ImageBackground source={{uri:value.uri}}
+                            //                        imageStyle={{borderRadius:normalize(6)}}
+                            //                        style={Styles.UnitDetailImagestyle}
+                            //                        resizeMode="stretch">
+                            //         <TouchableOpacity onPress={()=>DeleteImage(value.uri)} style={Styles.UnitDetailAddTextBox}>
+                            //           <MaterialCommunityIcons name={"delete"} size={17} color={'#fff'} />
+                            //         </TouchableOpacity>
+                            //       </ImageBackground>
+                            //   }
+                            //
+                            // </View>
                           )
                         })
                       }

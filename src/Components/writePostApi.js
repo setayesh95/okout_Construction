@@ -100,6 +100,9 @@ export async function selectPhotocamera()
     ImagePicker.openCamera({
       width: 300,
       height: 400,
+      // cropping: true,
+      // hideBottomControls:false,
+      // enableRotationGesture:true,
     }).then(response => {
       return response;
     })
@@ -115,6 +118,8 @@ export async function selectPhotocamera()
       multiple: true,
       mediaType: "photo",
       includeExif: true,
+      // cropping: true,
+      // hideBottomControls:false,
     }).then(response => {
       return response;
     })

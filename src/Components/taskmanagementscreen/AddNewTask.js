@@ -23,6 +23,8 @@ import { Warningmessage } from "../component/Warningmessage";
 import { Image,Video } from 'react-native-compressor';
 import {LogOutModal} from '../component/LogOutModal'
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+
+import PhotoEditor from "@baronha/react-native-photo-editor";
 const GLOBAL = require("../Global");
 const Api = require("../Api");
 const Photoes=require('../Photoes')
@@ -31,6 +33,7 @@ let B=[];
 let C=[];
 let D=[]
 function AddNewTask({ navigation, navigation: { goBack } }) {
+  const [photo, setPhoto] = useState({});
   const [showModalDelete, setshowModalDelete] = useState(false);
   const [value, setValue] = useState(null);
   const [selectedcategory, setSelectedcategory] = useState({label:"snag",value:"2",_index:1});
@@ -38,7 +41,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
   const [Cheked,setCheked] = useState(false);
   const [Taskcategory, setTaskcategory] = useState([]);
   const [dateType, setdateType] = useState(false);
-  const [categoryId, setCategoryId] = useState(0);
+  const [categoryId, setCategoryId] = useState(2);
   const [relatedId, setRelatedId] = useState(0);
   const [relatedName, setRelatedName] = useState('');
   const [SelectedParentTask, setSelectedParentTask] = useState(0);
@@ -184,6 +187,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
     const Second=date.getSeconds()
     const TodayDate = `${Year}-${Month}-${Day} ${Hour}:${Minute}:${Second}`;
     const formData = new FormData();
+    console.log(categoryId,'categoryId')
     if (categoryId === 0) {
       setErrors("selectedcategory");
     } else {
@@ -328,6 +332,17 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
       }
     });
   };
+  const OpenImages=async(imageUri)=>{
+    return   await PhotoEditor.open({
+      path: imageUri?.split('://')[1],
+      // path: photo.path,
+      hiddenControls:[ 'crop','save','clear'],
+      onDone:(res)=> {
+        console.log('res', res)
+      }
+    });
+  }
+
   const selectPhoto =async () => {
     onClose();
     selectPhotocamera().then(response => {
@@ -336,21 +351,39 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
       if (ImageSourceviewarray)
         A = [...ImageSourceviewarray];
       let attachmentId=0;
+
+      // PhotoEditor.open({
+      //   path:response.path?.split('://')[1],
+      //   hiddenControls:[ 'crop','save','clear'],
+      //   onDone:(res)=>{
+      //     console.log('res', res)
+      //
+      //   }})
+        // PhotoEditor.Edit({
+        //   path:RNFS.DocumentDirectoryPath + imgName
+        //
+        // }).then(res => {console.log(res,'res')})
        Image.compress( response.path, {
         maxWidth: 1000,
         quality: 0.8,
       }).then(res => {
-         A.push({
-           uri:res,
-           type:response.mime,
-           fileName:imgName,
-           attachmentId:attachmentId,
-           taskId:GLOBAL.TaskId,
-         });
-         setImageSourceviewarray(A);
-         setShowBackBtn(false)
-         A = [...A];
-      })
+         // OpenImages(res).then(res2 => {
+         //   console.log(res2,'res2')
+           A.push({
+             uri:res,
+             type:response.mime,
+             fileName:imgName,
+             attachmentId:attachmentId,
+             taskId:GLOBAL.TaskId,
+           });
+         // })
+           setImageSourceviewarray(A);
+           setShowBackBtn(false)
+           A = [...A];
+
+         })
+
+      // })
     });
   };
 
@@ -849,9 +882,6 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
             </TouchableOpacity>
           </>:null
       }
-
-
-
     </View>
   )
   const DeleteImage=(uri)=>{
