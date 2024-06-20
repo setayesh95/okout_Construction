@@ -100,6 +100,7 @@ export async function selectPhotocamera()
     ImagePicker.openCamera({
       width: 300,
       height: 400,
+
       // cropping: true,
       // hideBottomControls:false,
       // enableRotationGesture:true,

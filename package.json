@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
-    "@baronha/react-native-photo-editor": "^1.1.6",
     "@react-native-async-storage/async-storage": "^1.19.3",
     "@react-native-community/netinfo": "^9.4.1",
     "@react-native-voice/voice": "^3.2.3",
@@ -49,6 +48,7 @@
     "react-native-maps": "^1.11.3",
     "react-native-modalize": "^2.1.1",
     "react-native-normalize": "^1.0.1",
+    "react-native-photo-editor": "^1.0.13",
     "react-native-reanimated": "^3.4.2",
     "react-native-responsive-dimensions": "^3.1.1",
     "react-native-responsive-fontsize": "^0.5.1",
@@ -59,6 +59,7 @@
     "react-native-svg-uri": "^1.2.3",
     "react-native-vector-icons": "^10.0.0",
     "react-native-video": "^6.1.2",
+    "react-native-view-shot": "^3.8.0",
     "react-native-web": "^0.19.10",
     "react-native-web-linear-gradient": "^1.1.2",
     "rn-fetch-blob": "^0.12.0",

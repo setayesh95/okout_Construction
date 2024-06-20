@@ -5,7 +5,7 @@ import normalize from "react-native-normalize/src/index";
 import React, { useEffect, useState } from "react";
 import Video from "react-native-video";
 const GLOBAL = require("../Global");
-function TaskImages({ key,value,DeleteImage
+function TaskImages({ index,value,DeleteImage
                     }) {
 
   const [SelectItem,setSelectItem]=useState('');
@@ -14,7 +14,7 @@ function TaskImages({ key,value,DeleteImage
   }
   return(
 
-      <View key={key} style={Styles.UnitDetailImageBoxFeatureStyle2}>
+      <View index={key} style={Styles.UnitDetailImageBoxFeatureStyle2}>
         {
           value.type==='video/mp4'?
             <>
@@ -31,6 +31,7 @@ function TaskImages({ key,value,DeleteImage
               />
             </>:
             <>
+
               <ImageBackground source={{uri:value.uri}}
                                imageStyle={{borderRadius:normalize(6)}}
                                style={Styles.UnitDetailImagestyle}
@@ -40,12 +41,12 @@ function TaskImages({ key,value,DeleteImage
                 </TouchableOpacity>
 
               </ImageBackground>
-              <TextInput
-                value={SelectItem}
-                style={[Styles.inputStyletaskImages]}
-                onChangeText={(val) => setSelectItem(val)}
-                multiline={true}
-                placeholderTextColor={'#fff'} />
+              {/*<TextInput*/}
+              {/*  value={SelectItem}*/}
+              {/*  style={[Styles.inputStyletaskImages]}*/}
+              {/*  onChangeText={(val) => setSelectItem(val)}*/}
+              {/*  multiline={true}*/}
+              {/*  placeholderTextColor={'#fff'} />*/}
             </>
 
         }

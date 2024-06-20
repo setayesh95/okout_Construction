@@ -23,8 +23,8 @@ import { Warningmessage } from "../component/Warningmessage";
 import { Image,Video } from 'react-native-compressor';
 import {LogOutModal} from '../component/LogOutModal'
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-
-import PhotoEditor from "@baronha/react-native-photo-editor";
+import PhotoEditor from 'react-native-photo-editor'
+//import PhotoEditor from "@baronha/react-native-photo-editor";
 const GLOBAL = require("../Global");
 const Api = require("../Api");
 const Photoes=require('../Photoes')
@@ -41,8 +41,8 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
   const [Cheked,setCheked] = useState(false);
   const [Taskcategory, setTaskcategory] = useState([]);
   const [dateType, setdateType] = useState(false);
-  const [categoryId, setCategoryId] = useState(2);
-  const [relatedId, setRelatedId] = useState(0);
+  const [categoryId, setCategoryId] = useState('2');
+  const [relatedId, setRelatedId] = useState('');
   const [relatedName, setRelatedName] = useState('');
   const [SelectedParentTask, setSelectedParentTask] = useState(0);
   const [ParentTaskId, setParentTaskId] = useState(0);
@@ -266,8 +266,9 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
       }
       else {
         writePostApi("POST", Api.AddTask, formData).then(json => {
-          console.log(json,'json')
+          setShowMessagetype(json?.status);
           if (json) {
+            console.log(json,'json')
             if (json?.status === true) {
               My_TaskList_server();
               setMessage(json?.msg);
@@ -331,40 +332,64 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
         if (ImageSourceviewarray)
           A = [...ImageSourceviewarray];
         B = [...ImageSourceviewarray];
-        for (let item in response) {
-          let obj = response[item];
-          var getFilename = obj.path.split("/");
-          var imgName = getFilename[getFilename.length - 1];
-          let attachmentId=0;
-          Image_compress(obj.path).then(res=>{
-            A.push({
-              uri: res,
-              type: obj.mime,
-              fileName: imgName,
-              attachmentId:attachmentId,
-              taskId: GLOBAL.TaskId,
-            });
-              if(A?.length===response?.length) {
-                setImageSourceviewarray(A);
-                setShowBackBtn(false)
-                A = [...A];
-                B = [...B];
-              }
-          })
+        if(response.length===1){
+          for (let item in response) {
+            let obj = response[item];
+            var getFilename = obj.path.split("/");
+            var imgName = getFilename[getFilename.length - 1];
+            let attachmentId=0;
+              PhotoEditor.Edit({
+                path:obj.path?.split('://')[1],
+                onDone: (res) => {
+                  console.log('res : onDone', "file://" + res)
+                  Image_compress("file://" + res).then(res=>{
+                    A.push({
+                      uri: res,
+                      type: obj.mime,
+                      fileName: imgName,
+                      attachmentId:attachmentId,
+                      taskId: GLOBAL.TaskId,
+                    });
+                    if(A?.length===response?.length) {
+                      setImageSourceviewarray(A);
+                      setShowBackBtn(false)
+                      A = [...A];
+                      B = [...B];
+                    }
+                  })
+                }
+              })
+
+
+          }
         }
+        else {
+          for (let item in response) {
+            let obj = response[item];
+            var getFilename = obj.path.split("/");
+            var imgName = getFilename[getFilename.length - 1];
+            let attachmentId=0;
+              Image_compress(obj.path).then(res=>{
+                A.push({
+                  uri: res,
+                  type: obj.mime,
+                  fileName: imgName,
+                  attachmentId:attachmentId,
+                  taskId: GLOBAL.TaskId,
+                });
+                if(A?.length===response?.length) {
+                  setImageSourceviewarray(A);
+                  setShowBackBtn(false)
+                  A = [...A];
+                  B = [...B];
+                }
+              })
+          }
+        }
+
       }
     });
   };
-  const OpenImages=async(imageUri)=>{
-    return   await PhotoEditor.open({
-      path: imageUri?.split('://')[1],
-      // path: photo.path,
-      hiddenControls:[ 'crop','save','clear'],
-      onDone:(res)=> {
-        console.log('res', res)
-      }
-    });
-  }
 
   const selectPhoto =async () => {
     onClose();
@@ -374,39 +399,26 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
       if (ImageSourceviewarray)
         A = [...ImageSourceviewarray];
       let attachmentId=0;
-
-      // PhotoEditor.open({
-      //   path:response.path?.split('://')[1],
-      //   hiddenControls:[ 'crop','save','clear'],
-      //   onDone:(res)=>{
-      //     console.log('res', res)
-      //
-      //   }})
-        // PhotoEditor.Edit({
-        //   path:RNFS.DocumentDirectoryPath + imgName
-        //
-        // }).then(res => {console.log(res,'res')})
-       Image.compress( response.path, {
-        maxWidth: 1000,
-        quality: 0.8,
-      }).then(res => {
-         // OpenImages(res).then(res2 => {
-         //   console.log(res2,'res2')
-           A.push({
-             uri:res,
-             type:response.mime,
-             fileName:imgName,
-             attachmentId:attachmentId,
-             taskId:GLOBAL.TaskId,
-           });
-         // })
-           setImageSourceviewarray(A);
-           setShowBackBtn(false)
-           A = [...A];
-
-         })
-
-      // })
+      PhotoEditor.Edit({
+        path:response.path?.split('://')[1],
+        onDone: (res) => {
+          Image.compress("file://" + res, {
+            maxWidth: 1000,
+            quality: 0.6,
+          }).then(res => {
+            A.push({
+              uri:res,
+              type:response.mime,
+              fileName:imgName,
+              attachmentId:attachmentId,
+              taskId:GLOBAL.TaskId,
+            });
+            setImageSourceviewarray(A);
+            setShowBackBtn(false)
+            A = [...A];
+          })
+        }
+      })
     });
   };
 
@@ -938,6 +950,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
                 Title={"Add New Task"} />
         {ShowMessage === true ?
           <View style={{ width: "100%", alignItems: "center", justifyContent: "center" }}>
+            {console.log(ShowMessagetype)}
             <View style={ShowMessagetype===true?Styles.flashMessageSuccsess:Styles.flashMessage}>
               <View style={{ width: "10%" }} />
               <View style={{ width: "80%" }}>
@@ -1008,7 +1021,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
                             selectedrelatedname={selectedrelatedname} setselectedrelatedname={setselectedrelatedname}
                             selectedsectionName={selectedsectionName} setselectedsectionName={setselectedsectionName} setWorkTypeId={setWorkTypeId}
                             setselectedWorkType={setselectedWorkType} selectedWorkType={selectedWorkType} TaskWorkType={TaskWorkType}
-                            selectedpriority={selectedpriority} setselectedpriority={setselectedpriority}
+                            selectedpriority={selectedpriority} setselectedpriority={setselectedpriority} setShowMessagetype={setShowMessagetype}
                             priorityId={priorityId} setpriorityId={setpriorityId} ShowBtn={ShowBtn} setShowBtn={setShowBtn}
                             setErrors={setErrors} setShowButton={setShowButton} WorkTypeId={WorkTypeId} relatedId={relatedId}
                             Add_Task_Offline2={Add_Task_Offline2} My_TaskList_server2={My_TaskList_server2} getAllProjectInfo={getAllProjectInfo}

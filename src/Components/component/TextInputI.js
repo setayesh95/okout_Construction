@@ -91,7 +91,7 @@ function TextInputI({ GeoAddressCity,
                       My_TaskList_server2,getAllProjectInfo_dyb,getAllProjectInfo,setMessage,setRelatedNameList,Parentlist,setselectparentId,
                       selectparentname, setselectparentname,DirectoryUser,DirectoryUserName,setDirectoryUserName,setDirectoryUserId,
                       setOpenEnd,DateFormat,DateFormatEnd,Status,StatusName,setStatusName,setStatusId,selectFile,filename,Recipient,
-                      RecipientName,setRecipientName,RecipientId,setRecipientId,setRelatedName,uploadType
+                      RecipientName,setRecipientName,RecipientId,setRecipientId,setRelatedName,uploadType,setShowMessagetype
                     }) {
   const { navigate } = useNavigation();
   const player = useRef(null);
@@ -137,6 +137,9 @@ function TextInputI({ GeoAddressCity,
   const [end, setEnd] = useState('');
   const [started, setStarted] = useState('');
   const [results, setResults] = useState('');
+  const [endtitle, setEndtitle] = useState('');
+  const [startedtitle, setStartedtitle] = useState('');
+  const [resultstitle, setResultstitle] = useState('');
   const [partialResults, setPartialResults] = useState([]);
   const [Title, setTitle] = useState('');
   const videoError = error => {
@@ -621,6 +624,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
           }
           writePostApi("POST", Api.AddTask, formData, ImageSourceviewarray).then(json => {
             if (json) {
+              setShowMessagetype(json?.status);
               if (json?.status === true) {
                 My_TaskList_server2();
                 getAllProjectInfo();
@@ -636,6 +640,16 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                 setShowButton(true)
                 setShowBtn(true)
                 setTimeout(function(){ setShowMessage(false)}, 4000)
+              }
+              else{
+                setMessage(json?.msg);
+                setShowMessage(true);
+                setShowButton(true)
+                setShowBtn(true)
+                const timerId = setInterval(() => {
+                  setShowMessage(false);
+                }, 4115);
+                return () => clearInterval(timerId);
               }
             }
             else {
@@ -655,6 +669,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
         else {
           writePostApi("POST", Api.AddTask, formData).then(json => {
             if (json) {
+              setShowMessagetype(json?.status);
               if (json?.status === true) {
                 values.TaskNote=''
                 values.Title='';
@@ -669,6 +684,16 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                 setShowButton(true)
                 setShowBtn(true)
                 setTimeout(function(){ setShowMessage(false)}, 4000)
+              }
+              else{
+                setMessage(json?.msg);
+                setShowMessage(true);
+                setShowButton(true)
+                setShowBtn(true)
+                const timerId = setInterval(() => {
+                  setShowMessage(false);
+                }, 4115);
+                return () => clearInterval(timerId);
               }
             }
             else {
@@ -962,8 +987,10 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
     setGeoAddressCity('')
   }
   const onSpeechStart = (e) => {
-
-    setStarted('√');
+    if(GLOBAL.Type==='Description')
+      setStarted('√');
+    else if(GLOBAL.Type==='Title')
+      setStartedtitle('√');
 
   };
   const onSpeechRecognized = (e) => {
@@ -971,18 +998,25 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
   };
 
   const onSpeechEnd = (e) => {
+    if(GLOBAL.Type==='Description')
+    { setEnd('');
+      setStarted('');}
+    else if(GLOBAL.Type==='Title')
+    {
+      setEndtitle('');
+      setStartedtitle('');
+    }
 
-    setEnd('');
-    setStarted('');
 
   };
 
   const onSpeechResults = (e) => {
     let result=e.value?.[0].toString();
-    if(numberValue === 25)
+    if(numberValue === 25&&GLOBAL.Type==='Description')
       setResults(value?.taskDescription +' '+result)
+      else if(GLOBAL.Type==='Title')
+      setResultstitle(value?.Title +' '+result)
     else {
-
       setResults(result);
     }
   };
@@ -993,6 +1027,17 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
     setVolume(e.value);
   };
   const _startRecognizing = async (Title) => {
+    GLOBAL.Type='Description'
+    setTitle(Title)
+    _clearState();
+    try {
+      await Voice.start('en-US');
+    } catch (e) {
+
+    }
+  };
+  const _startRecognizingtitle = async (Title) => {
+    GLOBAL.Type='Title'
     setTitle(Title)
     _clearState();
     try {
@@ -3101,21 +3146,70 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
             {({ values, handleChange, errors, setFieldTouched, touched, isValid, handleSubmit }) => (
               <View style={[Styles.formContainer2]}>
                 <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Title</Text>
-                <TextInput
-                  value={values.Title}
-                  style={[Styles.inputStyleTask,{borderColor: GLOBAL.footertext_backgroundColor, color:GLOBAL.footertext_backgroundColor,}]}
-                  onChangeText={handleChange("Title")}
-                  onFocus={() => {
-                    setFieldTouched("Title");
-                    if(values.Title!=='')
-                      setShowBackBtn(false);
-                  }}
-                  multiline={true}
-                  onBlur={() => {
-                    if(values.Title!=='')
-                    setShowBackBtn(false);
-                  }}
-                  placeholderTextColor={"#fff"} />
+                <View style={[{
+                  borderWidth:0.5,
+                  borderColor:GLOBAL.footertext_backgroundColor,
+                  borderRadius: normalize(6),
+                  padding: 12,
+                  marginBottom: 5,
+                  width: '100%',
+                  paddingVertical: 4,
+                  color: GLOBAL.OFFICIAL_BLUE_COLOR,
+                  justifyContent: "center",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }]}>
+                  <TextInput
+                    value={values.Title}
+                    style={[{
+                      width: '97%',
+                      paddingVertical: 3,
+                      fontFamily:'OpenSansBold'
+                      ,color: GLOBAL.footertext_backgroundColor
+                    }]}
+                    onChangeText={handleChange("Title")}
+                    onFocus={() => {
+                      setFieldTouched("Title");
+                      if(values.Title!=='')
+                        setShowBackBtn(false);
+                    }}
+                    multiline={true}
+                    onBlur={() => {
+                      if(values.Title!=='')
+                        setShowBackBtn(false);
+                    }}
+                    placeholderTextColor={'#fff'} />
+                  {
+                    //const [endtitle, setEndtitle] = useState('');
+                    // const [startedtitle, setStartedtitle] = useState('');
+                    // const [resultstitle, setResultstitle] = useState('');
+                    startedtitle===''&&endtitle===''?
+                      <TouchableOpacity onPress={()=> {
+                        _startRecognizingtitle(values.Title);
+                      }} style={[{}]}>
+                        <MaterialIcons name={"keyboard-voice"} size={18} color={startedtitle===''&&endtitle===''?Colors.borderButton:Colors.Red} />
+                      </TouchableOpacity>:
+                      <View>
+                        <MaterialIcons name={"keyboard-voice"} size={18} color={startedtitle===''&&endtitle===''?Colors.borderButton:Colors.Red} />
+                      </View>
+                  }
+
+                </View>
+                {/*<TextInput*/}
+                {/*  value={values.Title}*/}
+                {/*  style={[Styles.inputStyleTask,{borderColor: GLOBAL.footertext_backgroundColor, color:GLOBAL.footertext_backgroundColor,}]}*/}
+                {/*  onChangeText={handleChange("Title")}*/}
+                {/*  onFocus={() => {*/}
+                {/*    setFieldTouched("Title");*/}
+                {/*    if(values.Title!=='')*/}
+                {/*      setShowBackBtn(false);*/}
+                {/*  }}*/}
+                {/*  multiline={true}*/}
+                {/*  onBlur={() => {*/}
+                {/*    if(values.Title!=='')*/}
+                {/*    setShowBackBtn(false);*/}
+                {/*  }}*/}
+                {/*  placeholderTextColor={"#fff"} />*/}
                 {touched.Title && errors.Title &&
                 <Text style={{ fontSize: 12, color: "#FF0D10",marginTop:normalize(10) }}>{errors.Title}</Text>
                 }
@@ -3551,9 +3645,9 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
 
                     <>
                       {
-                        ImageSourceviewarray.map((value,key) => {
+                        ImageSourceviewarray.map((value,index) => {
                           return (
-                            <TaskImages key={key} value={value} DeleteImage={DeleteImage} />
+                            <TaskImages key={index} value={value} DeleteImage={DeleteImage} />
                             // <View key={key} style={Styles.UnitDetailImageBoxFeatureStyle2}>
                             //   {
                             //     value.type==='video/mp4'?
@@ -3579,7 +3673,6 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                             //         </TouchableOpacity>
                             //       </ImageBackground>
                             //   }
-                            //
                             // </View>
                           )
                         })
