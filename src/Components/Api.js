@@ -20,6 +20,7 @@ module.exports = {
    Task_WorkType:`api/ApiTask/getWorkTypeComboList?`,
    Task_Project:`api/ApiTask/getCategoryRelatedTableComboList?`,
    RentalUnits:`api/ApiConstruction/getAllRentalUnits?`,
+   RentalSites:`api/ApiConstruction/getAllRentalUnits?`,
    Task_detail:`api/ApiTask/getSingleTask?`,
    Reason_Code:`https://demorent.okout.net/api/ApiTask/getTaskReasonCombo?`,
    getCountry:`api/ApiGetCommonInfo/getCountry`,

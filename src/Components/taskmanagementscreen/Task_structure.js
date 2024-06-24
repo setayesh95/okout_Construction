@@ -1,4 +1,4 @@
-import { Container } from "native-base";
+import { Container, Content } from "native-base";
 import { Styles } from "../Styles";
 import { Header } from "../component/Header";
 import React, { useEffect, useState } from "react";
@@ -52,13 +52,18 @@ function Taskstructure({ navigation, navigation: { goBack } }) {
     }
     catch (e) {}
   };
+  const back=()=>{
+    GLOBAL.Addtask='Add New Task';
+    goBack()
+  }
   return (
     <Container  style={{backgroundColor:GLOBAL.backgroundColor}}>
-      <Header colors={["#a39898", "#786b6b", "#382e2e"]} StatusColor={"#a39897"} onPress={goBack}
+      <Header colors={["#a39898", "#786b6b", "#382e2e"]} StatusColor={"#a39897"} onPress={back}
               Title={"Task Management"} />
       {showModalDelete &&
       <LogOutModal setshowModalDelete={setshowModalDelete} showModalDelete={showModalDelete} LogOut={LogOut} />
       }
+      <Content contentContainerStyle={{ alignItems: "center", justifyContent: "center"}}>
       <ImageBackground tintColor={"rgba(77,120,165,0.16)"} source={Photoes.Task_backgrung}
                        style={{ width: "100%", flex: 1, alignSelf: "stretch" }} resizeMode="stretch">
         <View style={Styles.container_task2}>
@@ -70,16 +75,31 @@ function Taskstructure({ navigation, navigation: { goBack } }) {
                     <LinearGradient key={key} colors={GLOBAL.task_structurelistbackgroundColor} style={Styles.ModuleBox}>
                       <TouchableOpacity onPress={() => {
                         if (value?.constModule_Name === "My Tasks") {
+                          GLOBAL.ScreenName=''
                           GLOBAL.selectItem = 1;
                           GLOBAL.TaskMenuName = "My Tasks";
                           GLOBAL.TaskName = "";
                           navigation.navigate("Task_Management");
-                        } else {
+                        } else  if (value?.constModule_Name === "WorkShop") {
+                          GLOBAL.ScreenName=''
                           GLOBAL.selectItem = 2;
                           GLOBAL.TaskMenuName = "WorkShop";
                           GLOBAL.TaskName = "";
                           navigation.navigate("Task_Management");
-                        }}
+                          GLOBAL.TaskRelatedCheck=''
+                        }
+                        else{
+                          GLOBAL.ScreenName=value?.constModule_Name
+                          GLOBAL.selectItem = 1;
+                          GLOBAL.TaskMenuName = "My "+value?.constModule_Name;
+                          GLOBAL.TaskName = "";
+                          GLOBAL.Addtask="Add new "+value?.constModule_Name;
+                          GLOBAL.TaskRelatedCheck=''
+                          GLOBAL.Url_Navigate=''
+                          navigation.navigate("Task_Management");
+                        }
+                      }
+
                       } style={{
                         width: "100%", alignItems: "center", justifyContent: "center", alignSelf: "center",
                       }}>
@@ -93,7 +113,7 @@ function Taskstructure({ navigation, navigation: { goBack } }) {
                                      justifyContent: "center",
                                      marginTop: normalize(7),
                                    }}
-                            /> :
+                            /> :  value?.constModule_Name === "WorkShop" ?
                             <Image tintColor={"#fff"} resizeMode={"contain"} source={Photoes.workshop}
                                    style={{
                                      width: "35%",
@@ -102,7 +122,44 @@ function Taskstructure({ navigation, navigation: { goBack } }) {
                                      justifyContent: "center",
                                      marginTop: normalize(7),
                                    }}
-                            />
+                            />:  value?.constModule_Name === "Support" ?
+                              <Image tintColor={"#fff"} resizeMode={"contain"} source={Photoes.Support}
+                                     style={{
+                                       width: "35%",
+                                       height: normalize(95),
+                                       alignItems: "center",
+                                       justifyContent: "center",
+                                       marginTop: normalize(7),
+                                     }}
+                              />
+                              :  value?.constModule_Name === "Property Maintenance" ?
+                                <Image tintColor={"#fff"} resizeMode={"contain"} source={Photoes.Maintenance}
+                                       style={{
+                                         width: "80%",
+                                         height: normalize(90),
+                                         alignItems: "center",
+                                         justifyContent: "center",
+                                         marginTop: normalize(7),
+                                       }}
+                                /> :  value?.constModule_Name === "Subcontract" ?
+                                <Image tintColor={"#fff"} resizeMode={"contain"} source={Photoes.Subcontract}
+                                       style={{
+                                         width: "35%",
+                                         height: normalize(90),
+                                         alignItems: "center",
+                                         justifyContent: "center",
+                                         marginTop: normalize(7),
+                                       }}
+                                /> :  value?.constModule_Name === "Snagging" ?
+                                <Image tintColor={"#fff"} resizeMode={"contain"} source={Photoes.Snagging}
+                                       style={{
+                                         width: "35%",
+                                         height: normalize(60),
+                                         alignItems: "center",
+                                         justifyContent: "center",
+                                         marginTop: normalize(7),
+                                       }}
+                                />:null
                         }
                         <Text style={Styles.txtMenuHome2}>{value.constModule_Name}</Text>
                       </TouchableOpacity>
@@ -118,6 +175,7 @@ function Taskstructure({ navigation, navigation: { goBack } }) {
           }
         </View>
       </ImageBackground>
+      </Content>
       <Footer1 onPressHome={Navigate_Url} onPressdeleteAsync={logout_Url} />
     </Container>
   );

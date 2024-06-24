@@ -67,7 +67,7 @@ function Home_meno({ navigation }) {
     if(GLOBAL.isConnected===true) {
       readOnlineApi(Api.getModulesInfoMin + `roleId=${GLOBAL.UserInformation?.roleId}&moduleType=${GLOBAL.UserInformation?.MenuType
       }`).then(json => {
-
+        console.log(json,'json')
         json?.modules?.forEach((obj) => {
           if (obj.constModule_Id === 1 || obj.constModule_Id === "1") {
             Icon = Photoes.ProjectStructure;
@@ -75,7 +75,7 @@ function Home_meno({ navigation }) {
           } else if (obj.constModule_Id === 4 || obj.constModule_Id === "4") {
             Icon = Photoes.Process;
             IconColor = ["#d7b2b2", "#715a5a", "#382e2e"];
-            GLOBAL.Submodules = obj?.subModules;
+           // GLOBAL.Submodules = obj?.subModules;
           } else if (obj.constModule_Id === 2 || obj.constModule_Id === "2") {
             Icon = Photoes.DocumentManagement;
             IconColor = ["#8bc3f8", "#4a7fb3", "#1c3045"];
@@ -190,6 +190,7 @@ function Home_meno({ navigation }) {
     if (constModule_Id === "1") {
         GLOBAL.TaskName = "";
         GLOBAL.route = "structure";
+      GLOBAL.ScreenName=''
       Navigate_Url("Project_structureStack")
 
     } else if (constModule_Id === "4") {
@@ -198,12 +199,15 @@ function Home_meno({ navigation }) {
     } else if (constModule_Id === "3") {
       GLOBAL.route = "DYB";
       GLOBAL.TaskName = "";
+      GLOBAL.ScreenName=''
       Navigate_Url("Project_structureStack")
     }
     else if (constModule_Id === "2") {
+      GLOBAL.ScreenName=''
       Navigate_Url("DocmanagementStack")
     }
     else if (constModule_Id === "7") {
+      GLOBAL.ScreenName=''
       Navigate_Url("Check_structureStack")
     }
   };
@@ -230,9 +234,12 @@ function Home_meno({ navigation }) {
             <AntDesign name={"menuunfold"} size={21} color={GLOBAL.headertext_backgroundColor} />
           </Button>
         </View>
-        <View style={{ width: "72%" }}>
+        <TouchableOpacity onPress={()=>{
+          GLOBAL.TaskName = "";
+          Navigate_Url("Task_managementStack");
+        }} style={{ width: "72%" }}>
           <Text numberOfLines={1} style={[Styles.HeaderText4,{color:GLOBAL.headertext_backgroundColor}]}>Home</Text>
-        </View>
+        </TouchableOpacity>
         <View style={{ width: "12%" }} >
           <Image style={Styles.littleImage} source={Photoes.OkoutLogo} resizeMode={"stretch"}/>
         </View>

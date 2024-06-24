@@ -1243,6 +1243,36 @@ paddingHorizontal:7,
     width: "100%",
     marginTop: normalize(4),
   },
+  dropdowntaskentity: {
+    height: normalize(35),
+    borderColor: GLOBAL.footertext_backgroundColor,
+    borderWidth: 0.5,
+    borderRadius: normalize(6),
+    paddingHorizontal: 8,
+    width: "32.5%",
+    marginTop: normalize(4),
+    marginLeft:normalize(4)
+  },
+  dropdowntaskentitySupport: {
+    height: normalize(35),
+    borderColor: GLOBAL.footertext_backgroundColor,
+    borderWidth: 0.5,
+    borderRadius: normalize(6),
+    paddingHorizontal: 8,
+    width: "99%",
+    marginTop: normalize(4),
+    marginLeft:normalize(4)
+  },
+  dropdowntaskentitymain: {
+    height: normalize(35),
+    borderColor: GLOBAL.footertext_backgroundColor,
+    borderWidth: 0.5,
+    borderRadius: normalize(6),
+    paddingHorizontal: 8,
+    width: "49%",
+    marginTop: normalize(4),
+    marginLeft:normalize(4)
+  },
   icon: {
     marginRight: 5,
   },
@@ -3851,5 +3881,12 @@ flex:1,
     height: 300,
     backgroundColor:'red'
   },
+  TaskEntityDropDown:{
+    flexDirection:'row',
+    width: '100%',
+    justifyContent: "flex-start",
+    alignItems: "center",
+    flexWrap: "wrap",
+  }
 });
 export { Styles };

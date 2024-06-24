@@ -750,6 +750,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
           });
 
         }
+        if(list?.length!==0)
         list.find((p) => p.value === Id).data=A
         if(GLOBAL.TaskRelatedNameId!==''||RelatedId_Info!=='') {
           let seacrhId=A?.find(p =>parseInt(p.value) ===parseInt( GLOBAL.ProjectId))?.value
@@ -764,6 +765,28 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
           }
           else
             getSites(categoryId,seacrhId,SubCategory_List);
+        }
+        setTaskRelated(A);
+      })
+    }
+    else {
+
+    }
+
+  };
+  const Task_RelatedList2 = (Id) => {
+    if (GLOBAL.isConnected === true)
+    {
+      readOnlineApi(Api.Task_Project+`userId=${GLOBAL.UserInformation?.userId}&categoryId=${Id}`).then(json => {
+        let A = [];
+        console.log(json?.relatedList,'json?.relatedList')
+        for (let item in json?.relatedList) {
+          let obj = json?.relatedList?.[item];
+          A.push({
+            value: obj.relatedId,
+            label: obj.relatedName,
+          });
+
         }
         setTaskRelated(A);
       })
@@ -902,11 +925,12 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
         }
   };
   const getInfo=async ()=>{
+    console.log('getInfo')
     setCategoryId(GLOBAL?.categoryId);
     setSelectedcategory({label:"Subcontract",value:"1",_index:0});
     let SubCategory_List =JSON.parse(await AsyncStorage.getItem(GLOBAL.Task_SubCategory2))
     setRelatedNameList(SubCategory_List);
-
+    console.log(SubCategory_List,'SubCategory_List')
     setcategoryEntityShow('y');
     Task_WorkTypeList(GLOBAL?.categoryId);
     Task_RelatedList('1',[],SubCategory_List);
@@ -935,7 +959,72 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
       setcategoryLevellist(SubCategory_List.filter((p)=>parseInt(p?.categoryLevel)<=5))
     }
   }
+  const getSites2=async ()=>{
+    if (GLOBAL.isConnected === true) {
+      readOnlineApi(Api.RentalUnits + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+        writeDataStorage(GLOBAL.RentalUnits_List, json?.allSiteInfo);
+        let A = [];
+        json?.allSiteInfo?.forEach((obj) => {
+          A.push({
+            value: obj.siteId,
+            label: obj.siteName,
+            units:obj.units
+          });
+        })
+        setSiteList(A);
+        getUnit2(GLOBAL.UnitId)
+        let json2=A.find((p)=>p.value===GLOBAL.UnitId)?.units
+        let B=[]
+        json2?.forEach((obj) => {
+          B.push({
+            value: obj.unitId,
+            label: obj.unitName,
+
+          });
+        })
+        setunitList(B);
+        if(GLOBAL.TaskRelatedCheck!=='') {
+          let Index=A.findIndex((p)=>p.value===GLOBAL.UnitId)
+          let Name=A.find((p)=>p.value===GLOBAL.UnitId).label
+          let Id=A.find((p)=>p.value===GLOBAL.UnitId).value
+          setselectedTaskSiteName({label:Name,value:Id,_index:Index});
+          let unit=A.find((p)=>p.value===GLOBAL.UnitId)?.units
+          let unitIndex=unit.findIndex((p)=>p.unitId===GLOBAL.relatedId)
+          setselectedunitName({label:unit.find((p)=>p.unitId===GLOBAL.relatedId)?.unitName,value:unit.find((p)=>p.unitId===GLOBAL.relatedId)?.unitId,_index:unitIndex})
+          //setselectedrelatedname({label:unit.find((p)=>p.unitId===GLOBAL.relatedId)?.unitName,value:unit.find((p)=>p.unitId===GLOBAL.relatedId)?.unitId,_index:unitIndex})
+        }
+
+      });
+    }
+    else {
+      let json = JSON.parse(await AsyncStorage.getItem(GLOBAL.RentalUnits_List));
+      let A = [];
+      json?.forEach((obj) => {
+        A.push({
+          value: obj.siteId,
+          label: obj.siteName,
+          units:obj.units
+      });
+      })
+      setSiteList(A);
+    }
+
+  }
+  const getUnit2=(value)=>{
+   let json=SiteList.find((p)=>p.value===value)?.units
+    let A=[]
+    json?.forEach((obj) => {
+      A.push({
+        value: obj.unitId,
+        label: obj.unitName,
+
+      });
+    })
+    setunitList(A);
+
+  }
   useEffect(()=>{
+    console.log(GLOBAL.TaskRelatedCheck,'GLOBAL.TaskRelatedCheck')
     if(location===undefined||location?.latitude==='') {
       if(location?.latitude==='') {
         requestLocationPermission().then(res => {
@@ -957,17 +1046,36 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
       setCheked(Boolean);
       setswitchDYB2(Boolean);
     }
+    console.log(GLOBAL.TaskRelatedNameId,'GLOBAL.TaskRelatedNameId')
     if( GLOBAL.TaskRelatedNameId!==''){
       getInfo()
     }
-    setcategoryEntityShow('y');
+    if(GLOBAL.TaskRelatedCheck===''||  GLOBAL.ScreenName!=='Snagging'&& GLOBAL.ScreenName!=='Subcontract'&&GLOBAL.ScreenName!=='Property Maintenance'&&GLOBAL.ScreenName!=='Support') {
+      setcategoryEntityShow("y");
+    }
+    if(  GLOBAL.ScreenName==='Snagging'|| GLOBAL.ScreenName==='Subcontract'||
+      GLOBAL.ScreenName==='Property Maintenance'||GLOBAL.ScreenName==='Support') {
+      setCategoryId(GLOBAL?.categoryId);
+      if(  GLOBAL.ScreenName==='Snagging'|| GLOBAL.ScreenName==='Subcontract') {
+
+        // const first = RelatedNameList.find((_, index) => !index);
+        // console.log(first,'first')
+        // console.log(RelatedNameList.find((_, index) => !index),'RelatedNameList.find((_, index) => !index)')
+        Task_RelatedList2(6);
+      }
+      else if(GLOBAL.ScreenName==='Property Maintenance'){
+        getSites2()
+      }
+    }
+
     Task_subcategory(1);
     if(GLOBAL.TaskRelatedCheck!==''){
+      getSites2()
+      setcategoryEntityShow("n")
       setCategoryId(GLOBAL?.categoryId);
       setSelectedcategory({label:"Maintenance",value:"4",_index:2});
       setRelatedId(GLOBAL.relatedId)
-      setselectedrelatedname({label:GLOBAL.relatedName,value:"0",_index:0})
-
+      setselectedrelatedname({label:GLOBAL.relatedName,value:'3',_index:0})
       Task_WorkTypeList(GLOBAL?.categoryId);
     }
     if(numberValue === 25)
@@ -3180,9 +3288,6 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                     }}
                     placeholderTextColor={'#fff'} />
                   {
-                    //const [endtitle, setEndtitle] = useState('');
-                    // const [startedtitle, setStartedtitle] = useState('');
-                    // const [resultstitle, setResultstitle] = useState('');
                     startedtitle===''&&endtitle===''?
                       <TouchableOpacity onPress={()=> {
                         _startRecognizingtitle(values.Title);
@@ -3220,81 +3325,95 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                 {tasktitleerro===true &&
                 <Text style={{ fontSize: 12, color: "#FF0D10",marginTop:normalize(10) }}>task Title ! Please?</Text>
                 }
-                <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Category</Text>
-                <Dropdown
-                  style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
-                  placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
-                  selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
-                  inputSearchStyle={Styles.inputSearchStyle}
-                  iconStyle={Styles.iconStyle}
-                  itemTextStyle={Styles.itemTextStyle}
-                  data={Taskcategory}
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  disabled={true}
-                  placeholder={!isFocus ? 'Select category' : '...'}
-                  searchPlaceholder="Search..."
-                  value={selectedcategory}
-                  containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
-                  renderItem={renderItem}
-                  onFocus={() => setIsFocus(true)}
-                  onBlur={() => setIsFocus(false)}
-                  onChange={item=> {
-                    setShowBackBtn(false)
-                    setSelectedcategory(item);
-                    setCategoryId(item.value);
-                    writeDataStorage(GLOBAL.Category_Last_Info,item.value);
-                    Task_WorkTypeList(item.value);
-                    setcategoryEntityShow(item.categoryEntityShow);
-                    Task_subcategory(item.value)
-                  }}
-                  renderSelectedItem={(item, unSelect) => (
-                    <TouchableOpacity  onPress={() => unSelect && unSelect(item)}>
-                      <View style={Styles.selectedStyle2}>
-                        <Text style={Styles.selectedTextStyle2}>{item.label}</Text>
-                        <AntDesign color="#fff" name="delete" size={15} />
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                />
-                {error==='selectedcategory' && selectedcategory==='' ?
-                  <Text style={{fontSize: 12,color:"#FF0D10",marginTop:normalize(10)}}>Select category! Please?</Text>:null
+
+                  {
+                    GLOBAL.ScreenName==='Snagging'|| GLOBAL.ScreenName==='Subcontract'|| GLOBAL.ScreenName==='Property Maintenance'|| GLOBAL.ScreenName==='Support'?null:
+                      <>
+                        <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Category</Text>
+                        <Dropdown
+                          style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
+                          placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
+                          selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
+                          inputSearchStyle={Styles.inputSearchStyle}
+                          iconStyle={Styles.iconStyle}
+                          itemTextStyle={Styles.itemTextStyle}
+                          data={Taskcategory}
+                          maxHeight={300}
+                          labelField="label"
+                          valueField="value"
+                          disabled={true}
+                          placeholder={!isFocus ? 'Select category' : '...'}
+                          searchPlaceholder="Search..."
+                          value={selectedcategory}
+                          containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
+                          renderItem={renderItem}
+                          onFocus={() => setIsFocus(true)}
+                          onBlur={() => setIsFocus(false)}
+                          onChange={item=> {
+                            setShowBackBtn(false)
+                            setSelectedcategory(item);
+                            setCategoryId(item.value);
+                            writeDataStorage(GLOBAL.Category_Last_Info,item.value);
+                            Task_WorkTypeList(item.value);
+                            setcategoryEntityShow(item.categoryEntityShow);
+                            Task_subcategory(item.value)
+                          }}
+                          renderSelectedItem={(item, unSelect) => (
+                            <TouchableOpacity  onPress={() => unSelect && unSelect(item)}>
+                              <View style={Styles.selectedStyle2}>
+                                <Text style={Styles.selectedTextStyle2}>{item.label}</Text>
+                                <AntDesign color="#fff" name="delete" size={15} />
+                              </View>
+                            </TouchableOpacity>
+                          )}
+                        />
+                        {error==='selectedcategory' && selectedcategory==='' ?
+                          <Text style={{fontSize: 12,color:"#FF0D10",marginTop:normalize(10)}}>Select category! Please?</Text>:null
+                        }
+                      </>
+                  }
+
+                {
+                  GLOBAL.ScreenName==='Support'?null:
+                    <>
+                      <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Work Type</Text>
+                      <Dropdown
+                        style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
+                        placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
+                        selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
+                        inputSearchStyle={Styles.inputSearchStyle}
+                        iconStyle={Styles.iconStyle}
+                        itemTextStyle={Styles.itemTextStyle}
+                        data={TaskWorkType}
+                        maxHeight={300}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={!isFocus ? 'Select Work Type' : '...'}
+                        searchPlaceholder="Search..."
+                        value={selectedWorkType}
+                        containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
+                        renderItem={renderItem}
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={item=> {
+                          setShowBackBtn(false)
+                          setselectedWorkType(item);
+                          setWorkTypeId(item.value);
+                          writeDataStorage(GLOBAL.WorkType_Last_Info,item.value)
+                        }}
+                        renderSelectedItem={(item, unSelect) => (
+                          <TouchableOpacity  onPress={() => unSelect && unSelect(item)}>
+                            <View style={Styles.selectedStyle2}>
+                              <Text style={Styles.selectedTextStyle2}>{item.label}</Text>
+                              <AntDesign color="#fff" name="delete" size={15} />
+                            </View>
+                          </TouchableOpacity>
+                        )}
+                      />
+                    </>
                 }
-                <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Work Type</Text>
-                <Dropdown
-                  style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
-                  placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
-                  selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
-                  inputSearchStyle={Styles.inputSearchStyle}
-                  iconStyle={Styles.iconStyle}
-                  itemTextStyle={Styles.itemTextStyle}
-                  data={TaskWorkType}
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  placeholder={!isFocus ? 'Select Work Type' : '...'}
-                  searchPlaceholder="Search..."
-                  value={selectedWorkType}
-                  containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
-                  renderItem={renderItem}
-                  onFocus={() => setIsFocus(true)}
-                  onBlur={() => setIsFocus(false)}
-                  onChange={item=> {
-                    setShowBackBtn(false)
-                    setselectedWorkType(item);
-                    setWorkTypeId(item.value);
-                    writeDataStorage(GLOBAL.WorkType_Last_Info,item.value)
-                  }}
-                  renderSelectedItem={(item, unSelect) => (
-                    <TouchableOpacity  onPress={() => unSelect && unSelect(item)}>
-                      <View style={Styles.selectedStyle2}>
-                        <Text style={Styles.selectedTextStyle2}>{item.label}</Text>
-                        <AntDesign color="#fff" name="delete" size={15} />
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                />
+
+
                 <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Priority</Text>
 
                 <Dropdown
@@ -3329,7 +3448,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                     </TouchableOpacity>
                   )}
                 />
-                {categoryEntityShow==='y'?
+                {categoryEntityShow==='y' ?
                   <>
                     <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Target Entity </Text>
                     <Dropdown
@@ -3361,6 +3480,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                     />
                   </>:null
                 }
+
                 {
                   GLOBAL.TaskRelatedNameId!==''?
                   <>
@@ -3563,7 +3683,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                     }
 
                     </>
-                        :
+                       :
                       <>
                       {categoryLevellist?.map((value, key) => {
                         return (
@@ -3576,6 +3696,294 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                         );
                       })}
                     </>
+                }
+                {
+                  GLOBAL.ScreenName==='Snagging'|| GLOBAL.ScreenName==='Subcontract'?
+                  <>
+                  <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Project</Text>
+                  <Dropdown
+                  style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
+                  placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
+                  selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
+                  iconStyle={Styles.iconStyle}
+                  itemTextStyle={Styles.itemTextStyle}
+                  containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
+                  data={TaskRelated}
+                  search
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={!isFocusrelated ? 'Select Project ' : '...'}
+                  searchPlaceholder="Search..."
+                  value={selectedrelated}
+                  renderItem={renderItem}
+                  onFocus={() => setIsFocusrelated(true)}
+                  onBlur={() => setIsFocusrelated(false)}
+                  onChange={item=> {
+                  setShowBackBtn(false)
+                  writeDataStorage(GLOBAL.projectId_Last_Info,item.value)
+                  GLOBAL.ProjectId=item.value;
+                  const categoryId= RelatedNameList.find((p)=>p.categoryLevel==='2')?.value
+                  getSites(categoryId,item.value);
+                  setSelectedrelated(item);
+                  setselectedrelatedname(item)
+                  setTaskProjectId(item.value)
+                  setRelatedId(item.value);
+                  writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
+                }}
+                  />
+
+
+
+                  <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Site</Text>
+                  <Dropdown
+                  style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
+                  placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
+                  selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
+                  iconStyle={Styles.iconStyle}
+                  itemTextStyle={Styles.itemTextStyle}
+                  containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
+                  data={SiteList}
+                  search
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={!isFocusrelated ? 'Select Site' : '...'}
+                  searchPlaceholder="Search..."
+                  value={selectedTaskSiteName}
+                  renderItem={renderItem}
+                  onFocus={() => setIsFocusrelated(true)}
+                  onBlur={() => setIsFocusrelated(false)}
+                  onChange={item=> {
+                  setShowBackBtn(false)
+                  GLOBAL.SiteId=item.value;
+                  writeDataStorage(GLOBAL.siteId_Last_Info,item.value)
+                    setselectedrelatedname(item)
+                  setRelatedId(item.value)
+                  writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
+                  const categoryId= RelatedNameList.find((p)=>p.categoryLevel==='3')?.value
+                  getUnits(categoryId,item.value);
+                  setselectedTaskSiteName(item);
+                  setTaskSiteId(item.value)
+                }}
+                  />
+
+
+                  <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Unit</Text>
+                  <Dropdown
+                  style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
+                  placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
+                  selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
+                  iconStyle={Styles.iconStyle}
+                  itemTextStyle={Styles.itemTextStyle}
+                  containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={!isFocusrelated ? 'Select unit' : '...'}
+                  searchPlaceholder="Search..."
+                  value={selectedunitName}
+                  data={unitList}
+                  search
+                  renderItem={renderItem}
+                  onFocus={() => setIsFocusrelated(true)}
+                  onBlur={() => setIsFocusrelated(false)}
+                  onChange={item=> {
+                  setShowBackBtn(false)
+                  writeDataStorage(GLOBAL.unitId_Last_Info,item.value)
+                  GLOBAL.UnitId=item.value
+
+                    setselectedrelatedname(item)
+                  setRelatedId(item.value)
+                  writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
+                  const categoryId= RelatedNameList.find((p)=>p.categoryLevel==='4')?.value
+                  getSection(categoryId,item.value);
+                  setselectedunitName(item);
+                  setTaskunitId(item.value)
+
+                }}
+                  />
+
+                  <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Section</Text>
+                  <Dropdown
+                  style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
+                  placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
+                  selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
+                  inputSearchStyle={Styles.inputSearchStyle}
+                  iconStyle={Styles.iconStyle}
+                  itemTextStyle={Styles.itemTextStyle}
+                  data={sectionList}
+                  search
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={!isFocusrelated ? 'Select Section' : '...'}
+                  searchPlaceholder="Search..."
+                  value={selectedsectionName}
+                  containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
+                  renderItem={renderItem}
+                  onFocus={() => setIsFocusrelated(true)}
+                  onBlur={() => setIsFocusrelated(false)}
+                  onChange={item=> {
+                  setShowBackBtn(false)
+                  writeDataStorage(GLOBAL.sectionId_Last_Info,item.value)
+                  GLOBAL.SectionId=item.value
+                  setRelatedId(item.value)
+                  writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
+                  const categoryId= RelatedNameList.find((p)=>p.categoryLevel==='5')?.value
+                  getFeatures(categoryId,item.value);
+                  setselectedsectionName(item);
+                  setTasksectionId(item.value)
+                    setselectedrelatedname(item)
+
+                }}
+                  />
+
+
+                  <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Feature</Text>
+                  <Dropdown
+                  style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
+                  placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
+                  selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
+                  inputSearchStyle={Styles.inputSearchStyle}
+                  iconStyle={Styles.iconStyle}
+                  itemTextStyle={Styles.itemTextStyle}
+                  data={featureList}
+                  search
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={!isFocusrelated ? 'Select Feature' : '...'}
+                  searchPlaceholder="Search..."
+                  value={selectedfeatureName}
+                  containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
+                  renderItem={renderItem}
+                  onFocus={() => setIsFocusrelated(true)}
+                  onBlur={() => setIsFocusrelated(false)}
+                  onChange={item=> {
+                  setShowBackBtn(false)
+                  writeDataStorage(GLOBAL.featureId_Last_Info,item.value)
+                  setselectedfeatureName(item);
+                    setselectedrelatedname(item)
+                  setRelatedId(item.value)
+                  writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
+                }}
+                  />
+                  </>:
+                      GLOBAL.ScreenName==='Property Maintenance'||GLOBAL.TaskRelatedCheck!==''?
+                        <>
+
+                          <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Site</Text>
+                          <Dropdown
+                            style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
+                            placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
+                            selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
+                            iconStyle={Styles.iconStyle}
+                            itemTextStyle={Styles.itemTextStyle}
+                            containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
+                            data={SiteList}
+                            search
+                            maxHeight={300}
+                            labelField="label"
+                            valueField="value"
+                            placeholder={!isFocusrelated ? 'Select Site' : '...'}
+                            searchPlaceholder="Search..."
+                            value={selectedTaskSiteName}
+                            renderItem={renderItem}
+                            onFocus={() => setIsFocusrelated(true)}
+                            onBlur={() => setIsFocusrelated(false)}
+                            onChange={item=> {
+                              setShowBackBtn(false)
+                              GLOBAL.SiteId=item.value;
+                              writeDataStorage(GLOBAL.siteId_Last_Info,item.value)
+                              getUnit2(item.value)
+                              setRelatedId(item.value)
+                              if(GLOBAL.TaskRelatedCheck!=='')
+                              setselectedrelatedname({label:GLOBAL.relatedName,value:'2',_index:0})
+                              else
+                                setselectedrelatedname({label:'site',value:'2',_index:0})
+                              writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
+                                setselectedTaskSiteName(item);
+                                setTaskSiteId(item.value)
+                            }}
+                          />
+
+
+                          <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Unit</Text>
+                          <Dropdown
+                            style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
+                            placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
+                            selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
+                            iconStyle={Styles.iconStyle}
+                            itemTextStyle={Styles.itemTextStyle}
+                            containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
+                            maxHeight={300}
+                            labelField="label"
+                            valueField="value"
+                            placeholder={!isFocusrelated ? 'Select unit' : '...'}
+                            searchPlaceholder="Search..."
+                            value={selectedunitName}
+                            data={unitList}
+                            search
+                            renderItem={renderItem}
+                            onFocus={() => setIsFocusrelated(true)}
+                            onBlur={() => setIsFocusrelated(false)}
+                            onChange={item=> {
+                              setShowBackBtn(false)
+                              writeDataStorage(GLOBAL.unitId_Last_Info,item.value)
+                              GLOBAL.UnitId=item.value
+                                setselectedunitName(item);
+                                setRelatedId(item.value)
+                              if(GLOBAL.TaskRelatedCheck!=='')
+                                setselectedrelatedname({label:GLOBAL.relatedName,value:'2',_index:0})
+                              else
+                              setselectedrelatedname({label:'unit',value:'3',_index:0})
+                                writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
+                            }}
+                          />
+                        </>:
+                        GLOBAL.ScreenName==='Support'?
+<>
+
+
+                          <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Section</Text>
+                          <Dropdown
+                            style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
+                            placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
+                            selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
+                            inputSearchStyle={Styles.inputSearchStyle}
+                            iconStyle={Styles.iconStyle}
+                            itemTextStyle={Styles.itemTextStyle}
+                            data={sectionList}
+                            search
+                            maxHeight={300}
+                            labelField="label"
+                            valueField="value"
+                            placeholder={!isFocusrelated ? 'Select Section' : '...'}
+                            searchPlaceholder="Search..."
+                            value={selectedsectionName}
+                            containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
+                            renderItem={renderItem}
+                            onFocus={() => setIsFocusrelated(true)}
+                            onBlur={() => setIsFocusrelated(false)}
+                            onChange={item=> {
+                              setShowBackBtn(false)
+                              writeDataStorage(GLOBAL.sectionId_Last_Info,item.value)
+                              GLOBAL.SectionId=item.value
+                              if(RelatedNameLvalue==='Section') {
+                                setselectedsectionName(item);
+                                setRelatedId(item.value)
+                                writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
+                              }
+                              else {
+                                const categoryId= categoryLevellist.find((p)=>p.categoryLevel==='5')?.value
+                                getFeatures(categoryId,item.value);
+                                setselectedsectionName(item);
+                                setTasksectionId(item.value)
+                              }
+                            }}
+                          />
+</>:null
                 }
 
                 <Text style={[Styles.txtLightColor,{marginTop: normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Description</Text>
@@ -3741,6 +4149,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                     </View>:null
                 }
               </View>
+
             )}
           </Formik>
 

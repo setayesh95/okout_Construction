@@ -141,6 +141,9 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
 
   const Navigate_Url= (Url) => {
       navigation.navigate(Url);
+    GLOBAL.Addtask='Add New Task';
+    GLOBAL.ScreenName='';
+    GLOBAL.TaskRelatedCheck=''
   };
   ///LogOut Function///
   const LogOut = () => {
@@ -167,6 +170,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
   ///get  task list when user come from project or Dyb///
   const My_TaskList_server = async () => {
       readOnlineApi(Api.My_TaskList+`userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+        console.log(json,'json')
         DataStorage(json?.tasks)
       });
   };
@@ -947,10 +951,10 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
   return (
     <Container  style={{backgroundColor:GLOBAL.backgroundColor}}>
         <Header colors={["#a39898", "#786b6b", "#382e2e"]} StatusColor={"#a39897"} onPress={Back_navigate}
-                Title={"Add New Task"} />
+                Title={GLOBAL.Addtask} />
         {ShowMessage === true ?
           <View style={{ width: "100%", alignItems: "center", justifyContent: "center" }}>
-            {console.log(ShowMessagetype)}
+
             <View style={ShowMessagetype===true?Styles.flashMessageSuccsess:Styles.flashMessage}>
               <View style={{ width: "10%" }} />
               <View style={{ width: "80%" }}>

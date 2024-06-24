@@ -21,7 +21,7 @@ import { TextInputI } from "../component/TextInputI";
 import { isNetworkConnected } from "../GlobalConnected";
 import { Dropdown } from "react-native-element-dropdown";
 import { Taskdropdown } from "../component/Taskdropdown";
-
+import {TaskEntityDropDown} from '../component/TaskEntityDropDown'
 const GLOBAL = require("../Global");
 const Api = require("../Api");
 let A = [];
@@ -106,7 +106,22 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   const [categoryLevel, setcategoryLevel] = useState('');
   const [relatedName, setRelatedName] = useState('');
   const [RelatedNameLvalue, setRelatedNameLvalue] = useState('');
+
+
   useEffect(() => {
+    if(GLOBAL.ScreenName==='Subcontract'){
+      GLOBAL.categoryId='1'
+    }
+    else   if(GLOBAL.ScreenName==='Snagging'){
+      GLOBAL.categoryId='2'
+    }
+    else   if(GLOBAL.ScreenName==='Property Maintenance'){
+      GLOBAL.categoryId='4'
+      getSites2()
+    }
+    else   if(GLOBAL.ScreenName==='Support'){
+      //GLOBAL.categoryId='4'
+    }
     const unsubscribe = navigation.addListener("focus", () => {
       if (GLOBAL.selectItem === 1 && GLOBAL.TaskName === "") {
         My_TaskList();
@@ -122,8 +137,14 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     Task_status();
     Task_priority();
     ReasonCodeReopen(7);
-    Task_RelatedList();
+
     Task_category();
+    if( GLOBAL.ScreenName==='Snagging'|| GLOBAL.ScreenName==='Subcontract') {
+      Task_RelatedList("1");
+      Task_subcategory('1')
+    }
+    else
+      Task_RelatedList();
     // getSites();
     // getUnits();
     // getSection();
@@ -243,6 +264,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   const getSites = async (TaskRelatedNameId,value,SubCategory_List) => {
 
     const json=await getEntityInfo(TaskRelatedNameId,value)
+    console.log(json,'json')
     let A = [];
     for (let item in json?.relatedList) {
       let obj = json?.relatedList?.[item];
@@ -372,6 +394,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     }
   };
   const Task_RelatedList =async (value,list) => {
+    console.log(value,'value')
     let SubCategory_List =JSON.parse(await AsyncStorage.getItem(GLOBAL.Task_SubCategory2))
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.Task_Project + `userId=${GLOBAL.UserInformation?.userId}&categoryId=${value}`).then(json => {
@@ -389,6 +412,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
             });
           }
         }
+        console.log(RelatedList,'RelatedList')
         setTaskRelated(RelatedList);
         writeDataStorage(GLOBAL.RelatedList, json);
         if(GLOBAL.TaskRelatedNameId!=='') {
@@ -976,6 +1000,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
             data:dataList,
           });
         }
+        console.log(json?.subCategories,'json?.subCategories')
         setRelatedNameList(A);
         writeDataStorage(GLOBAL.Task_SubCategory, json);
       })
@@ -1677,9 +1702,103 @@ function Task_Management({ navigation, navigation: { goBack } }) {
           </View>
         </TouchableOpacity> : null
       }
+
+      <TaskEntityDropDown TypeName={GLOBAL.ScreenName} getSection={getSection}  getUnit2={getUnit2}
+                          selectedrelated={selectedrelated} setSelectedrelated={setSelectedrelated}
+                          setRelatedId={setRelatedId}  categoryId={categoryId}
+                           Taskcategory={Taskcategory} setCategoryId={setCategoryId}
+                          TaskRelated={TaskRelated} SiteList={SiteList} getSites={getSites}
+                          RelatedNameList={RelatedNameList} unitList={unitList} getUnits={getUnits}
+                          sectionList={sectionList} getFeatures={getFeatures} featureList={featureList}
+                          TaskRelatedNameId={TaskRelatedNameId} setTaskRelatedNameId={setTaskRelatedNameId}
+                          selectedfeatureName={selectedfeatureName} setselectedfeatureName={setselectedfeatureName}
+                          selectedTaskSiteName={selectedTaskSiteName}  setselectedTaskSiteName={setselectedTaskSiteName}
+                          selectedunitName={selectedunitName} setselectedunitName={setselectedunitName}
+                          selectedrelatedname={selectedrelatedname} setselectedrelatedname={setselectedrelatedname}
+                          selectedsectionName={selectedsectionName} setselectedsectionName={setselectedsectionName}
+                          relatedId={relatedId} FilterTaskEntityDropDown={FilterTaskEntityDropDown}/>
       <View style={Styles.SectionHeader} />
     </>
   );
+  const getSites2=async ()=>{
+    if (GLOBAL.isConnected === true) {
+      readOnlineApi(Api.RentalUnits + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+        writeDataStorage(GLOBAL.RentalUnits_List, json?.allSiteInfo);
+        let A = [];
+        json?.allSiteInfo?.forEach((obj) => {
+          A.push({
+            value: obj.siteId,
+            label: obj.siteName,
+            units:obj.units
+          });
+        })
+        setSiteList(A);
+      });
+    }
+    else {
+      let json = JSON.parse(await AsyncStorage.getItem(GLOBAL.RentalUnits_List));
+      let A = [];
+      json?.forEach((obj) => {
+        A.push({
+          value: obj.siteId,
+          label: obj.siteName,
+          units:obj.units
+        });
+      })
+      setSiteList(A);
+    }
+
+  }
+  const getUnit2=(value)=>{
+    let json=SiteList.find((p)=>p.value===value)?.units
+    let A=[]
+    json?.forEach((obj) => {
+      A.push({
+        value: obj.unitId,
+        label: obj.unitName,
+
+      });
+    })
+    setunitList(A);
+
+  }
+  const FilterTaskEntityDropDown=(Item)=>{
+
+    // if(GLOBAL.ScreenName==='Subcontract'||GLOBAL.ScreenName==='Snagging'){
+    //  if(GLOBAL.ProjectName!==''&& GLOBAL.SiteName===''&&GLOBAL.UnitName===''&& GLOBAL.SectionNamee===''&& GLOBAL.FeatureNamee===''){
+    //    setmodules(modules.filter((p)=>p.taskRelatedNameRef===GLOBAL.ProjectName))
+    //  }
+    //  else  if(GLOBAL.ProjectName!==''&& GLOBAL.SiteName!==''&&GLOBAL.UnitName===''&& GLOBAL.SectionNamee===''&& GLOBAL.FeatureNamee===''){
+    //    setmodules(modules.filter((p)=>p.taskRelatedNameRef===GLOBAL.ProjectName||p.taskRelatedNameRef===GLOBAL.SiteName))
+    //  }
+    //  else  if(GLOBAL.ProjectName!==''&& GLOBAL.SiteName!==''&&GLOBAL.UnitName!==''&& GLOBAL.SectionNamee===''&& GLOBAL.FeatureNamee===''){
+    //    setmodules(modules.filter((p)=>p.taskRelatedNameRef===GLOBAL.ProjectName||p.taskRelatedNameRef===GLOBAL.SiteName||p.taskRelatedNameRef===GLOBAL.UnitName))
+    //  }
+    // }
+    //
+    // else   if(GLOBAL.ScreenName==='Property Maintenance'){
+    //   GLOBAL.categoryId='4'
+    // }
+    // else   if(GLOBAL.ScreenName==='Support'){
+    //   //GLOBAL.categoryId='4'
+    // }
+    if  (GLOBAL.ScreenName==='Property Maintenance'){
+      if(GLOBAL.SiteName==='site')
+      {
+        setmodules(MudolList.filter((p)=>p.taskRelatedName==='site'&&p.taskCategoryName==='Maintenance'))
+      }
+        else if(GLOBAL.SiteName==='unit')
+      {
+        console.log(MudolList.filter((p)=>p.taskRelatedName==='unit'&&p.taskCategoryName==='Maintenance'),'All')
+        console.log(MudolList.filter((p)=>p.taskRelatedName==='unit'),'===\'unit\'')
+        console.log(MudolList.filter((p)=>p.taskCategoryName==='Maintenance'),'===taskCategoryName===\'Maintenance\'')
+        setmodules(MudolList.filter((p)=>p.taskRelatedName==='unit'&&p.taskCategoryName==='Maintenance'))
+      }
+      }
+      else {
+      setmodules(MudolList.filter((p)=>p.taskRelatedNameRef===Item.label))
+    }
+  }
   /// sort Task by week ///
   const SortByWeek = (startDate, endDate) => {
     let Filter = "";
@@ -1863,6 +1982,8 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     GLOBAL.FilterStatus === false
     GLOBAL.FilterPriority === false
     GLOBAL.FilterCategory === false
+    GLOBAL.ScreenName=''
+    GLOBAL.TaskRelatedCheck=''
     if (GLOBAL.TaskName !== "") {
       GLOBAL.TaskName = "";
       Navigate_Url(GLOBAL.Url_Navigate);

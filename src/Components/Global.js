@@ -55,6 +55,7 @@ module.exports = {
   AllProjectInfo_dyb:'@MySuperStore:AllProjectInfo_dyb',
   Assigned_TaskList:'@MySuperStore:Assigned_TaskList',
   RentalUnits_List:'@MySuperStore:RentalUnits_List',
+  RentalSite_List:'@MySuperStore:RentalSite_List',
   Get_Docmanage:'@MySuperStore:Get_Docmanage',
   Get_Docmanagecategory:'@MySuperStore:Get_Docmanagecategory',
   UserPermissions:'@MySuperStore:UserPermissions',
@@ -154,7 +155,10 @@ module.exports = {
   categoryId:'',
   TaskRelatedId:'',
   Subtask:'',
-  Submodules:[],
+  Submodules:[{constModule_Id:'0',constModule_Name:'Snagging'},{constModule_Id:'1',constModule_Name:'Subcontract'},
+    {constModule_Id:'2',constModule_Name:'Property Maintenance'},{constModule_Id:'3',constModule_Name:'Support'}
+    ,{constModule_Id:'6',constModule_Name:'WorkShop'}
+  ],
   CheckSubmodules:[{constModule_Name:'Check in',IconColor:[ "#8DA750", "#537B2F", "#2D5128"],constModule_Id:'1'},
     {constModule_Name:'Check out',IconColor:["#abb456", "#989a2b", "#48450B"],constModule_Id:'2'},
     {constModule_Name:'Inspection',IconColor:["#80a569", "#6c8e5a", "#33402c"],constModule_Id:'3'}],
@@ -231,5 +235,12 @@ module.exports = {
   TaskRelatedCheck:"",
   OrgKeyValue:'',
   Email:'',
-  Type:''
+  Type:'',
+  ScreenName:"",
+  Addtask:'Add New Task',
+  ProjectName:"",
+  SiteName:'',
+  UnitName:'',
+  SectionNamee:'',
+  FeatureNamee:""
 };
