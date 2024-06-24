@@ -76,6 +76,7 @@ module.exports = {
   RelatedId_Last_Info:'@MySuperStore:RelatedIdLastInfo',
   RelatedName_Last_Info:'@MySuperStore:RelatedNameLastInfo',
   priorityId_Last_Info:'@MySuperStore:priorityId_Last_Info',
+  TaskIssues:'@MySuperStore:TaskIssues',
   projectId_Last_Info:'@MySuperStore:projectId_Last_Info',
   siteId_Last_Info:'@MySuperStore:siteId_Last_Info',
   unitId_Last_Info:'@MySuperStore:unitId_Last_Info',

@@ -120,7 +120,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       getSites2()
     }
     else   if(GLOBAL.ScreenName==='Support'){
-      //GLOBAL.categoryId='4'
+      GLOBAL.categoryId='5'
     }
     const unsubscribe = navigation.addListener("focus", () => {
       if (GLOBAL.selectItem === 1 && GLOBAL.TaskName === "") {
@@ -586,6 +586,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       }
       if (Task_List?.length !== 0) {
         Task_List?.sort(dateComparison_data);
+        console.log(Task_List,'Task_List')
         setMudolList(Task_List);
         Make_Week_Filter_List(Task_List);
           if(GLOBAL.Url_Navigate==='InspectionUnits')
@@ -1789,9 +1790,6 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       }
         else if(GLOBAL.SiteName==='unit')
       {
-        console.log(MudolList.filter((p)=>p.taskRelatedName==='unit'&&p.taskCategoryName==='Maintenance'),'All')
-        console.log(MudolList.filter((p)=>p.taskRelatedName==='unit'),'===\'unit\'')
-        console.log(MudolList.filter((p)=>p.taskCategoryName==='Maintenance'),'===taskCategoryName===\'Maintenance\'')
         setmodules(MudolList.filter((p)=>p.taskRelatedName==='unit'&&p.taskCategoryName==='Maintenance'))
       }
       }

@@ -96,6 +96,7 @@ function Taskstructure({ navigation, navigation: { goBack } }) {
                           GLOBAL.Addtask="Add new "+value?.constModule_Name;
                           GLOBAL.TaskRelatedCheck=''
                           GLOBAL.Url_Navigate=''
+                          GLOBAL.TaskRelatedNameId=''
                           navigation.navigate("Task_Management");
                         }
                       }

@@ -80,6 +80,9 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
     _index: 1,
   }
   );
+  const[Taskissues, setTaskIssues] = useState([{value:'0',label:'Software bug'},{value:'1',label:'Data'},{value:'2',label:'Connection'}]);
+  const [selectedTaskissues, setselectedTaskissues] = useState('');
+  const [TaskissuesId, setTaskissuesId] = useState(0);
   const [priorityId, setpriorityId] = useState("2");
   useEffect(()=>{
       Task_category();
@@ -1028,9 +1031,11 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
                             selectedpriority={selectedpriority} setselectedpriority={setselectedpriority} setShowMessagetype={setShowMessagetype}
                             priorityId={priorityId} setpriorityId={setpriorityId} ShowBtn={ShowBtn} setShowBtn={setShowBtn}
                             setErrors={setErrors} setShowButton={setShowButton} WorkTypeId={WorkTypeId} relatedId={relatedId}
-                            Add_Task_Offline2={Add_Task_Offline2} My_TaskList_server2={My_TaskList_server2} getAllProjectInfo={getAllProjectInfo}
+                            Add_Task_Offline2={Add_Task_Offline2} My_TaskList_server2={My_TaskList_server2} getAllProjectInfo={getAllProjectInfo} Taskissues={Taskissues}
                             getAllProjectInfo_dyb={getAllProjectInfo_dyb} setMessage={setMessage} setShowMessage={setShowMessage} setRelatedNameList={setRelatedNameList}
+                            selectedTaskissues={selectedTaskissues} setselectedTaskissues={setselectedTaskissues} setTaskissuesId={setTaskissuesId}
                 />
+
               </View>
             </View>
           </View>

@@ -91,7 +91,8 @@ function TextInputI({ GeoAddressCity,
                       My_TaskList_server2,getAllProjectInfo_dyb,getAllProjectInfo,setMessage,setRelatedNameList,Parentlist,setselectparentId,
                       selectparentname, setselectparentname,DirectoryUser,DirectoryUserName,setDirectoryUserName,setDirectoryUserId,
                       setOpenEnd,DateFormat,DateFormatEnd,Status,StatusName,setStatusName,setStatusId,selectFile,filename,Recipient,
-                      RecipientName,setRecipientName,RecipientId,setRecipientId,setRelatedName,uploadType,setShowMessagetype
+                      RecipientName,setRecipientName,RecipientId,setRecipientId,setRelatedName,uploadType,setShowMessagetype,
+                      setTaskissuesId,selectedTaskissues, setselectedTaskissues,Taskissues
                     }) {
   const { navigate } = useNavigation();
   const player = useRef(null);
@@ -1024,7 +1025,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
 
   }
   useEffect(()=>{
-    console.log(GLOBAL.TaskRelatedCheck,'GLOBAL.TaskRelatedCheck')
+
     if(location===undefined||location?.latitude==='') {
       if(location?.latitude==='') {
         requestLocationPermission().then(res => {
@@ -1046,7 +1047,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
       setCheked(Boolean);
       setswitchDYB2(Boolean);
     }
-    console.log(GLOBAL.TaskRelatedNameId,'GLOBAL.TaskRelatedNameId')
+
     if( GLOBAL.TaskRelatedNameId!==''){
       getInfo()
     }
@@ -1069,6 +1070,8 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
     }
 
     Task_subcategory(1);
+    if(GLOBAL.ScreenName==='Support')
+      setcategoryEntityShow("n")
     if(GLOBAL.TaskRelatedCheck!==''){
       getSites2()
       setcategoryEntityShow("n")
@@ -3726,7 +3729,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   const categoryId= RelatedNameList.find((p)=>p.categoryLevel==='2')?.value
                   getSites(categoryId,item.value);
                   setSelectedrelated(item);
-                  setselectedrelatedname(item)
+                    setselectedrelatedname({label:'project',value:'2',_index:0})
                   setTaskProjectId(item.value)
                   setRelatedId(item.value);
                   writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
@@ -3758,7 +3761,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   setShowBackBtn(false)
                   GLOBAL.SiteId=item.value;
                   writeDataStorage(GLOBAL.siteId_Last_Info,item.value)
-                    setselectedrelatedname(item)
+                    setselectedrelatedname({label:'site',value:'2',_index:0})
                   setRelatedId(item.value)
                   writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
                   const categoryId= RelatedNameList.find((p)=>p.categoryLevel==='3')?.value
@@ -3792,8 +3795,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   setShowBackBtn(false)
                   writeDataStorage(GLOBAL.unitId_Last_Info,item.value)
                   GLOBAL.UnitId=item.value
-
-                    setselectedrelatedname(item)
+                    setselectedrelatedname({label:'unit',value:'2',_index:0})
                   setRelatedId(item.value)
                   writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
                   const categoryId= RelatedNameList.find((p)=>p.categoryLevel==='4')?.value
@@ -3834,7 +3836,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   getFeatures(categoryId,item.value);
                   setselectedsectionName(item);
                   setTasksectionId(item.value)
-                    setselectedrelatedname(item)
+                    setselectedrelatedname({label:'section',value:'2',_index:0})
 
                 }}
                   />
@@ -3864,7 +3866,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   setShowBackBtn(false)
                   writeDataStorage(GLOBAL.featureId_Last_Info,item.value)
                   setselectedfeatureName(item);
-                    setselectedrelatedname(item)
+                    setselectedrelatedname({label:'feature',value:'2',_index:0})
                   setRelatedId(item.value)
                   writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
                 }}
@@ -3944,7 +3946,40 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                         </>:
                         GLOBAL.ScreenName==='Support'?
 <>
+  <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Type of Issues</Text>
 
+  <MultiSelect
+    style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
+    placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
+    selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
+    inputSearchStyle={Styles.inputSearchStyle}
+    iconStyle={Styles.iconStyle}
+    itemTextStyle={Styles.itemTextStyle}
+    data={Taskissues}
+    maxHeight={300}
+    labelField="label"
+    valueField="value"
+    placeholder={!isFocus ? 'Select Priority' : '...'}
+    value={selectedTaskissues}
+    containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
+    renderItem={renderItem}
+    onFocus={() => setIsFocus(true)}
+    onBlur={() => setIsFocus(false)}
+    onChange={item=> {
+      setShowBackBtn(false)
+      setselectedTaskissues(item);
+      setTaskissuesId(item.value);
+      writeDataStorage(GLOBAL.TaskIssues,item.value)
+    }}
+    renderSelectedItem={(item, unSelect) => (
+      <TouchableOpacity  onPress={() => unSelect && unSelect(item)}>
+        <View style={Styles.selectedStyle2}>
+          <Text style={Styles.selectedTextStyle2}>{item.label}</Text>
+          <AntDesign color="#fff" name="delete" size={15} />
+        </View>
+      </TouchableOpacity>
+    )}
+  />
 
                           <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Section</Text>
                           <Dropdown
@@ -3970,17 +4005,14 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                               setShowBackBtn(false)
                               writeDataStorage(GLOBAL.sectionId_Last_Info,item.value)
                               GLOBAL.SectionId=item.value
-                              if(RelatedNameLvalue==='Section') {
+
                                 setselectedsectionName(item);
                                 setRelatedId(item.value)
+                                setselectedrelatedname({label:'support',value:'2',_index:0})
                                 writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
-                              }
-                              else {
-                                const categoryId= categoryLevellist.find((p)=>p.categoryLevel==='5')?.value
-                                getFeatures(categoryId,item.value);
-                                setselectedsectionName(item);
+
                                 setTasksectionId(item.value)
-                              }
+
                             }}
                           />
 </>:null

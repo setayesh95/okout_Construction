@@ -191,6 +191,7 @@ function Home_meno({ navigation }) {
         GLOBAL.TaskName = "";
         GLOBAL.route = "structure";
       GLOBAL.ScreenName=''
+      GLOBAL.Addtask='Add New Task'
       Navigate_Url("Project_structureStack")
 
     } else if (constModule_Id === "4") {
@@ -199,15 +200,18 @@ function Home_meno({ navigation }) {
     } else if (constModule_Id === "3") {
       GLOBAL.route = "DYB";
       GLOBAL.TaskName = "";
-      GLOBAL.ScreenName=''
+      GLOBAL.ScreenName='';
+      GLOBAL.Addtask='Add New Task'
       Navigate_Url("Project_structureStack")
     }
     else if (constModule_Id === "2") {
-      GLOBAL.ScreenName=''
+      GLOBAL.ScreenName='';
+      GLOBAL.Addtask='Add New Task'
       Navigate_Url("DocmanagementStack")
     }
     else if (constModule_Id === "7") {
-      GLOBAL.ScreenName=''
+      GLOBAL.ScreenName='';
+      GLOBAL.Addtask='Add New Task'
       Navigate_Url("Check_structureStack")
     }
   };
