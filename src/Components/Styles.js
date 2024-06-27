@@ -1273,6 +1273,16 @@ paddingHorizontal:7,
     marginTop: normalize(4),
     marginLeft:normalize(4)
   },
+  dropdowntaskentitymain2: {
+    height: normalize(35),
+    borderColor: GLOBAL.footertext_backgroundColor,
+    borderWidth: 0.5,
+    borderRadius: normalize(6),
+    paddingHorizontal: 8,
+    width: "100%",
+    marginTop: normalize(4),
+    marginLeft:normalize(4)
+  },
   icon: {
     marginRight: 5,
   },
@@ -3125,6 +3135,14 @@ flex:1,
     textAlign: "left",
    fontFamily:'OpenSansBold',
 
+  },
+  txt_leftModalFilterTAsk:{
+    color: GLOBAL.OFFICIAL_BLUE_COLOR,
+    fontSize: normalize(14),
+    marginVertical: normalize(12),
+    textAlign: "left",
+   fontFamily:'OpenSansBold',
+    marginLeft:normalize(10),
   },
   btntaskModalFilter:
     {

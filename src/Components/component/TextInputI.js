@@ -7,21 +7,17 @@ import {
   Dimensions,
   TouchableOpacity, Linking, Button, ImageBackground, Modal, Image, LogBox,
 } from "react-native";
-
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Styles } from "../Styles";
-import { CheckBox } from "native-base";
 import normalize from "react-native-normalize";
 import { ButtonI } from "./ButtonI";
 import {TaskImages} from './TaskImages'
 import {Taskdropdown} from './Taskdropdown'
-import Video, {VideoRef} from 'react-native-video';
 const { width: viewportWidth } = Dimensions.get('window');
 const GLOBAL = require("../Global");
 const Api = require("../Api");
 const Photoes=require('../Photoes')
-
 let RelatedId_Info=''
 const SLIDER_1_FIRST_ITEM = 0;
 function wp (percentage) {
@@ -52,6 +48,7 @@ import { writePostApi } from "../writePostApi";
 import { readOnlineApi } from "../ReadPostApi";
 import { DropDownItems } from "./DropDownItems";
 import Voice from "@react-native-voice/voice";
+import { TaskFilterDropDown } from "./TaskFilterDropDown";
 let numOfLinesCompany = 0;
 const screen = Dimensions.get('window');
 const ASPECT_RATIO = (screen.width / screen.height)/4;
@@ -62,7 +59,7 @@ const LONGITUDE_DELTA =( LATITUDE_DELTA * ASPECT_RATIO)/2;
 function TextInputI({ GeoAddressCity,
                       GeoAddressCountry,
                       GeoAddressStreet,GeoAddressPostalCode,
-                      CityList,CountryList,
+                      CityList,CountryfList,
                       Version,
                       onChangeText,
                       setCheked,
@@ -143,13 +140,26 @@ function TextInputI({ GeoAddressCity,
   const [resultstitle, setResultstitle] = useState('');
   const [partialResults, setPartialResults] = useState([]);
   const [Title, setTitle] = useState('');
+  const [RelatedNameListTask, setRelatedNameListTask] = useState([]);
   const videoError = error => {
 
   }
   const  navigatebtn=()=>{
     setShowBackBtn(false)
   }
-  const Task_subcategory =async (value) => {
+  const FilterTaskEntityDropDown=(Item)=> {
+  }
+  const getListsTask=async(TaskRelatedNameId,value)=>{
+    const json=await getEntityInfo(TaskRelatedNameId,value)
+    RelatedNameListTask.find((p)=>p.value===TaskRelatedNameId).data=[];
+    for (let item in json.relatedList) {
+      let obj = json.relatedList?.[item];
+      RelatedNameListTask.find((p)=>p.value===TaskRelatedNameId).data?.push({value: obj.relatedId,
+        label: obj.relatedName,})
+    }
+
+  }
+    const Task_subcategory =async (value) => {
 
     writeDataStorage(GLOBAL.Category_Last_Info,value);
     if (GLOBAL.isConnected === true) {
@@ -169,7 +179,9 @@ function TextInputI({ GeoAddressCity,
         }
 
         setRelatedNameList(A);
-
+        if(GLOBAL.TaskRelatedCheck!=='') {
+          A.find((p) => p.value === GLOBAL.relatedId).label = "";
+        }
         if(GLOBAL.TaskRelatedNameId!==''){
          if(GLOBAL.TaskRelatedNameId==='1') {
             setcategoryLevellist(A.filter((p)=>parseInt(p?.categoryLevel)<=2))
@@ -186,6 +198,27 @@ function TextInputI({ GeoAddressCity,
             setcategoryLevellist(A.filter((p)=>parseInt(p?.categoryLevel)<=5))
 
           }
+        }
+        else if(value==='4'||value==='5') {
+          console.log(value==='4','value===\'4\'',value)
+          setRelatedNameListTask (A);
+
+          if(value==='4'){
+
+            getSites3(A);
+          }
+
+        }
+        else if(value==='1'||value==='2')
+        {
+          setRelatedNameListTask (A);
+          console.log(A,'A: Task_subcategory')
+          const first = A?.find((_, index) => !index);
+          Task_RelatedList(first?.value,A);
+          // Task_RelatedList(Id,A);
+        }
+        else {
+          setcategoryLevellist(A)
         }
         writeDataStorage(GLOBAL.Task_SubCategory, json);
       })
@@ -205,6 +238,46 @@ function TextInputI({ GeoAddressCity,
       setRelatedNameList(A);
       }
   }
+  const getSites3=async (list)=>{
+    console.log('getSites3')
+    if (GLOBAL.isConnected === true) {
+      readOnlineApi(Api.RentalUnits + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+        writeDataStorage(GLOBAL.RentalUnits_List, json?.allSiteInfo);
+        let A = [];
+        json?.allSiteInfo?.forEach((obj) => {
+          A.push({
+            value: obj.siteId,
+            label: obj.siteName,
+            units:obj.units,
+          });
+          console.log(list,'list')
+          const first = list?.find((_, index) => !index);
+          if(list?.length!==0) {
+            list?.find((p) => p?.value ===first?.value)?.data?.push({
+              value: obj.siteId,
+              label: obj.siteName,
+            });
+          }
+        })
+
+        setRelatedNameListTask (list);
+        setSiteList(A);
+      });
+    }
+    else {
+      let json = JSON.parse(await AsyncStorage.getItem(GLOBAL.RentalUnits_List));
+      let A = [];
+      json?.forEach((obj) => {
+        A.push({
+          value: obj.siteId,
+          label: obj.siteName,
+          units:obj.units
+        });
+      })
+      setSiteList(A);
+    }
+  }
+
   const getLocation =async (coordinate) => {
     requestLocationPermission().then(res => {
       if (res) {
@@ -749,10 +822,17 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
             value: obj.relatedId,
             label: obj.relatedName,
           });
-
+          console.log(A,'A')
+          console.log(list,'list')
+          if(list?.length!==0&&list!==undefined)
+          {
+            list.find((p) => p.value ===Id).data=[]
+            list?.find((p) => p?.value ===Id)?.data?.push({
+              value: obj.relatedId,
+              label: obj.relatedName,
+            });
+          }
         }
-        if(list?.length!==0)
-        list.find((p) => p.value === Id).data=A
         if(GLOBAL.TaskRelatedNameId!==''||RelatedId_Info!=='') {
           let seacrhId=A?.find(p =>parseInt(p.value) ===parseInt( GLOBAL.ProjectId))?.value
           const categoryId= SubCategory_List.find((p)=>p.categoryLevel==='2')?.value
@@ -829,7 +909,10 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                 setSiteList(A);
                   if(GLOBAL.TaskRelatedNameId!==''||RelatedId_Info!=='') {
                     let seacrhId=A?.find(p =>parseInt(p.value) ===parseInt( GLOBAL.SiteId))?.value
-                    const categoryId= SubCategory_List.find((p)=>p.categoryLevel==='3')?.value
+                    const categoryId= SubCategory_List.find((p)=>p.categoryLevel==='3')?.value;
+                    console.log(A,'A')
+                    console.log(GLOBAL.SiteId,'GLOBAL.SiteId')
+                    console.log(A?.find(p => parseInt(p.value) ===parseInt(  GLOBAL.SiteId)),'A?.find(p => parseInt(p.value) ===parseInt(  GLOBAL.SiteId))')
                     setselectedTaskSiteName({
                       label:A?.find(p => parseInt(p.value) ===parseInt(  GLOBAL.SiteId))?.label,
                       value:A?.find(p =>parseInt(p.value) ===parseInt( GLOBAL.SiteId))?.value,
@@ -926,7 +1009,6 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
         }
   };
   const getInfo=async ()=>{
-    console.log('getInfo')
     setCategoryId(GLOBAL?.categoryId);
     setSelectedcategory({label:"Subcontract",value:"1",_index:0});
     let SubCategory_List =JSON.parse(await AsyncStorage.getItem(GLOBAL.Task_SubCategory2))
@@ -1011,18 +1093,26 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
     }
 
   }
-  const getUnit2=(value)=>{
-   let json=SiteList.find((p)=>p.value===value)?.units
+  const getUnit2=(categoryId,value)=>{
     let A=[]
+    let json=SiteList.find((p)=>p.value===value)?.units
+    console.log(json,'json',value,'value')
+    console.log(SiteList,'SiteList')
+    console.log(RelatedNameListTask,'RelatedNameListTask')
+    //RelatedNameListTask.find((p)=>p.value===categoryId).data=[];
     json?.forEach((obj) => {
       A.push({
         value: obj.unitId,
         label: obj.unitName,
-
       });
     })
-    setunitList(A);
-
+    let List_Item =RelatedNameListTask;
+    let index = List_Item?.findIndex((p) =>  p.value === categoryId);
+    let markers = [...List_Item];
+    markers[index] = {
+      ...markers[index],data:A
+    };
+    setRelatedNameListTask(markers);
   }
   useEffect(()=>{
 
@@ -1058,22 +1148,27 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
       GLOBAL.ScreenName==='Property Maintenance'||GLOBAL.ScreenName==='Support') {
       setCategoryId(GLOBAL?.categoryId);
       if(  GLOBAL.ScreenName==='Snagging'|| GLOBAL.ScreenName==='Subcontract') {
+        setcategoryEntityShow('n')
+        let Id=''
+        if( GLOBAL.ScreenName==='Subcontract')
+          Id='1'
+        else
+          Id='2'
+        Task_subcategory(Id);
 
-        // const first = RelatedNameList.find((_, index) => !index);
-        // console.log(first,'first')
-        // console.log(RelatedNameList.find((_, index) => !index),'RelatedNameList.find((_, index) => !index)')
-        Task_RelatedList2(6);
       }
       else if(GLOBAL.ScreenName==='Property Maintenance'){
-        getSites2()
+        Task_subcategory('4')
+        setcategoryEntityShow('n')
       }
     }
 
-    Task_subcategory(1);
+    Task_subcategory('1');
     if(GLOBAL.ScreenName==='Support')
       setcategoryEntityShow("n")
     if(GLOBAL.TaskRelatedCheck!==''){
-      getSites2()
+
+      Task_subcategory('4')
       setcategoryEntityShow("n")
       setCategoryId(GLOBAL?.categoryId);
       setSelectedcategory({label:"Maintenance",value:"4",_index:2});
@@ -3418,7 +3513,6 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
 
 
                 <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Priority</Text>
-
                 <Dropdown
                   style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
                   placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
@@ -3686,263 +3780,57 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                     }
 
                     </>
-                       :
-                      <>
-                      {categoryLevellist?.map((value, key) => {
-                        return (
-                          <Taskdropdown value={value} key={key} getLists={getLists} SubCategory_List={categoryLevellist} setRelatedId={setRelatedId} entityIdList={entityIdList}  setEntityIdList={setEntityIdList}
-                               textStyle={Styles.txtLightColor22}  dropdownStyle={Styles.dropdowntask}   placeholderStyle={Styles.placeholderStyle}
-                                        selectedTextStyle={Styles.selectedTextStyle}  setShowBackBtn={ setShowBackBtn}
-                                        containerStyle={Styles.containerStyle} setRelatedName={setRelatedName}
+                        :
 
-                                        />
-                        );
-                      })}
-                    </>
-                }
-                {
                   GLOBAL.ScreenName==='Snagging'|| GLOBAL.ScreenName==='Subcontract'?
-                  <>
-                  <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Project</Text>
-                  <Dropdown
-                  style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
-                  placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
-                  selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
-                  iconStyle={Styles.iconStyle}
-                  itemTextStyle={Styles.itemTextStyle}
-                  containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
-                  data={TaskRelated}
-                  search
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  placeholder={!isFocusrelated ? 'Select Project ' : '...'}
-                  searchPlaceholder="Search..."
-                  value={selectedrelated}
-                  renderItem={renderItem}
-                  onFocus={() => setIsFocusrelated(true)}
-                  onBlur={() => setIsFocusrelated(false)}
-                  onChange={item=> {
-                  setShowBackBtn(false)
-                  writeDataStorage(GLOBAL.projectId_Last_Info,item.value)
-                  GLOBAL.ProjectId=item.value;
-                  const categoryId= RelatedNameList.find((p)=>p.categoryLevel==='2')?.value
-                  getSites(categoryId,item.value);
-                  setSelectedrelated(item);
-                    setselectedrelatedname({label:'project',value:'2',_index:0})
-                  setTaskProjectId(item.value)
-                  setRelatedId(item.value);
-                  writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
-                }}
-                  />
+                    <>
 
+                        {RelatedNameListTask?.map((value, key) => {
+                          return (
+                            <TaskFilterDropDown
+                              categoryLevellist={RelatedNameListTask}  value={value} key={key} getLists={getListsTask} SubCategory_List={categoryLevellist} setRelatedId={setRelatedId} entityIdList={entityIdList}  setEntityIdList={setEntityIdList}
+                              dropdownStyle={Styles.dropdownModalFilter} textStyle={Styles.txt_leftModalFilter} placeholderStyle={Styles.placeholderStyleModalFilter}
+                              selectedTextStyle={Styles.selectedTextModalFilter} containerStyle={Styles.containerModalFilter} setRelatedName={setRelatedName}
+                              TypeName={GLOBAL.ScreenName} getSection={getSection}  getUnit2={getUnit2}
+                              selectedrelated={selectedrelated} setSelectedrelated={setSelectedrelated}
+                              categoryId={categoryId} TypeName2={'Add'}
+                              Taskcategory={Taskcategory} setCategoryId={setCategoryId}
+                              TaskRelated={TaskRelated}
+                              RelatedNameList={RelatedNameListTask}
+                              TaskRelatedNameId={TaskRelatedNameId} setTaskRelatedNameId={setTaskRelatedNameId}
+                              selectedrelatedname={selectedrelatedname} setselectedrelatedname={setselectedrelatedname}
+                              relatedId={relatedId} FilterTaskEntityDropDown={FilterTaskEntityDropDown}
+                            />
 
+                          );
+                        })}
 
-                  <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Site</Text>
-                  <Dropdown
-                  style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
-                  placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
-                  selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
-                  iconStyle={Styles.iconStyle}
-                  itemTextStyle={Styles.itemTextStyle}
-                  containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
-                  data={SiteList}
-                  search
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  placeholder={!isFocusrelated ? 'Select Site' : '...'}
-                  searchPlaceholder="Search..."
-                  value={selectedTaskSiteName}
-                  renderItem={renderItem}
-                  onFocus={() => setIsFocusrelated(true)}
-                  onBlur={() => setIsFocusrelated(false)}
-                  onChange={item=> {
-                  setShowBackBtn(false)
-                  GLOBAL.SiteId=item.value;
-                  writeDataStorage(GLOBAL.siteId_Last_Info,item.value)
-                    setselectedrelatedname({label:'site',value:'2',_index:0})
-                  setRelatedId(item.value)
-                  writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
-                  const categoryId= RelatedNameList.find((p)=>p.categoryLevel==='3')?.value
-                  getUnits(categoryId,item.value);
-                  setselectedTaskSiteName(item);
-                  setTaskSiteId(item.value)
-                }}
-                  />
-
-
-                  <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Unit</Text>
-                  <Dropdown
-                  style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
-                  placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
-                  selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
-                  iconStyle={Styles.iconStyle}
-                  itemTextStyle={Styles.itemTextStyle}
-                  containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  placeholder={!isFocusrelated ? 'Select unit' : '...'}
-                  searchPlaceholder="Search..."
-                  value={selectedunitName}
-                  data={unitList}
-                  search
-                  renderItem={renderItem}
-                  onFocus={() => setIsFocusrelated(true)}
-                  onBlur={() => setIsFocusrelated(false)}
-                  onChange={item=> {
-                  setShowBackBtn(false)
-                  writeDataStorage(GLOBAL.unitId_Last_Info,item.value)
-                  GLOBAL.UnitId=item.value
-                    setselectedrelatedname({label:'unit',value:'2',_index:0})
-                  setRelatedId(item.value)
-                  writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
-                  const categoryId= RelatedNameList.find((p)=>p.categoryLevel==='4')?.value
-                  getSection(categoryId,item.value);
-                  setselectedunitName(item);
-                  setTaskunitId(item.value)
-
-                }}
-                  />
-
-                  <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Section</Text>
-                  <Dropdown
-                  style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
-                  placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
-                  selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
-                  inputSearchStyle={Styles.inputSearchStyle}
-                  iconStyle={Styles.iconStyle}
-                  itemTextStyle={Styles.itemTextStyle}
-                  data={sectionList}
-                  search
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  placeholder={!isFocusrelated ? 'Select Section' : '...'}
-                  searchPlaceholder="Search..."
-                  value={selectedsectionName}
-                  containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
-                  renderItem={renderItem}
-                  onFocus={() => setIsFocusrelated(true)}
-                  onBlur={() => setIsFocusrelated(false)}
-                  onChange={item=> {
-                  setShowBackBtn(false)
-                  writeDataStorage(GLOBAL.sectionId_Last_Info,item.value)
-                  GLOBAL.SectionId=item.value
-                  setRelatedId(item.value)
-                  writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
-                  const categoryId= RelatedNameList.find((p)=>p.categoryLevel==='5')?.value
-                  getFeatures(categoryId,item.value);
-                  setselectedsectionName(item);
-                  setTasksectionId(item.value)
-                    setselectedrelatedname({label:'section',value:'2',_index:0})
-
-                }}
-                  />
-
-
-                  <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Feature</Text>
-                  <Dropdown
-                  style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
-                  placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
-                  selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
-                  inputSearchStyle={Styles.inputSearchStyle}
-                  iconStyle={Styles.iconStyle}
-                  itemTextStyle={Styles.itemTextStyle}
-                  data={featureList}
-                  search
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  placeholder={!isFocusrelated ? 'Select Feature' : '...'}
-                  searchPlaceholder="Search..."
-                  value={selectedfeatureName}
-                  containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
-                  renderItem={renderItem}
-                  onFocus={() => setIsFocusrelated(true)}
-                  onBlur={() => setIsFocusrelated(false)}
-                  onChange={item=> {
-                  setShowBackBtn(false)
-                  writeDataStorage(GLOBAL.featureId_Last_Info,item.value)
-                  setselectedfeatureName(item);
-                    setselectedrelatedname({label:'feature',value:'2',_index:0})
-                  setRelatedId(item.value)
-                  writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
-                }}
-                  />
-                  </>:
-                      GLOBAL.ScreenName==='Property Maintenance'||GLOBAL.TaskRelatedCheck!==''?
+                    </>
+                    :
+                  //||GLOBAL.TaskRelatedCheck!==''
+                      GLOBAL.ScreenName==='Property Maintenance'?
                         <>
 
-                          <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Site</Text>
-                          <Dropdown
-                            style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
-                            placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
-                            selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
-                            iconStyle={Styles.iconStyle}
-                            itemTextStyle={Styles.itemTextStyle}
-                            containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
-                            data={SiteList}
-                            search
-                            maxHeight={300}
-                            labelField="label"
-                            valueField="value"
-                            placeholder={!isFocusrelated ? 'Select Site' : '...'}
-                            searchPlaceholder="Search..."
-                            value={selectedTaskSiteName}
-                            renderItem={renderItem}
-                            onFocus={() => setIsFocusrelated(true)}
-                            onBlur={() => setIsFocusrelated(false)}
-                            onChange={item=> {
-                              setShowBackBtn(false)
-                              GLOBAL.SiteId=item.value;
-                              writeDataStorage(GLOBAL.siteId_Last_Info,item.value)
-                              getUnit2(item.value)
-                              setRelatedId(item.value)
-                              if(GLOBAL.TaskRelatedCheck!=='')
-                              setselectedrelatedname({label:GLOBAL.relatedName,value:'2',_index:0})
-                              else
-                                setselectedrelatedname({label:'site',value:'2',_index:0})
-                              writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
-                                setselectedTaskSiteName(item);
-                                setTaskSiteId(item.value)
-                            }}
-                          />
+                          {RelatedNameListTask?.map((value, key) => {
+                            return (
+                              <TaskFilterDropDown
+                                categoryLevellist={RelatedNameListTask}  value={value} key={key} getLists={getListsTask} SubCategory_List={categoryLevellist} setRelatedId={setRelatedId} entityIdList={entityIdList}  setEntityIdList={setEntityIdList}
+                                dropdownStyle={Styles.dropdownModalFilter} textStyle={Styles.txt_leftModalFilter} placeholderStyle={Styles.placeholderStyleModalFilter}
+                                selectedTextStyle={Styles.selectedTextModalFilter} containerStyle={Styles.containerModalFilter} setRelatedName={setRelatedName}
+                                TypeName={GLOBAL.ScreenName} getSection={getSection}  getUnit2={getUnit2}
+                                selectedrelated={selectedrelated} setSelectedrelated={setSelectedrelated}
+                                categoryId={categoryId} TypeName2={'Add'}
+                                Taskcategory={Taskcategory} setCategoryId={setCategoryId}
+                                TaskRelated={TaskRelated}
+                                RelatedNameList={RelatedNameListTask}
+                                TaskRelatedNameId={TaskRelatedNameId} setTaskRelatedNameId={setTaskRelatedNameId}
+                                selectedrelatedname={selectedrelatedname} setselectedrelatedname={setselectedrelatedname}
+                                relatedId={relatedId} FilterTaskEntityDropDown={FilterTaskEntityDropDown}
+                              />
 
-
-                          <Text style={[Styles.txtLightColor,{marginTop:normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Unit</Text>
-                          <Dropdown
-                            style={[Styles.dropdowntask,{  borderColor: GLOBAL.footertext_backgroundColor,}]}
-                            placeholderStyle={[Styles.placeholderStyle,{color: GLOBAL.footertext_backgroundColor,}]}
-                            selectedTextStyle={[Styles.selectedTextStyle,{ color: GLOBAL.footertext_backgroundColor,}]}
-                            iconStyle={Styles.iconStyle}
-                            itemTextStyle={Styles.itemTextStyle}
-                            containerStyle={[Styles.containerStyle,{backgroundColor:GLOBAL.footer_backgroundColor}]}
-                            maxHeight={300}
-                            labelField="label"
-                            valueField="value"
-                            placeholder={!isFocusrelated ? 'Select unit' : '...'}
-                            searchPlaceholder="Search..."
-                            value={selectedunitName}
-                            data={unitList}
-                            search
-                            renderItem={renderItem}
-                            onFocus={() => setIsFocusrelated(true)}
-                            onBlur={() => setIsFocusrelated(false)}
-                            onChange={item=> {
-                              setShowBackBtn(false)
-                              writeDataStorage(GLOBAL.unitId_Last_Info,item.value)
-                              GLOBAL.UnitId=item.value
-                                setselectedunitName(item);
-                                setRelatedId(item.value)
-                              if(GLOBAL.TaskRelatedCheck!=='')
-                                setselectedrelatedname({label:GLOBAL.relatedName,value:'2',_index:0})
-                              else
-                              setselectedrelatedname({label:'unit',value:'3',_index:0})
-                                writeDataStorage(GLOBAL.RelatedId_Last_Info, item.value)
-                            }}
-                          />
+                            );
+                          })}
+                          
                         </>:
                         GLOBAL.ScreenName==='Support'?
 <>
@@ -4015,7 +3903,25 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
 
                             }}
                           />
-</>:null
+</>:
+                          GLOBAL.TaskRelatedNameId===''&&GLOBAL.ScreenName===''&&GLOBAL.TaskRelatedCheck===''?
+                            <>
+                              {categoryLevellist?.map((value, key) => {
+                                return (
+                                  <Taskdropdown value={value} key={key} getLists={getLists} SubCategory_List={categoryLevellist} setRelatedId={setRelatedId} entityIdList={entityIdList}  setEntityIdList={setEntityIdList}
+                                                textStyle={Styles.txtLightColor22}  dropdownStyle={Styles.dropdowntask}   placeholderStyle={Styles.placeholderStyle}
+                                                selectedTextStyle={Styles.selectedTextStyle}  setShowBackBtn={ setShowBackBtn}
+                                                containerStyle={Styles.containerStyle} setRelatedName={setRelatedName}
+
+                                  />
+                                );
+                              })}
+                            </>
+                            :
+
+                          null
+
+
                 }
 
                 <Text style={[Styles.txtLightColor,{marginTop: normalize(15),color:GLOBAL.footertext_backgroundColor}]}>Description</Text>

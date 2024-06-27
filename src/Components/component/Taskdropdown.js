@@ -6,7 +6,7 @@ import {Dropdown} from "react-native-element-dropdown";
 import AntDesign from "react-native-vector-icons/AntDesign";
 const GLOBAL = require("../Global");
 function Taskdropdown({value,getLists,SubCategory_List,setRelatedId,setEntityIdList,entityIdList,textStyle,dropdownStyle,placeholderStyle,
-                        selectedTextStyle,containerStyle,setRelatedName, setShowBackBtn
+                        selectedTextStyle,containerStyle,setRelatedName, setShowBackBtn,categoryIdSub,getUnit2
                       }) {
   const [selectedTaskName,setselectedTaskName]=useState('');
   const [isFocusrelated, setIsFocusrelated] = useState(false);
@@ -46,8 +46,10 @@ function Taskdropdown({value,getLists,SubCategory_List,setRelatedId,setEntityIdL
           let List = [...entityIdList];
           const Index=SubCategory_List.findIndex((p)=>parseInt(p.value)===parseInt(value.value))
           const categoryId= SubCategory_List?.[Index+1]?.value;
-
-          getLists(categoryId,item.value);
+          if(categoryIdSub==='4')
+            getUnit2(categoryId,item.value)
+          else
+            getLists(categoryId,item.value);
          let Exist = List?.findIndex((p) => p.categoryId ===item.value);
           if (Exist === -1) {
             List.push({

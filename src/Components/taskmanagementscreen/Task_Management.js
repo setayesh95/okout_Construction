@@ -4,7 +4,6 @@ import { Styles } from "../Styles";
 import normalize from "react-native-normalize/src/index";
 import { Container, Content } from "native-base";
 import Task_management_Item from "./Task_management_Item";
-import LinearGradient from "react-native-linear-gradient";
 import { Header } from "../component/Header";
 import { Footer1 } from "../component/Footer";
 import { removeDataStorage, writeDataStorage } from "../Get_Location";
@@ -18,10 +17,9 @@ import { LogOutModal } from "../component/LogOutModal";
 import { Warningmessage } from "../component/Warningmessage";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { TextInputI } from "../component/TextInputI";
-import { isNetworkConnected } from "../GlobalConnected";
 import { Dropdown } from "react-native-element-dropdown";
 import { Taskdropdown } from "../component/Taskdropdown";
-import {TaskEntityDropDown} from '../component/TaskEntityDropDown'
+import {TaskFilterDropDown} from '../component/TaskFilterDropDown'
 const GLOBAL = require("../Global");
 const Api = require("../Api");
 let A = [];
@@ -106,9 +104,10 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   const [categoryLevel, setcategoryLevel] = useState('');
   const [relatedName, setRelatedName] = useState('');
   const [RelatedNameLvalue, setRelatedNameLvalue] = useState('');
-
-
+  const [RelatedNameListTask, setRelatedNameListTask] = useState([]);
+  const [value2, setValue] = useState('');
   useEffect(() => {
+    console.log(GLOBAL.ScreenName,'GLOBAL.ScreenName')
     if(GLOBAL.ScreenName==='Subcontract'){
       GLOBAL.categoryId='1'
     }
@@ -117,7 +116,8 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     }
     else   if(GLOBAL.ScreenName==='Property Maintenance'){
       GLOBAL.categoryId='4'
-      getSites2()
+      //getSites2()
+
     }
     else   if(GLOBAL.ScreenName==='Support'){
       GLOBAL.categoryId='5'
@@ -137,11 +137,21 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     Task_status();
     Task_priority();
     ReasonCodeReopen(7);
-
     Task_category();
     if( GLOBAL.ScreenName==='Snagging'|| GLOBAL.ScreenName==='Subcontract') {
-      Task_RelatedList("1");
-      Task_subcategory('1')
+      let Id=''
+      if( GLOBAL.ScreenName==='Subcontract')
+        Id='1'
+      else
+        Id='2'
+
+      Task_subcategory(Id)
+    }
+    else if(GLOBAL.ScreenName==='Property Maintenance'){
+      Task_subcategory('4')
+    }
+    else if(GLOBAL.ScreenName==='Support'){
+      Task_subcategory('5')
     }
     else
       Task_RelatedList();
@@ -163,13 +173,6 @@ function Task_Management({ navigation, navigation: { goBack } }) {
             const Year = obj?.taskCreatedOn?.split(" ");
             const Day = Year?.[0]?.split("-");
             const W = Day?.[2]?.split(" ");
-            let taskPriorityColor = "";
-            // if (obj?.taskPriorityName === "Low")
-            //   taskPriorityColor = "#999999";
-            // else if (obj?.taskPriorityName === "High")
-            //   taskPriorityColor = "#FF474D";
-            // else
-            //   taskPriorityColor = "#008000";
             Task_List.push({
               taskId: obj.taskId,
               taskTitle: obj.taskTitle,
@@ -262,9 +265,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
 
   };
   const getSites = async (TaskRelatedNameId,value,SubCategory_List) => {
-
     const json=await getEntityInfo(TaskRelatedNameId,value)
-    console.log(json,'json')
     let A = [];
     for (let item in json?.relatedList) {
       let obj = json?.relatedList?.[item];
@@ -394,7 +395,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     }
   };
   const Task_RelatedList =async (value,list) => {
-    console.log(value,'value')
+
     let SubCategory_List =JSON.parse(await AsyncStorage.getItem(GLOBAL.Task_SubCategory2))
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.Task_Project + `userId=${GLOBAL.UserInformation?.userId}&categoryId=${value}`).then(json => {
@@ -405,14 +406,21 @@ function Task_Management({ navigation, navigation: { goBack } }) {
             value: obj.relatedId,
             label: obj.relatedName,
           });
-          if(list?.length!==0) {
+
+          if(list?.length!==0&&list!==undefined) {
+            list.find((p) => p.value ===value).data=[]
             list?.find((p) => p?.value ===value)?.data?.push({
               value: obj.relatedId,
               label: obj.relatedName,
             });
           }
         }
-        console.log(RelatedList,'RelatedList')
+        if(GLOBAL.categoryId==='4'){
+          getSites2(A)
+        }
+        else{
+          setRelatedNameList(A);
+        }
         setTaskRelated(RelatedList);
         writeDataStorage(GLOBAL.RelatedList, json);
         if(GLOBAL.TaskRelatedNameId!=='') {
@@ -554,13 +562,6 @@ function Task_Management({ navigation, navigation: { goBack } }) {
         const Year = obj?.taskCreatedOn?.split(" ");
         const Day = Year?.[0]?.split("-");
         const W = Day?.[2]?.split(" ");
-        // let taskPriorityColor = "";
-        // if (obj?.taskPriorityName === "Low")
-        //   taskPriorityColor = "#999999";
-        // else if (obj?.taskPriorityName === "High")
-        //   taskPriorityColor = "#FF474D";
-        // else
-        //   taskPriorityColor = "#008000";
         Task_List.push({
           taskId: obj.taskId,
           taskTitle: obj.taskTitle,
@@ -574,8 +575,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
           WeekDay: getDayOfWeek(Year?.[0]),
           Day: W?.[0],
           Month: Day?.[1],
-          taskPriorityColor: obj?.taskPriorityColor
-          ,
+          taskPriorityColor: obj?.taskPriorityColor,
           attachments: obj?.attachments,
           taskUpdated: obj?.taskNotify,
           taskRelatedName: obj?.taskRelatedName,
@@ -586,7 +586,6 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       }
       if (Task_List?.length !== 0) {
         Task_List?.sort(dateComparison_data);
-        console.log(Task_List,'Task_List')
         setMudolList(Task_List);
         Make_Week_Filter_List(Task_List);
           if(GLOBAL.Url_Navigate==='InspectionUnits')
@@ -986,6 +985,46 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       setTaskpriorityfilter(priority_List_copy);
     }
   };
+  const getSites3=async (list)=>{
+console.log('getSites3')
+    if (GLOBAL.isConnected === true) {
+      readOnlineApi(Api.RentalUnits + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+        writeDataStorage(GLOBAL.RentalUnits_List, json?.allSiteInfo);
+        let A = [];
+        json?.allSiteInfo?.forEach((obj) => {
+          A.push({
+            value: obj.siteId,
+            label: obj.siteName,
+            units:obj.units,
+          });
+
+          const first = list?.find((_, index) => !index);
+          if(list?.length!==0) {
+            list?.find((p) => p?.value ===first?.value)?.data?.push({
+              value: obj.siteId,
+              label: obj.siteName,
+            });
+          }
+        })
+
+        setRelatedNameListTask (list);
+        setSiteList(A);
+      });
+    }
+    else {
+      let json = JSON.parse(await AsyncStorage.getItem(GLOBAL.RentalUnits_List));
+      let A = [];
+      json?.forEach((obj) => {
+        A.push({
+          value: obj.siteId,
+          label: obj.siteName,
+          units:obj.units
+        });
+      })
+      setSiteList(A);
+    }
+  }
+
   const Task_subcategory =async (value) => {
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.Task_subcategory + `userId=${GLOBAL.UserInformation?.userId}&categoryId=${value}`).then(json => {
@@ -1001,8 +1040,19 @@ function Task_Management({ navigation, navigation: { goBack } }) {
             data:dataList,
           });
         }
-        console.log(json?.subCategories,'json?.subCategories')
+          if(value==='4'||value==='5') {
+            setcategoryLevellist(A);
+            if(value==='4')
+              getSites3(A);
+          }
+          else if(value==='1'||value==='2')
+          {
+            const first = A?.find((_, index) => !index);
+            Task_RelatedList(first?.value,A);
+            // Task_RelatedList(Id,A);
+          }
         setRelatedNameList(A);
+        setRelatedNameListTask (A);
         writeDataStorage(GLOBAL.Task_SubCategory, json);
       })
     }
@@ -1555,7 +1605,16 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       setvisiblFilter(!visiblFilter);
     }
   };
+  const getListsTask=async(TaskRelatedNameId,value)=>{
+    const json=await getEntityInfo(TaskRelatedNameId,value)
+    RelatedNameListTask.find((p)=>p.value===TaskRelatedNameId).data=[];
+    for (let item in json.relatedList) {
+      let obj = json.relatedList?.[item];
+      RelatedNameListTask.find((p)=>p.value===TaskRelatedNameId).data?.push({value: obj.relatedId,
+        label: obj.relatedName,})
+    }
 
+  }
   const renderSectionHeader = () => (
     <>
       {showWarning === true && <Warningmessage />}
@@ -1703,25 +1762,33 @@ function Task_Management({ navigation, navigation: { goBack } }) {
           </View>
         </TouchableOpacity> : null
       }
+      <View  style={Styles.TaskEntityDropDown}>
+        {RelatedNameListTask?.map((value, key) => {
+          return (
+            <TaskFilterDropDown
+              categoryLevellist={RelatedNameListTask}  value={value} key={key} getLists={getListsTask} SubCategory_List={categoryLevellist} setRelatedId={setRelatedId} entityIdList={entityIdList}  setEntityIdList={setEntityIdList}
+              dropdownStyle={Styles.dropdownModalFilter} textStyle={Styles.txt_leftModalFilter} placeholderStyle={Styles.placeholderStyleModalFilter}
+              selectedTextStyle={Styles.selectedTextModalFilter} containerStyle={Styles.containerModalFilter} setRelatedName={setRelatedName}
+              TypeName={GLOBAL.ScreenName} getSection={getSection}  getUnit2={getUnit2}
+              selectedrelated={selectedrelated} setSelectedrelated={setSelectedrelated}
+              categoryId={categoryId} TypeName2={''}
+              Taskcategory={Taskcategory} setCategoryId={setCategoryId}
+              TaskRelated={TaskRelated}
+              RelatedNameList={RelatedNameListTask}
+              TaskRelatedNameId={TaskRelatedNameId} setTaskRelatedNameId={setTaskRelatedNameId}
+              selectedrelatedname={selectedrelatedname} setselectedrelatedname={setselectedrelatedname}
+              relatedId={relatedId} FilterTaskEntityDropDown={FilterTaskEntityDropDown}
+              value2={value2} setValue={setValue}
+            />
 
-      <TaskEntityDropDown TypeName={GLOBAL.ScreenName} getSection={getSection}  getUnit2={getUnit2}
-                          selectedrelated={selectedrelated} setSelectedrelated={setSelectedrelated}
-                          setRelatedId={setRelatedId}  categoryId={categoryId}
-                           Taskcategory={Taskcategory} setCategoryId={setCategoryId}
-                          TaskRelated={TaskRelated} SiteList={SiteList} getSites={getSites}
-                          RelatedNameList={RelatedNameList} unitList={unitList} getUnits={getUnits}
-                          sectionList={sectionList} getFeatures={getFeatures} featureList={featureList}
-                          TaskRelatedNameId={TaskRelatedNameId} setTaskRelatedNameId={setTaskRelatedNameId}
-                          selectedfeatureName={selectedfeatureName} setselectedfeatureName={setselectedfeatureName}
-                          selectedTaskSiteName={selectedTaskSiteName}  setselectedTaskSiteName={setselectedTaskSiteName}
-                          selectedunitName={selectedunitName} setselectedunitName={setselectedunitName}
-                          selectedrelatedname={selectedrelatedname} setselectedrelatedname={setselectedrelatedname}
-                          selectedsectionName={selectedsectionName} setselectedsectionName={setselectedsectionName}
-                          relatedId={relatedId} FilterTaskEntityDropDown={FilterTaskEntityDropDown}/>
+          );
+        })}
+      </View>
+
       <View style={Styles.SectionHeader} />
     </>
   );
-  const getSites2=async ()=>{
+  const getSites2=async (list)=>{
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.RentalUnits + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
         writeDataStorage(GLOBAL.RentalUnits_List, json?.allSiteInfo);
@@ -1732,7 +1799,15 @@ function Task_Management({ navigation, navigation: { goBack } }) {
             label: obj.siteName,
             units:obj.units
           });
+          const first = list?.find((_, index) => !index);
+          if(list?.length!==0) {
+            list?.find((p) => p?.value ===first?.value)?.data?.push({
+              value: obj.siteId,
+              label: obj.siteName,
+            });
+          }
         })
+        setRelatedNameListTask (list);
         setSiteList(A);
       });
     }
@@ -1750,40 +1825,43 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     }
 
   }
-  const getUnit2=(value)=>{
+  const getUnit2=(categoryId,value)=>{
     let json=SiteList.find((p)=>p.value===value)?.units
-    let A=[]
+    RelatedNameListTask.find((p)=>p.value===categoryId).data=[];
     json?.forEach((obj) => {
       A.push({
         value: obj.unitId,
         label: obj.unitName,
-
       });
     })
-    setunitList(A);
+    let List_Item =RelatedNameListTask;
+    let index = List_Item?.findIndex((p) =>  p.value === categoryId);
+    let markers = [...List_Item];
+    markers[index] = {
+      ...markers[index],data:A
+    };
+    setRelatedNameListTask(markers);
 
   }
-  const FilterTaskEntityDropDown=(Item)=>{
+  const getUnit3=async(categoryId,value)=>{
+    let json=SiteList.find((p)=>p.value===value)?.units
+    categoryLevellist.find((p)=>p.value===categoryId).data=[];
+    json?.forEach((obj) => {
+      A.push({
+        value: obj.unitId,
+        label: obj.unitName,
+      });
+      categoryLevellist?.find((p) => p?.value ===categoryId)?.data?.push({
+        value: obj.unitId,
+        label: obj.unitName,
+      });
+    })
+  }
+  const FilterTaskEntityDropDown=(Item,categoryId2)=>{
+    RelatedNameListTask.find((p) => p.value ===categoryId2).label=Item.label
 
-    // if(GLOBAL.ScreenName==='Subcontract'||GLOBAL.ScreenName==='Snagging'){
-    //  if(GLOBAL.ProjectName!==''&& GLOBAL.SiteName===''&&GLOBAL.UnitName===''&& GLOBAL.SectionNamee===''&& GLOBAL.FeatureNamee===''){
-    //    setmodules(modules.filter((p)=>p.taskRelatedNameRef===GLOBAL.ProjectName))
-    //  }
-    //  else  if(GLOBAL.ProjectName!==''&& GLOBAL.SiteName!==''&&GLOBAL.UnitName===''&& GLOBAL.SectionNamee===''&& GLOBAL.FeatureNamee===''){
-    //    setmodules(modules.filter((p)=>p.taskRelatedNameRef===GLOBAL.ProjectName||p.taskRelatedNameRef===GLOBAL.SiteName))
-    //  }
-    //  else  if(GLOBAL.ProjectName!==''&& GLOBAL.SiteName!==''&&GLOBAL.UnitName!==''&& GLOBAL.SectionNamee===''&& GLOBAL.FeatureNamee===''){
-    //    setmodules(modules.filter((p)=>p.taskRelatedNameRef===GLOBAL.ProjectName||p.taskRelatedNameRef===GLOBAL.SiteName||p.taskRelatedNameRef===GLOBAL.UnitName))
-    //  }
-    // }
-    //
-    // else   if(GLOBAL.ScreenName==='Property Maintenance'){
-    //   GLOBAL.categoryId='4'
-    // }
-    // else   if(GLOBAL.ScreenName==='Support'){
-    //   //GLOBAL.categoryId='4'
-    // }
     if  (GLOBAL.ScreenName==='Property Maintenance'){
+
       if(GLOBAL.SiteName==='site')
       {
         setmodules(MudolList.filter((p)=>p.taskRelatedName==='site'&&p.taskCategoryName==='Maintenance'))
@@ -1795,7 +1873,9 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       }
       else {
       setmodules(MudolList.filter((p)=>p.taskRelatedNameRef===Item.label))
+
     }
+
   }
   /// sort Task by week ///
   const SortByWeek = (startDate, endDate) => {
@@ -1976,10 +2056,12 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     GLOBAL.FilterUnit_name = "";
     GLOBAL.FilterSection_name = "";
     GLOBAL.FilterFeature_name = "";
-    GLOBAL.FilterTime === false
-    GLOBAL.FilterStatus === false
-    GLOBAL.FilterPriority === false
-    GLOBAL.FilterCategory === false
+    GLOBAL.FilterTime = false
+    GLOBAL.FilterStatus = false
+    GLOBAL.FilterPriority = false
+    GLOBAL.FilterCategory = false
+    GLOBAL.FilterCategory_name = "";
+    GLOBAL.categoryId = ""
     GLOBAL.ScreenName=''
     GLOBAL.TaskRelatedCheck=''
     if (GLOBAL.TaskName !== "") {
@@ -2652,21 +2734,13 @@ function Task_Management({ navigation, navigation: { goBack } }) {
                   />
 
                 </>
-
-
-                  // style={[Styles.dropdownModalFilter]}
-                  // placeholderStyle={Styles.placeholderStyleModalFilter}
-                  // selectedTextStyle={Styles.selectedTextModalFilter}
-                  // iconStyle={Styles.iconStyle}
-                  // itemTextStyle={Styles.itemTextStyle}
-                  // containerStyle={Styles.containerModalFilter}
                 }
                 {categoryLevellist?.map((value, key) => {
                   return (
                     <Taskdropdown  value={value} key={key} getLists={getLists} SubCategory_List={categoryLevellist} setRelatedId={setRelatedId} entityIdList={entityIdList}  setEntityIdList={setEntityIdList}
                                    dropdownStyle={Styles.dropdownModalFilter} textStyle={Styles.txt_leftModalFilter} placeholderStyle={Styles.placeholderStyleModalFilter}
-                                   selectedTextStyle={Styles.selectedTextModalFilter} containerStyle={Styles.containerModalFilter} setRelatedName={setRelatedName}
-
+                                   selectedTextStyle={Styles.selectedTextModalFilter} containerStyle={Styles.containerModalFilter} setRelatedName={setRelatedName} setShowBackBtn={setShowBackBtn}
+                                   categoryIdSub={categoryId} getUnit2={getUnit3}
                     />
                   );
                 })}

@@ -673,6 +673,7 @@ function List_Items({index,value,ShowMessage,ChangeChecked,setShowMessage,data,n
                             <Text style={[Styles.txt_left2, { fontSize: normalize(14) }]}>task : {value.task}</Text>
                           </View>:
                           <TouchableOpacity onPress={()=> {
+                            GLOBAL.SiteId =value.siteId
                             GLOBAL.TaskName=value.siteName
                             GLOBAL.RelatedName='site';
                             GLOBAL.RelatedId=value.siteId;

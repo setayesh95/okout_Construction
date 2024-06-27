@@ -475,6 +475,7 @@ function Doc_List_Item({
             <LinearGradient   colors={["#4d78a5", "#375e89", "#27405c"]} style={Styles.btnListfirst}>
               <TouchableOpacity onPress={() => {
                 GLOBAL.UnitId = value.Id
+
                 Navigate_Url('InspectionUnits');
               }} >
                 <Text style={[Styles.txt_left2, { fontSize: normalize(14) }]}> units : {value.unitCount}</Text>
@@ -492,6 +493,7 @@ function Doc_List_Item({
                       GLOBAL.categoryId = "4";
                       GLOBAL.relatedId = value.Id;
                       //GLOBAL.TaskName=GLOBAL.relatedName
+                      GLOBAL.TaskMenuName=GLOBAL.route+' Task'
                       GLOBAL.Url_Navigate = "InspectionUnits";
                       Navigate_Url("Task_managementStack3");
                     }

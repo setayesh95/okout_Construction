@@ -84,6 +84,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
   const [selectedTaskissues, setselectedTaskissues] = useState('');
   const [TaskissuesId, setTaskissuesId] = useState(0);
   const [priorityId, setpriorityId] = useState("2");
+  const [RelatedNameListTask, setRelatedNameListTask] = useState([]);
   useEffect(()=>{
       Task_category();
      Task_priority();
