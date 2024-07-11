@@ -243,5 +243,12 @@ module.exports = {
   SiteName:'',
   UnitName:'',
   SectionNamee:'',
-  FeatureNamee:""
+  FeatureNamee:"",
+  Selected:[],
+  RelatedIdTask:0,
+  RelatedNameListTask:[],
+  MudolList:[],
+
+
+
 };

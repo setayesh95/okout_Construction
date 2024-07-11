@@ -569,7 +569,6 @@ function Task_List_Check({ navigation, navigation: { goBack } }) {
         // else {
         setMudolList(Task_List);
         Make_Week_Filter_List(Task_List);
-        console.log(Task_List,'Task_List')
         setmodules(Task_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
         // }
       } else {
@@ -863,7 +862,6 @@ function Task_List_Check({ navigation, navigation: { goBack } }) {
           statusColorCode: "#bd04ae",
           Icon: "status",
         };
-        console.log( json?.taskStatus,' json?.taskStatus')
         let status_List_Copy = [];
         for (let item in json?.taskStatus) {
           let obj = json?.taskStatus?.[item];

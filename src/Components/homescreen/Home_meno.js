@@ -67,7 +67,6 @@ function Home_meno({ navigation }) {
     if(GLOBAL.isConnected===true) {
       readOnlineApi(Api.getModulesInfoMin + `roleId=${GLOBAL.UserInformation?.roleId}&moduleType=${GLOBAL.UserInformation?.MenuType
       }`).then(json => {
-        console.log(json,'json')
         json?.modules?.forEach((obj) => {
           if (obj.constModule_Id === 1 || obj.constModule_Id === "1") {
             Icon = Photoes.ProjectStructure;

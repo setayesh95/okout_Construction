@@ -80,6 +80,7 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
   const [changestatus, setchangestatus] = useState(false);
   const [completedtask, setcompletedtask] = useState(false);
   const [scroll, setscroll] = useState(false);
+  const [NavigateCompleted, setNavigateCompleted] = useState(false);
   const [ShowWarningMessage, setShowWarningMessage] = useState(false);
   const [ShowBackBtn, setShowBackBtn] = useState(true);
   const [ShowButton, setShowButton] = useState(false);
@@ -112,6 +113,14 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
     YearFull = `${Year}-${Month}-${Day} ${Hour}:${Minutes}:${Seconds}`;
   }, []);
   const Navigate_Url = (Url) => {
+    GLOBAL.FilterTime = false
+    GLOBAL.FilterStatus = false
+    GLOBAL.FilterPriority = false
+    GLOBAL.FilterCategory = false
+    GLOBAL.TaskRelatedCheck=''
+    GLOBAL.ScreenName=''
+    GLOBAL.TaskRelatedNameId=''
+    GLOBAL.Selected=[]
     navigation.navigate(Url);
   };
   ///Technician can chose to see update flag or not and send to server///
@@ -131,6 +140,7 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
           setMessage(json?.msg);
           setShowMessage(true);
           My_TaskList_server();
+          My_TaskList_server2();
           GetTaskDetail();
           setShowMessage(false);
           setchangestatus_Reopen(false);
@@ -305,6 +315,7 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
             setMessage(json?.msg);
             setShowMessage(true);
             My_TaskList_server();
+            My_TaskList_server2();
             GetTaskDetail();
             setShowMessage(false);
             setchangestatus_Reopen(false);
@@ -356,7 +367,6 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
     writeDataStorage(GLOBAL.Task_Detail, markers_Listdetail);
   };
   const GetTaskDetail = async () => {
-
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.Task_detail + `&taskId=${GLOBAL.TaskId}`).then(json => {
         setTask_detail(json?.singleTask);
@@ -380,6 +390,25 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
           setDateend(new Date(json?.singleTask?.taskPlanDueDate));
           setDescription(json?.singleTask?.taskRequestNotes);
           let Task_details_attachmentUrl = [];
+            let Days = dateDifferenceInDays(
+              new Date(Moment(json?.singleTask?.taskPlanDueDate)?.format("YYYY-MM-DD")),
+              new Date(Moment(json?.singleTask?.taskPlanStartDate)?.format("YYYY-MM-DD")),
+            );
+            let hours = dateDifferenceInHours(
+              new Date(Moment(json?.singleTask?.taskPlanDueDate)?.format("YYYY-MM-DD H:mm")),
+              new Date(Moment(json?.singleTask?.taskPlanStartDate)?.format("YYYY-MM-DD H:mm")),
+            );
+            if (Days !== 0) {
+              setdateDifferenceInHours(0);
+              setdateDifferenceInDays(parseInt(Math.abs(Days)));
+              setTimeRelatedselct("days");
+            } else {
+              setdateDifferenceInDays(0);
+              setdateDifferenceInHours(parseInt(Math.abs(hours)));
+
+              setTimeRelatedselct("hours");
+            }
+
           let uri = "";
           settaskId(json?.singleTask?.taskId);
           let mark2 = {
@@ -543,9 +572,12 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
     writePostApi("POST", Api.ChangeStatusTask, formData).then(json => {
       if (json) {
         if (json?.status === true) {
+
+          setNavigateCompleted(true)
           setMessage(json?.msg);
           setShowMessage(true);
           My_TaskList_server();
+          My_TaskList_server2();
           GetTaskDetail();
           setShowMessage(false);
           setcompletedtask(false);
@@ -558,6 +590,7 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
         }
       } else {
         Update_Off_Assigned(GLOBAL.TaskId);
+        setNavigateCompleted(true)
         setMessage("Your task status successfully changed");
         setShowMessage(true);
         setShowMessage(false);
@@ -603,6 +636,14 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
   const LogOut = () => {
     removeDataStorage(GLOBAL.PASSWORD_KEY);
     setshowModalDelete(false);
+    GLOBAL.Selected=[];
+    GLOBAL.FilterTime = false
+    GLOBAL.FilterStatus = false
+    GLOBAL.FilterPriority = false
+    GLOBAL.FilterCategory = false
+    GLOBAL.TaskRelatedCheck='';
+    GLOBAL.ScreenName='';
+    GLOBAL.TaskRelatedNameId='';
     navigation.navigate("LogIn");
   };
   /// Bottom menu click On LogOut button///
@@ -759,6 +800,7 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
   const My_TaskList_server2 = async () => {
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.My_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+
         GLOBAL.buttonName = "My_TaskList";
         writeDataStorage(GLOBAL.All_Task, json?.tasks);
       });
@@ -783,6 +825,7 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
             setShowMessage(true);
             GetTaskDetail();
             My_TaskList_server();
+            My_TaskList_server2();
             setshowModalReject(false);
             setShowMessage(false);
             if (GLOBAL?.FilterTime === true || GLOBAL?.FilterStatus === true || GLOBAL?.FilterPriority === true || GLOBAL.FilterCategory === true) {
@@ -863,6 +906,7 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
             setShowMessage(true);
             GetTaskDetail();
             My_TaskList_server();
+            My_TaskList_server2();
             ReadApi("#008000", "In Progress");
             setShowMessage(false);
             setshowModalAccept(false);
@@ -935,12 +979,15 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
   };
   ///change status to cancell///
   const Updatestatus = async () => {
+
     let List_Item = JSON.parse(await AsyncStorage.getItem(GLOBAL.All_Task));
     const formData = new FormData();
     formData.append("userId", GLOBAL.UserInformation?.userId);
     formData.append("taskId", GLOBAL.TaskId);
     formData.append("taskStatusId", "6");
+
     writePostApi("POST", Api.Change_Task_Status, formData).then(json => {
+
       if (json) {
         if (json?.status === true) {
           setMessage(json?.msg);
@@ -1022,7 +1069,7 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
   const dateDifferenceInHours = (dateInitial, dateFinal) =>
     (dateFinal - dateInitial) / 3_600_000;
   const renderCompletestaskModalContent = () => (
-    <View style={[Styles.taskModalStyle, { paddingVertical: normalize(55) }]}>
+    <View style={[Styles.taskModalStyle2, { paddingVertical: normalize(55) }]}>
       <View style={Styles.With95}>
         <View style={[{ width: "89%", marginBottom: "4%" }]}>
           <TouchableOpacity onPress={() => {
@@ -1085,6 +1132,7 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
       writePostApi("POST", Api.UpdateTask, formData, ImageSourceviewarrayUpload).then(json => {
         if (json) {
           if (json?.status === true) {
+            setShowBackBtn(false);
             Assigned_TaskList_server();
             GetTaskDetail();
             setMessage(json?.msg);
@@ -1138,6 +1186,7 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
       writePostApi("POST", Api.UpdateTask, formData).then(json => {
         if (json) {
           if (json?.status === true) {
+            setShowBackBtn(false);
             Assigned_TaskList_server();
             GetTaskDetail();
             setMessage(json?.msg);
@@ -1627,32 +1676,8 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
 ///header back button when Technician =>if add photos or change items and did not send server send message if not navigate back///
   const string_equalityAssignTask = (values) => {
     let isValid = false;
-    if (values?.DateFormatplanend !== DateFormatplanend) {
-      scrollRef.current?.scrollTo({
-        y: 0,
-        animated: true,
-      });
-      setscroll(false);
-      setShowBackBtn(false);
-      isValid = true;
-    } else if (values?.DateFormatplanstart !== DateFormatplanstart) {
-      scrollRef.current?.scrollTo({
-        y: 0,
-        animated: true,
-      });
-      setscroll(false);
-      setShowBackBtn(false);
-      isValid = true;
-    } else if (values?.TaskNote !== Task_detail?.taskFeedback) {
-      scrollRef.current?.scrollTo({
-        y: 0,
-        animated: true,
-      });
-      setscroll(false);
-      setShowBackBtn(false);
-      isValid = true;
-    } else if (values?.CaseNote?.split("\n")?.length > 1) {
-      if (values?.CaseNote?.split("\n")?.[2] !== "") {
+    if(NavigateCompleted===false) {
+      if (values?.DateFormatplanend !== DateFormatplanend) {
         scrollRef.current?.scrollTo({
           y: 0,
           animated: true,
@@ -1660,32 +1685,60 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
         setscroll(false);
         setShowBackBtn(false);
         isValid = true;
+      } else if (values?.DateFormatplanstart !== DateFormatplanstart) {
+        scrollRef.current?.scrollTo({
+          y: 0,
+          animated: true,
+        });
+        setscroll(false);
+        setShowBackBtn(false);
+        isValid = true;
+      } else if (values?.TaskNote !== Task_detail?.taskFeedback) {
+        scrollRef.current?.scrollTo({
+          y: 0,
+          animated: true,
+        });
+        setscroll(false);
+        setShowBackBtn(false);
+        isValid = true;
+      } else if (values?.CaseNote?.split("\n")?.length > 1) {
+        if (values?.CaseNote?.split("\n")?.[2] !== "") {
+          scrollRef.current?.scrollTo({
+            y: 0,
+            animated: true,
+          });
+          setscroll(false);
+          setShowBackBtn(false);
+          isValid = true;
+        }
+      } else if (values?.CaseNote?.split("\n")?.length === 1) {
+        if (values?.CaseNote === "" || values?.CaseNote.split("\n")?.[0] !== Task_detail?.taskRequestNotes) {
+          setShowBackBtn(false);
+          isValid = true;
+          scrollRef.current?.scrollTo({
+            y: 0,
+            animated: true,
+          });
+          setscroll(false);
+        }
       }
-    } else if (values?.CaseNote?.split("\n")?.length === 1) {
-      if (values?.CaseNote === "" || values?.CaseNote.split("\n")?.[0] !== Task_detail?.taskRequestNotes) {
-        setShowBackBtn(false);
+      if (isValid) {
+        //setShowBackBtn(false)
+
         isValid = true;
-        scrollRef.current?.scrollTo({
-          y: 0,
-          animated: true,
-        });
-        setscroll(false);
+        Back_navigate(false);
+      } else {
+
+        Back_navigate();
       }
     }
-    if (isValid) {
-      //setShowBackBtn(false)
-
-      isValid = true;
-      Back_navigate(false);
-    } else {
-
-      Back_navigate();
+    else {
+      goBack();
     }
   };
   const onChangeText = (value) => {
     Update_AssignTask(value, Task_detail?.taskId, Cheked);
   };
-
   return (
     <>
       {
@@ -1706,6 +1759,7 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
                             setDateFormatplanstart(Moment(date)?.format("YYYY-MM-DD H:mm"));
                             setShowButton(true);
                             setstartdate(date);
+
                             if (dateend === "") {
                               let Days = dateDifferenceInDays(
                                 new Date(Moment(date)?.format("YYYY-MM-DD")),
@@ -1718,14 +1772,16 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
 
                               if (Days !== 0) {
                                 setdateDifferenceInHours(0);
-                                setdateDifferenceInDays(parseInt(Days));
+                                setdateDifferenceInDays(parseInt(Math.abs(Days)));
                                 setTimeRelatedselct("days");
                               } else {
                                 setdateDifferenceInDays(0);
-                                setdateDifferenceInHours(parseInt(hours));
+                                setdateDifferenceInHours(parseInt(Math.abs(hours)));
                                 setTimeRelatedselct("hours");
                               }
-                            } else {
+                            }
+                            else {
+
                               let Days = dateDifferenceInDays(
                                 new Date(Moment(date)?.format("YYYY-MM-DD")),
                                 new Date(Moment(dateend)?.format("YYYY-MM-DD")),
@@ -1736,11 +1792,13 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
                               );
                               if (Days !== 0) {
                                 setdateDifferenceInHours(0);
-                                setdateDifferenceInDays(parseInt(Days));
+                                setdateDifferenceInDays(parseInt(Math.abs(Days)));
+
                                 setTimeRelatedselct("days");
                               } else {
                                 setdateDifferenceInDays(0);
-                                setdateDifferenceInHours(parseInt(hours));
+                                setdateDifferenceInHours(parseInt(Math.abs(hours)));
+
                                 setTimeRelatedselct("hours");
                               }
                             }
@@ -1769,11 +1827,12 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
                               );
                               if (Days !== 0) {
                                 setdateDifferenceInHours(0);
-                                setdateDifferenceInDays(parseInt(Days));
+                                setdateDifferenceInDays(parseInt(Math.abs(Days)));
+
                                 setTimeRelatedselct("days");
                               } else {
                                 setdateDifferenceInDays(0);
-                                setdateDifferenceInHours(hours);
+                                setdateDifferenceInHours(parseInt(Math.abs(hours)));
                                 setTimeRelatedselct("hours");
                               }
                             } else {
@@ -1788,11 +1847,11 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
 
                               if (Days !== 0) {
                                 setdateDifferenceInHours(0);
-                                setdateDifferenceInDays(parseInt(Days));
+                                setdateDifferenceInDays(parseInt(Math.abs(Days)));
                                 setTimeRelatedselct("days");
                               } else {
                                 setdateDifferenceInDays(0);
-                                setdateDifferenceInHours(parseInt(hours));
+                                setdateDifferenceInHours(parseInt(Math.abs(hours)));
                                 setTimeRelatedselct("hours");
                               }
                             }
@@ -1819,7 +1878,9 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
                       <LinearGradient colors={["#a39898", "#786b6b", "#382e2e"]} style={Styles.HeaderItems}>
                         <View style={{ width: "2%" }} />
                         <View style={{ width: "12%" }}>
-                          <Button onPress={() => string_equalityAssignTask(values)} transparent style={Styles.Backbtn}>
+                          <Button onPress={() => {
+                            string_equalityAssignTask(values);
+                          }} transparent style={Styles.Backbtn}>
                             <AntDesign name={"arrowleft"} size={21} color={"#fff"} />
                           </Button>
                         </View>
@@ -2191,25 +2252,6 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
                               Task_detail?.taskStatusName === "Accepted" && GLOBAL.selectItem === 2 &&
                               <LinearGradient colors={["#28892f", "#1a7222", "#03570d"]} style={Styles.btnList15}>
                                 <TouchableOpacity onPress={() => {
-                                  if (Task_detail?.taskPlanStartDate && Task_detail?.taskPlanDueDate) {
-                                    let Days = dateDifferenceInDays(
-                                      new Date(Moment(Task_detail?.taskPlanStartDate)?.format("YYYY-MM-DD")),
-                                      new Date(Moment(Task_detail?.taskPlanDueDate)?.format("YYYY-MM-DD")),
-                                    );
-                                    let hours = dateDifferenceInHours(
-                                      new Date(Moment(Task_detail?.taskPlanStartDate)?.format("YYYY-MM-DD H:mm")),
-                                      new Date(Moment(Task_detail?.taskPlanDueDate)?.format("YYYY-MM-DD H:mm")),
-                                    );
-                                    if (Days !== 0) {
-                                      setdateDifferenceInHours(0);
-                                      setdateDifferenceInDays(parseInt(Days));
-                                      setTimeRelatedselct("days");
-                                    } else {
-                                      setdateDifferenceInDays(0);
-                                      setdateDifferenceInHours(parseInt(hours));
-                                      setTimeRelatedselct("hours");
-                                    }
-                                  }
                                   setcompletedtask(true);
                                 }}>
                                   <Text style={[Styles.txt_left2, { fontSize: normalize(14) }]}>Complete Task</Text>

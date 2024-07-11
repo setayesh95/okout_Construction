@@ -958,7 +958,6 @@ function List_Items({index,value,ShowMessage,ChangeChecked,setShowMessage,data,n
                             geoLong={value?.geoLong}
                             Boolean={value?.Boolean}
                             setshowMap={setshowMap}
-                            setLocation={setLocation}
                             location={location}
                             tittlebtn={tittlebtn} />:
                 <View style={[Styles.ModalStyle]}>

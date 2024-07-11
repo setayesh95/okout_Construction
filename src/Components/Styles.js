@@ -121,8 +121,24 @@ const Styles = StyleSheet.create({
     textAlign: "left",
     fontFamily:'OpenSansBold',
   },
+  txt_left4:{
+    color: GLOBAL.OFFICIAL_BLUE_COLOR,
+    fontSize: normalize(15),
+
+    textAlign: "left",
+    fontFamily:'OpenSansBold',
+    marginTop:normalize(4),
+    marginLeft:normalize(8)
+  },
   txt_left_Pos:{
     color: GLOBAL.OFFICIAL_BLUE_COLOR,
+    fontSize: normalize(14),
+    marginVertical: 5,
+    textAlign: "left",
+    fontFamily:'OpenSansBold',
+  },
+  txt_left_Pos_Gray:{
+    color: GLOBAL.OFFICIAL_PURPLE_COLOR,
     fontSize: normalize(14),
     marginVertical: 5,
     textAlign: "left",
@@ -1338,7 +1354,8 @@ paddingHorizontal:7,
     alignItems: "center",justifyContent:"center", borderWidth:1,
     borderRadius: normalize(10), borderColor:GLOBAL.OFFICIAL_Button,width:'90%',},
 
-
+  taskModalStyle2:{ backgroundColor:GLOBAL.OFFICIAL_background, paddingVertical:normalize(5),
+    alignItems: "center", borderRadius: 10,justifyContent:"center",marginTop:'9%',borderWidth:1,borderColor:GLOBAL.OFFICIAL_BLUE_COLOR },
 
   DeleteModalStyle23:{backgroundColor:Colors.Light, paddingVertical:normalize(5),
     alignItems: "center",justifyContent:"center", borderWidth:1,
@@ -1421,7 +1438,12 @@ paddingHorizontal:7,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: normalize(13),},
+    marginTop: normalize(13)},
+  BtnListStylePos:{width: "90%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: normalize(25),},
   BtnListStyleDyb:{width: "100%",
     flexDirection: "row",
     alignItems: "center",
@@ -1492,8 +1514,6 @@ paddingHorizontal:7,
       width: "45%",
       backgroundColor: "#7953FAFF", filter: "blur(15)", paddingVertical: normalize(7),
       borderRadius: normalize(6),
-      marginRight: normalize(7),
-
     },
   btnListTask2:
     {
@@ -1789,6 +1809,12 @@ paddingHorizontal:7,
     flex:1,
     borderWidth:0.7,
     borderColor:"#eee"
+  },
+  ItemDetailBoxCollection:{
+    width:'100%',
+     marginVertical:'4%'
+    ,justifyContent:'center',
+    alignItems:"center",
   },
   ItemFoctorBox:{
     width:width-SPACING?.space_25,

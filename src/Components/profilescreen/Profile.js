@@ -31,8 +31,9 @@ function Profile( { navigation, navigation: { goBack }}) {
   const [ImageSourceviewarray, setImageSourceviewarray] = useState([]);
   const [ShowMessage, setShowMessage] = useState(false);
   const [Message, setMessage] = useState("");
+  const [categoryId, setCategoryId] = useState('2');
   useEffect( () => {
-    setVersionCheck('1.0.40');
+    setVersionCheck('1.0.42');
     const date=new Date();
     const Day=date.getDate();
     const Month=date.getMonth()+1;

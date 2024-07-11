@@ -64,10 +64,10 @@ function DrawerCustomize(props) {
         {/*  <Ionicons name={"color-palette-outline"} size={27} color={GLOBAL.headertext_backgroundColor} />*/}
         {/*  <Text style={[Styles.txtMenu,{ margin: normalize(8),marginLeft:normalize(19),color:GLOBAL.headertext_backgroundColor }]}>colour them</Text>*/}
         {/*</TouchableOpacity>*/}
-        {/*<TouchableOpacity   onPress={() =>     props.navigation.navigate("LocationStack")}*/}
+        {/*<TouchableOpacity   onPress={() =>     props.navigation.navigate("DoshboardStack")}*/}
         {/*                  style={[styles.circleContainer, {marginTop:15}]}>*/}
         {/*  <Ionicons name={"color-palette-outline"} size={27} color={GLOBAL.headertext_backgroundColor} />*/}
-        {/*  <Text style={[Styles.txtMenu,{ margin: normalize(8),marginLeft:normalize(19),color:GLOBAL.headertext_backgroundColor }]}>colour them</Text>*/}
+        {/*  <Text style={[Styles.txtMenu,{ margin: normalize(8),marginLeft:normalize(19),color:GLOBAL.headertext_backgroundColor }]}>Dashboard</Text>*/}
         {/*</TouchableOpacity>*/}
       </View>
     </DrawerContentScrollView>

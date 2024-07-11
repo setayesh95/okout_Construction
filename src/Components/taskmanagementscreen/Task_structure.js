@@ -18,6 +18,13 @@ const Api = require("../Api");
 function Taskstructure({ navigation, navigation: { goBack } }) {
   const [showModalDelete, setshowModalDelete] = useState(false);
   const Navigate_Url = (Url) => {
+    GLOBAL.TaskRelatedCheck=''
+    GLOBAL.ScreenName=''
+    GLOBAL.TaskRelatedNameId=''
+    GLOBAL.FilterTime = false
+    GLOBAL.FilterStatus = false
+    GLOBAL.FilterPriority = false
+    GLOBAL.FilterCategory = false
     navigation.navigate(Url);
   };
 

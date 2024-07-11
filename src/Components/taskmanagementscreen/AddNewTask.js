@@ -146,12 +146,26 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
   const Navigate_Url= (Url) => {
       navigation.navigate(Url);
     GLOBAL.Addtask='Add New Task';
-    GLOBAL.ScreenName='';
     GLOBAL.TaskRelatedCheck=''
+    GLOBAL.ScreenName=''
+    GLOBAL.TaskRelatedNameId=''
+    GLOBAL.FilterTime = false
+    GLOBAL.FilterStatus = false
+    GLOBAL.FilterPriority = false
+    GLOBAL.FilterCategory = false
+    GLOBAL.Selected=[]
   };
   ///LogOut Function///
   const LogOut = () => {
     removeDataStorage(GLOBAL.PASSWORD_KEY);
+    GLOBAL.FilterTime = false
+    GLOBAL.FilterStatus = false
+    GLOBAL.FilterPriority = false
+    GLOBAL.FilterCategory = false
+    GLOBAL.TaskRelatedCheck=''
+    GLOBAL.ScreenName=''
+    GLOBAL.TaskRelatedNameId=''
+    GLOBAL.Selected=[]
     setshowModalDelete(false);
     navigation.navigate("LogIn");
   };
@@ -174,9 +188,13 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
   ///get  task list when user come from project or Dyb///
   const My_TaskList_server = async () => {
       readOnlineApi(Api.My_TaskList+`userId=${GLOBAL.UserInformation?.userId}`).then(json => {
-        console.log(json,'json')
         DataStorage(json?.tasks)
       });
+  };
+  const getDayOfWeek = (date) => {
+    const dayOfWeek = new Date(date).getDay();
+    return isNaN(dayOfWeek) ? null :
+      ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][dayOfWeek];
   };
   ///get  task list ///
   const My_TaskList_server2 = async () => {
@@ -196,7 +214,6 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
     const Second=date.getSeconds()
     const TodayDate = `${Year}-${Month}-${Day} ${Hour}:${Minute}:${Second}`;
     const formData = new FormData();
-    console.log(categoryId,'categoryId')
     if (categoryId === 0) {
       setErrors("selectedcategory");
     } else {
@@ -222,7 +239,6 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
       else
         formData.append("parentTaskId", null);
         formData.append("assignedTo", null);
-        console.log(formData,'formData')
       if (GLOBAL.isConnected=== false) {
         Add_Task_Offline(value,TodayDate);
       }
@@ -246,10 +262,11 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
               setCategoryId(0);
               setRelatedId(0);
               setShowBtn(true);
+              setShowBackBtn(true)
               //setTimeout(function(){ setShowMessage(false)}, 2000)
             }
             else{
-              setMessage(json?.msg);
+              setMessage(json?.error?.relatedId?.replace(/<\/?span[^>]*>/g,""));
               setShowMessage(true);
               setShowButton(true)
               setShowBtn(true)
@@ -260,7 +277,13 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
             }
           }
           else {
-            setMessage("Your task successfully added");
+            if(relatedId==='') {
+              setShowMessagetype(false)
+              setMessage("The Related field is required.");
+            }
+            else
+              setShowMessagetype(true)
+              setMessage("Your task successfully added");
             setShowMessage(true);
             setShowButton(true);
             setImageSourceviewarray([]);
@@ -276,7 +299,6 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
         writePostApi("POST", Api.AddTask, formData).then(json => {
           setShowMessagetype(json?.status);
           if (json) {
-            console.log(json,'json')
             if (json?.status === true) {
               My_TaskList_server();
               setMessage(json?.msg);
@@ -285,9 +307,11 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
               setCategoryId(0)
               setRelatedId(0)
               setShowBtn(true)
+              setShowBackBtn(true)
             }
             else{
-              setMessage(json?.msg);
+
+              setMessage(json?.error?.relatedId?.replace(/<\/?span[^>]*>/g,""));
               setShowMessage(true);
               setShowButton(true)
               setShowBtn(true)
@@ -298,7 +322,12 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
             }
           }
           else {
-            setMessage("Your task successfully added");
+            if(relatedId==='') {
+              setShowMessagetype(false)
+              setMessage("The Related field is required.");
+            }
+            else
+              setShowMessagetype(true)
             setShowMessage(true);
             setShowButton(true)
             setCategoryId(0)
@@ -349,7 +378,6 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
               PhotoEditor.Edit({
                 path:obj.path?.split('://')[1],
                 onDone: (res) => {
-                  console.log('res : onDone', "file://" + res)
                   Image_compress("file://" + res).then(res=>{
                     A.push({
                       uri: res,

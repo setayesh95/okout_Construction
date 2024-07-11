@@ -1,21 +1,22 @@
-import { Container } from "native-base";
+import { FlatList, Image, ImageBackground, Modal, Text, TouchableOpacity, View } from "react-native";
 import { Styles } from "../Styles";
-import { Header } from "../component/Header";
-import { FlatList, Image, Modal, Text, TouchableOpacity, View } from "react-native";
-import { Warningmessage } from "../component/Warningmessage";
-import { Footer1 } from "../component/Footer";
-import React, { useEffect, useState } from "react";
 import normalize from "react-native-normalize/src/index";
 import LinearGradient from "react-native-linear-gradient";
 import { removeDataStorage } from "../Get_Location";
 import { UserPermission } from "../CheckPermission";
-import POS_List_Item from "../component/POS_List_Item";
-const GLOBAL = require("../Global");
+import React, { useState } from "react";
+import { Container, Content } from "native-base";
+import { Header } from "../component/Header";
+import { Warningmessage } from "../component/Warningmessage";
+import { Footer1 } from "../component/Footer";
+import InvoiceFactor from "../component/InvoiceFactor";
+let A=[]
 const Photoes=require('../Photoes');
-function PosScreen({navigation,navigation:{goBack}}) {
+function CollectionDetail({navigation,navigation:{goBack}}) {
   const [showModalDelete, setshowModalDelete] = useState(false);
   const [showWarning, setshowWarning] = useState(false);
-  const [modules, setmodules] = useState([{ Id: 0 ,Name:'Walk In MoveOut',Address:'test address,London'},{ Id: 1 ,Name:'TEST CUSTOMER (TEST CUSTOMER) ',Address:'test address,London'}]);
+  const [categorylist,setcategorylist] = useState([]);
+  const [Sourceviewarray, setSourceviewarray] = useState([]);
   const logout_Url= () => {
     setshowModalDelete(true)
   };
@@ -77,59 +78,48 @@ function PosScreen({navigation,navigation:{goBack}}) {
     else
       navigation.navigate(Url);
   };
-const SeeDetail=()=>{
-}
-  useEffect(() => {
-  }, []);
-  const renderItem=({ item ,index})=>(
-    <POS_List_Item data={GLOBAL.Pos_dyb} value={item} Type={'Pos'}  SeeDetail={SeeDetail}
-                   Navigate_Url={Navigate_Url}/>
-  )
-
-  const renderSectionFooter=()=>(
-    <View style={Styles.SectionFooter}/>
-  )
   return (
     <Container style={[Styles.Backcolor]}>
-      <Header colors={['#ffc2b5','#fca795','#d1583b']} StatusColor={'#ffc6bb'} onPress={goBack}
-              Title={"Pos"} />
+      <Header colors={["#4d78a5", "#375e89", "#27405c"]} StatusColor={'#5079a5'} onPress={goBack}
+              Title={"Collection"} />
+      <Content contentContainerStyle={{alignItems:'center',justifyContent:'center'}}>
+      <View style={[Styles.containerList]}>
+        {
+          showModalDelete &&
+          <View>
+            {
+              _showModalDelete()
+            }
+          </View>
+        }
+        {showWarning===true&& <Warningmessage/>}
+        <View style={Styles.mainSystemDesigner}>
+        <View style={Styles.greenView2}>
 
-        <View style={[Styles.containerList]}>
-          {
-            showModalDelete &&
-            <View>
-              {
-                _showModalDelete()
-              }
-            </View>
-          }
-          {showWarning===true&& <Warningmessage/>}
-          {
-            modules!=='' ?
-              <View style={Styles.Center_margin_Bottom3}>
-                {modules&&(
-                  <FlatList
-                    showsVerticalScrollIndicator={false}
-                    data={modules}
-                    style={{width:'100%',flexGrow:0}}
-                    renderItem={renderItem}
-                    ListFooterComponent={renderSectionFooter}
-                    keyExtractor={(item,index)=>{
-                      return index.toString();
-                    }}
-                  />
-                )}
-              </View>:
-              <View style={Styles.With90CenterVertical}>
-                <Text style={Styles.EmptyText}>
-                  " Nothing defined
-                </Text>
-              </View>
-          }
+          <Text style={[Styles.txtGreenView ,{flex:1}]}>Due Amount</Text>
+          <Text style={[Styles.txtGreenView ,{flex:0.5}]}>Date</Text>
+          <Text style={[Styles.txtGreenView ,{flex:1}]}>Collection Number</Text>
+          <Text style={[Styles.txtGreenView, {flex: 1.5}]}>Invoice Amount</Text>
+          <Text style={[Styles.txtGreenView, {flex: 1}]}>Invoice No
+          </Text>
         </View>
-
+        {categorylist?.map((item, key) => {
+          return (
+            <View style={Styles.greenView3}>
+              <Text style={[Styles.CatText4 ,{flex:1}]}>{item.CreatedBy}</Text>
+              <Text style={[Styles.CatText4 ,{flex:1}]}>{item.CreatedOn}</Text>
+              <Text style={[Styles.CatText4 ,{flex:1}]}>{item.Notes}</Text>
+              <Text style={[Styles.CatText4 ,{flex:1}]}>{item.Reference}</Text>
+              <Text style={[Styles.CatText4 ,{flex:1}]}>{item.Code}</Text>
+              <Text style={[Styles.CatText4 ,{flex:1}]}>{item.name}</Text>
+            </View>
+          )})
+        }
+        </View>
+      </View>
+      </Content>
       <Footer1 onPressHome={Navigate_Url}  onPressdeleteAsync={logout_Url} />
     </Container>
   );
 }
-export default PosScreen;
+export default CollectionDetail;

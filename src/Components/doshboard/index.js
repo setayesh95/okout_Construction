@@ -4,7 +4,8 @@ import CustomerStack from '../customerscreen/index';
 import PosStack from '../posscreen/index'
 const Stack=createNativeStackNavigator();
 import Doshboardscreen from "./Doshboardscreen";
-
+import MoveOutStack from "../moveoutscreen";
+import  MainPageStack from '../collection&Order/index'
 function DoshboardStack() {
   return (
 
@@ -12,6 +13,9 @@ function DoshboardStack() {
       <Stack.Screen  name="Doshboardscreen"      component={Doshboardscreen} initialRouteName={Doshboardscreen}/>
       <Stack.Screen  name="CustomerStack"      component={CustomerStack}/>
       <Stack.Screen  name="PosStack"      component={PosStack}/>
+       <Stack.Screen  name="MoveOutStack"      component={MoveOutStack}/>
+ <Stack.Screen  name="MainPageStack"      component={MainPageStack}/>
+
     </Stack.Navigator>
 
   );

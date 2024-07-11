@@ -187,20 +187,20 @@ function Task_management_Item({
       GLOBAL.TaskId = value.taskId;
       if (value?.taskPlanStartDate && value?.taskPlanDueDate) {
         let Days = dateDifferenceInDays(
-          new Date(Moment(value?.taskPlanStartDate)?.format("YYYY-MM-DD ")),
           new Date(Moment(value?.taskPlanDueDate)?.format("YYYY-MM-DD")),
+          new Date(Moment(value?.taskPlanStartDate)?.format("YYYY-MM-DD")),
         );
         let hours = dateDifferenceInHours(
-          new Date(Moment(value?.taskPlanStartDate)?.format("YYYY-MM-DD H:mm")),
           new Date(Moment(value?.taskPlanDueDate)?.format("YYYY-MM-DD H:mm")),
+          new Date(Moment(value?.taskPlanStartDate)?.format("YYYY-MM-DD H:mm")),
         );
         if (Days !== 0) {
           setdateDifferenceInHours(0);
-          setdateDifferenceInDays(parseInt(Days));
+          setdateDifferenceInDays(parseInt(Math.abs(Days)));
           setTimeRelatedselct("days");
         } else {
           setdateDifferenceInDays(0);
-          setdateDifferenceInHours(parseInt(hours));
+          setdateDifferenceInHours(parseInt( Math.abs(hours)));
           setTimeRelatedselct("hours");
         }
       }
@@ -321,7 +321,7 @@ function Task_management_Item({
     );
   };
   const renderCompletestaskModalContent = () => (
-    <View style={[Styles.taskModalStyle, { paddingVertical: normalize(55) }]}>
+    <View style={[Styles.taskModalStyle2, { paddingVertical: normalize(55) }]}>
       <View style={Styles.With95}>
         <View style={[{ width: "89%", marginBottom: "4%" }]}>
           <TouchableOpacity onPress={() => {
@@ -445,8 +445,8 @@ function Task_management_Item({
     writePostApi("POST", Api.Change_Task_Status, formData).then(json => {
       if (json) {
         if (json?.status === true) {
-          setMessage(json?.msg);
-          setShowMessage(true);
+          // setMessage(json?.msg);
+          // setShowMessage(true);
           My_TaskList_server(json.msg,'Cancell');
           let index = GLOBAL?.FilterList.findIndex((p) => p.taskId === GLOBAL.TaskId);
           let mark = [...GLOBAL?.FilterList];
@@ -643,7 +643,6 @@ function Task_management_Item({
     formData.append("title", value?.Title);
     if (GLOBAL?.selectItem === 1)
       formData.append("description", value?.TaskNote);
-
     if (ImageSourceviewarrayUpload?.length !== 0) {
       ImageSourceviewarrayUpload?.forEach((obj) => {
         formData.append("attachments[]", {
@@ -685,6 +684,7 @@ function Task_management_Item({
     } else {
       writePostApi("POST", Api.UpdateTask, formData).then(json => {
         if (json) {
+
           if (json?.status === true) {
             if (GLOBAL?.selectItem === 1) {
               My_TaskList_server();
@@ -1037,7 +1037,7 @@ function Task_management_Item({
     </View>
   );
   const selectVideoGallery= async () => {
-    onClose();
+    onClosetask();
     selectPhotoGalleryVideo().then(response => {
       if (response.didCancel) {
       } else if (response.error) {
@@ -1074,7 +1074,7 @@ function Task_management_Item({
     });
   };
   const selectVideocamera =async () => {
-    onClose();
+    onClosetask();
     selectPhotocameraVideo().then(response => {
       var getFilename = response.path.split("/");
       var imgName = getFilename[getFilename.length - 1];
@@ -1249,6 +1249,7 @@ function Task_management_Item({
     setshowModalAddImage(true);
   };
   const onClosetask = () => {
+    setUploadType('')
     setshowModalAddImage(false);
   };
   return (
@@ -1280,11 +1281,12 @@ function Task_management_Item({
 
                       if (Days !== 0) {
                         setdateDifferenceInHours(0);
-                        setdateDifferenceInDays(parseInt(Days));
+                        setdateDifferenceInDays(parseInt(Math.abs(Days)));
                         setTimeRelatedselct("days");
                       } else {
                         setdateDifferenceInDays(0);
-                        setdateDifferenceInHours(parseInt(hours));
+                        setdateDifferenceInHours(parseInt(Math.abs(hours)));
+
                         setTimeRelatedselct("hours");
                       }
                     } else {
@@ -1299,11 +1301,13 @@ function Task_management_Item({
                       );
                       if (Days !== 0) {
                         setdateDifferenceInHours(0);
-                        setdateDifferenceInDays(parseInt(Days));
+                        setdateDifferenceInDays(parseInt(Math.abs(Days)));
+
                         setTimeRelatedselct("days");
                       } else {
                         setdateDifferenceInDays(0);
-                        setdateDifferenceInHours(parseInt(hours));
+
+                        setdateDifferenceInHours(parseInt(Math.abs(hours)));
                         setTimeRelatedselct("hours");
                       }
                     }
@@ -1332,11 +1336,12 @@ function Task_management_Item({
                       );
                       if (Days !== 0) {
                         setdateDifferenceInHours(0);
-                        setdateDifferenceInDays(parseInt(Days));
+                        setdateDifferenceInDays(parseInt(Math.abs(Days)));
+
                         setTimeRelatedselct("days");
                       } else {
                         setdateDifferenceInDays(0);
-                        setdateDifferenceInHours(hours);
+                        setdateDifferenceInHours(parseInt(Math.abs(hours)));
                         setTimeRelatedselct("hours");
                       }
                     } else {
@@ -1350,11 +1355,12 @@ function Task_management_Item({
                       );
                       if (Days !== 0) {
                         setdateDifferenceInHours(0);
-                        setdateDifferenceInDays(parseInt(Days));
+                        setdateDifferenceInDays(parseInt(Math.abs(Days)));
                         setTimeRelatedselct("days");
                       } else {
                         setdateDifferenceInDays(0);
-                        setdateDifferenceInHours(parseInt(hours));
+                        setdateDifferenceInHours(parseInt(Math.abs(hours)));
+
                         setTimeRelatedselct("hours");
                       }
                     }

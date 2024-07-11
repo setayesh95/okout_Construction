@@ -7,7 +7,7 @@ function TaskFilterDropDown({value,TypeName,setRelatedId,sectionList,
                               selectedsectionName,RelatedNameList,
                               getFeatures,setselectedsectionName,FilterTaskEntityDropDown,getUnit2,
                               getLists,categoryLevellist,
-                              TypeName2,setselectedrelatedname
+                              TypeName2,setselectedrelatedname,RelatedNameListTask
                             }) {
   const [selectedTaskName,setselectedTaskName]=useState('');
   const [value2, setValue] = useState('');
@@ -28,7 +28,7 @@ function TaskFilterDropDown({value,TypeName,setRelatedId,sectionList,
           {
             TypeName2==='Add'&&
             <View style={Styles.ItemModalFilter}>
-              <Text style={Styles.txt_leftModalFilterTAsk}>{value.label}</Text>
+              <Text style={Styles.txt_leftModalFilterTAsk}>{value.Name}</Text>
             </View>
           }
 
@@ -58,8 +58,21 @@ function TaskFilterDropDown({value,TypeName,setRelatedId,sectionList,
              FilterTaskEntityDropDown(item,categoryId2)
               getLists(categoryId,item.value);
               setRelatedId(item.value)
-              setselectedrelatedname({label:categoryLevellist?.[Index]?.label,value:"0",_index:0})
-
+              let index = GLOBAL.Selected?.findIndex((p) => p?.Id === categoryId2);
+              if(index!==-1) {
+                GLOBAL.Selected[index] = {
+                  ...GLOBAL.Selected[index], Name: item.label,
+                };
+              }
+              else {
+                GLOBAL.Selected.push({
+                  Name:item.label,
+                  Id:categoryId2
+                })
+              }
+              setselectedrelatedname({label:categoryLevellist?.[Index]?.Name,value:"0",_index:0})
+              GLOBAL.RelatedIdTask=item.value
+              GLOBAL.relatedName=categoryLevellist?.[Index]?.Name
             }}
           />
         </>
@@ -68,7 +81,7 @@ function TaskFilterDropDown({value,TypeName,setRelatedId,sectionList,
             {
               TypeName2==='Add'&&
               <View style={Styles.ItemModalFilter}>
-                <Text style={Styles.txt_leftModalFilterTAsk}>{value.label}</Text>
+                <Text style={Styles.txt_leftModalFilterTAsk}>{value.Name}</Text>
               </View>
             }
             <Dropdown
@@ -90,7 +103,7 @@ function TaskFilterDropDown({value,TypeName,setRelatedId,sectionList,
               onFocus={() => setIsFocusrelated(true)}
               onBlur={() => setIsFocusrelated(false)}
               onChange={item=> {
-                console.log(item,'item')
+
                 const Index=categoryLevellist.findIndex((p)=>parseInt(p.value)===parseInt(value.value))
                 const categoryId= categoryLevellist?.[Index+1]?.value;
                 const categoryId2 = categoryLevellist?.[Index]?.value;
@@ -100,6 +113,21 @@ function TaskFilterDropDown({value,TypeName,setRelatedId,sectionList,
                 FilterTaskEntityDropDown(item,categoryId2)
                 setRelatedId(item.value)
                 setselectedrelatedname({label:categoryLevellist?.[Index]?.label,value:"0",_index:0})
+                let index = GLOBAL.Selected?.findIndex((p) => p?.Id === categoryId2);
+                if(index!==-1) {
+                  GLOBAL.Selected[index] = {
+                    ...GLOBAL.Selected[index], Name: item.label,
+                  };
+                }
+                else {
+                  GLOBAL.Selected.push({
+                    Name:item.label,
+                    Id:categoryId2
+                  })
+                }
+                setselectedrelatedname({label:categoryLevellist?.[Index]?.Name,value:"0",_index:0})
+                GLOBAL.RelatedIdTask=item.value
+                GLOBAL.relatedName=categoryLevellist?.[Index]?.Name
               }}
             />
           </>
@@ -109,7 +137,7 @@ function TaskFilterDropDown({value,TypeName,setRelatedId,sectionList,
                 {
                   TypeName2==='Add'&&
                   <View style={Styles.ItemModalFilter}>
-                    <Text style={Styles.txt_leftModalFilterTAsk}>{value.label}</Text>
+                    <Text style={Styles.txt_leftModalFilterTAsk}>{value.Name}</Text>
                   </View>
                 }
                 <Dropdown
@@ -131,7 +159,7 @@ function TaskFilterDropDown({value,TypeName,setRelatedId,sectionList,
                   onFocus={() => setIsFocusrelated(true)}
                   onBlur={() => setIsFocusrelated(false)}
                   onChange={item=> {
-                    console.log(item,'item')
+
                     const Index=categoryLevellist.findIndex((p)=>parseInt(p.value)===parseInt(value.value))
                     const categoryId= categoryLevellist?.[Index+1]?.value;
                     const categoryId2 = categoryLevellist?.[Index]?.value;

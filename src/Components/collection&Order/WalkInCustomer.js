@@ -1,28 +1,30 @@
-import { Container, Content } from "native-base";
+import { FlatList, Image, ImageBackground, Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Styles } from "../Styles";
-import { Header } from "../component/Header";
-import { FlatList, Image, Modal, Text, TouchableOpacity, View } from "react-native";
-import { Warningmessage } from "../component/Warningmessage";
-import { Footer1 } from "../component/Footer";
-import React, { useEffect, useState } from "react";
 import normalize from "react-native-normalize/src/index";
 import LinearGradient from "react-native-linear-gradient";
 import { removeDataStorage } from "../Get_Location";
 import { UserPermission } from "../CheckPermission";
-import { TextInputI } from "../component/TextInputI";
-let City=[]
+import React, { useEffect, useState } from "react";
+import { Container, Content } from "native-base";
+import { Header } from "../component/Header";
+import { Warningmessage } from "../component/Warningmessage";
+import { Footer1 } from "../component/Footer";
 const GLOBAL = require("../Global");
-const Photoes=require('../Photoes')
-function Customer({navigation,navigation:{goBack}}) {
+const Photoes=require('../Photoes');
+import AntDesign from "react-native-vector-icons/AntDesign";
+import { Dropdown } from "react-native-element-dropdown";
+import { TextInputI } from "../component/TextInputI";
+let numOfLinesCompany=0
+function WalkInCustomer({navigation,navigation:{goBack}}) {
   const [showModalDelete, setshowModalDelete] = useState(false);
   const [showWarning, setshowWarning] = useState(false);
-
+  const [Cheked,setCheked] = useState(false);
+  const [CountryList,setCountryList] = useState([]);
+  const [categorylist,setcategorylist] = useState([]);
   const [CityList,setCityList] = useState([]);
   const [cityId,setcityId] = useState('');
   const [countryId,setcountryId] = useState('');
   const [GeoAddressCountry, setGeoAddressCountry] = useState('');
-  const [Cheked,setCheked] = useState(false);
-  const [CountryList,setCountryList] = useState([]);
   const [GeoAddressCity, setGeoAddressCity] = useState('');
   const logout_Url= () => {
     setshowModalDelete(true)
@@ -72,6 +74,21 @@ function Customer({navigation,navigation:{goBack}}) {
       </View>
     </View>
   );
+  const renderItem_Location = (item,value) => {
+    return (
+      <View style={Styles.item_dropdownLocation}>
+        <Text style={Styles.textItem}>{item.label}</Text>
+        {item.value === value && (
+          <AntDesign
+            style={Styles.icon}
+            color="black"
+            name="Safety"
+            size={20}
+          />
+        )}
+      </View>
+    );
+  };
   const Navigate_Url= (Url) => {
     if(Url==='ProfileStack') {
       UserPermission(GLOBAL.UserPermissionsList?.Profile).then(res => {
@@ -129,33 +146,32 @@ function Customer({navigation,navigation:{goBack}}) {
       setcityId(Default_cityId)
     }
   };
-
   return (
     <Container style={[Styles.Backcolor]}>
-      <Header colors={['#ffc2b5','#fca795','#d1583b']} StatusColor={'#ffc6bb'} onPress={goBack}
-              Title={"Customer"} />
-      <Content style={{zIndex:1000}}>
-      <View style={[Styles.containerList]}>
-        {
-          showModalDelete &&
-          <View>
-            {
-              _showModalDelete()
-            }
-          </View>
-        }
-        {showWarning===true&& <Warningmessage/>}
+      <Header colors={["#4d78a5", "#375e89", "#27405c"]} StatusColor={'#5079a5'} onPress={goBack}
+              Title={"Walk In Customer"} />
+      <Content contentContainerStyle={{alignItems:'center',justifyContent:'center'}}>
+          {
+            showModalDelete &&
+            <View>
+              {
+                _showModalDelete()
+              }
+            </View>
+          }
+          {showWarning===true&& <Warningmessage/>}
         <View style={Styles.mainSystemDesigner}>
-          <TextInputI onChangeText={(value)=>CreateCustomer(value)}  numberValue={30} CountryList={CountryList} CityList={CityList}
-                      ChangeChecked={(value)=>ChangeChecked(value)}  tittlebtn={'Submit'} getCity={getCity}
+          <TextInputI onChangeText={(value)=>CreateCustomer(value)}  numberValue={41} CountryList={CountryList} CityList={CityList}
+                      ChangeChecked={(value)=>ChangeChecked(value)}  tittlebtn={'Edit Sales Order'} getCity={getCity}
                       GeoAddressCountry={GeoAddressCountry} setGeoAddressCountry={setGeoAddressCountry}
                       GeoAddressCity={GeoAddressCity} setGeoAddressCity={setGeoAddressCity}
           />
         </View>
-      </View>
+
       </Content>
       <Footer1 onPressHome={Navigate_Url}  onPressdeleteAsync={logout_Url} />
     </Container>
   );
 }
-export default Customer;
+export default WalkInCustomer;
+

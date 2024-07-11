@@ -13,15 +13,20 @@ import { Dropdown } from "react-native-element-dropdown";
 import LinearGradient from "react-native-linear-gradient";
 import { Container, Content } from "native-base";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { TextInputI } from "./TextInputI";
 const GLOBAL = require("../Global");
 function POS_List_Item({
                               value,
                               SeeDetail,
                                data,
-                               Navigate_Url,
+                               Navigate_Url,Type
                             }) {
   const [isFocus, setIsFocus] = useState(false);
   const [visible,setvisible] = useState(false);
+  const [GeoAddressCountry, setGeoAddressCountry] = useState('');
+  const [Cheked,setCheked] = useState(false);
+  const [CountryList,setCountryList] = useState([]);
   const ClickManagement = (id, Id) => {
     if(id=== "14") {
       setvisible(true)
@@ -51,26 +56,25 @@ function POS_List_Item({
         .catch(err => console.error("An error occurred", err));
     }
   }
+  const CreateCustomer=()=>{
+  }
+  const ChangeChecked =(value) => {
+    setCheked(!Cheked);
+  };
   return (
           <View  style={Styles.ItemDetailBox}>
             <View style={Styles.With90}>
               <View style={{ width: "100%" }}>
-                <Text onPress={() => SeeDetail(value.Id)} style={[Styles.txt_left_Pos]}>{value.Name}</Text>
-                <View style={Styles.BtnListStyle}>
-                  {/*<Text onPress={() => SeeDetail(value.Id)} style={[Styles.txt_left_small2]}>{value.Address}</Text>*/}
-                  <LinearGradient colors={["#4d78a5", "#375e89", "#27405c"]} style={Styles.btnList}>
-                    <TouchableOpacity onPress={() =>  Navigate_Url('InvoiceScreen')}>
-                      <Text
-                        style={[Styles.txt_left2, { fontSize: normalize(14) }]}>Invoice</Text>
-                    </TouchableOpacity>
-                  </LinearGradient>
-                  <LinearGradient colors={['#a39898', '#786b6b', '#382e2e']} style={Styles.btnPos}>
-                        <TouchableOpacity onPress={() => {
-                          Navigate_Url('InvoiceScreen')}}>
-                          <Text style={[Styles.txt_left2, { fontSize: normalize(14) }]}> Return Invoice</Text>
-                        </TouchableOpacity>
-                  </LinearGradient>
-                </View>
+                <TouchableOpacity  onPress={() => {
+                  SeeDetail(value);
+                  if(Type==='Pos')
+                  setvisible(true)
+                }} style={{ width: "100%" ,flexDirection:'row'}}>
+                  <FontAwesome size={normalize(22)} color={Colors.black} name={'user'} style={{ }}/>
+                  <Text style={[Styles.txt_left4]}>{value.Name}</Text>
+                </TouchableOpacity>
+                  <Text  style={[Styles.txt_left_Pos_Gray]}>{value.Address}</Text>
+
               </View>
             </View>
             <Modal
@@ -91,67 +95,27 @@ function POS_List_Item({
                       <AntDesign name={"closecircleo"} size={20} color={Colors.button} />
                     </TouchableOpacity>
                   </View>
-                  <View style={Styles.formContainer}>
-                    <View style={Styles.InputeRowItems2}>
-                      <Text
-                        style={[Styles.txtLightColor, { marginTop: normalize(10), textAlign: "left" }]}>Street</Text>
-                      <View
-                        style={[Styles.inputStyleLocation]}>
-                        <Text numberOfLines={3} style={[Styles.txtLightColor]}>{value?.street}</Text>
+                  <View style={Styles.formContainertask}>
+                    <TextInputI onChangeText={(value)=>CreateCustomer(value)}  numberValue={42} CountryList={CountryList}
+                                ChangeChecked={(value)=>ChangeChecked(value)}
+                                GeoAddressCountry={GeoAddressCountry} setGeoAddressCountry={setGeoAddressCountry}
+
+                    />
+                      <View style={Styles.BtnListStylePos}>
+                        {/*<Text onPress={() => SeeDetail(value.Id)} style={[Styles.txt_left_small2]}>{value.Address}</Text>*/}
+                        <LinearGradient colors={["#4d78a5", "#375e89", "#27405c"]} style={Styles.btnList}>
+                          <TouchableOpacity onPress={() =>  Navigate_Url('InvoiceScreen')}>
+                            <Text
+                              style={[Styles.txt_left2, { fontSize: normalize(15),paddingVertical:7 }]}>Invoice</Text>
+                          </TouchableOpacity>
+                        </LinearGradient>
+                        <LinearGradient colors={['#a39898', '#786b6b', '#382e2e']} style={Styles.btnPos}>
+                          <TouchableOpacity onPress={() => {
+                            Navigate_Url('InvoiceScreen')}}>
+                            <Text style={[Styles.txt_left2, { fontSize: normalize(15),paddingVertical:7 }]}> Return Invoice</Text>
+                          </TouchableOpacity>
+                        </LinearGradient>
                       </View>
-                    </View>
-                    <View style={Styles.InputeRow}>
-                      <View style={Styles.InputeRowItems}>
-                        <Text
-                          style={[Styles.txtLightColor, { marginTop: normalize(10), textAlign: "left" }]}>Country</Text>
-                        <View
-                          style={[Styles.inputStyleLocation]}>
-
-                          <Text style={[Styles.txtLightColor]}>{value?.countryName}</Text>
-
-                        </View>
-                      </View>
-                      <View style={Styles.InputeRowItems}>
-                        <Text
-                          style={[Styles.txtLightColor, { marginTop: normalize(10), textAlign: "left" }]}>City</Text>
-                        <View
-                          style={[Styles.inputStyleLocation]}>
-                          <Text style={[Styles.txtLightColor]}>{value?.cityName}</Text>
-
-                        </View>
-                      </View>
-
-                      <View style={Styles.InputeRowItems}>
-                        <Text style={[Styles.txtLightColor, { marginTop: normalize(10), textAlign: "left" }]}>postal
-                          code</Text>
-                        <View
-                          style={[Styles.inputStyleLocation]}>
-                          <Text style={[Styles.txtLightColor]}>{value?.postalCode}</Text>
-
-                        </View>
-                      </View>
-                      <TouchableOpacity onPress={()=>openMaps(value?.geoLat,value?.geoLong)} style={Styles.InputeRowItems}>
-                        <View style={Styles.InputeRowLocation}>
-                          <MaterialCommunityIcons
-                            style={Styles.icon_Location}
-                            color="#fff"
-                            name="map-search-outline"
-                            size={14}
-                          />
-                          <Text style={[Styles.txtLightColor,{marginTop:normalize(10),textAlign:"left"}]}>Lat & Long
-                            <Text style={Styles.txtLightColor_samall}>  (click here)</Text>
-                          </Text>
-                        </View>
-
-                        <View
-                          style={Styles.inputStyleLocation}>
-                          { value?.geoLat&&value?.geoLong?
-                            <Text style={Styles.txtLightColorLocation}>{value?.geoLat} , {value?.geoLong}</Text>:
-                            <Text style={Styles.txtLightColorLocation}></Text>
-                          }
-                        </View>
-                      </TouchableOpacity>
-                    </View>
                   </View>
                 </View>
               </Content>

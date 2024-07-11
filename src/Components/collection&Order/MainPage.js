@@ -12,10 +12,11 @@ import { UserPermission } from "../CheckPermission";
 import POS_List_Item from "../component/POS_List_Item";
 const GLOBAL = require("../Global");
 const Photoes=require('../Photoes');
-function PosScreen({navigation,navigation:{goBack}}) {
+function MainPage({navigation,navigation:{goBack}}) {
   const [showModalDelete, setshowModalDelete] = useState(false);
   const [showWarning, setshowWarning] = useState(false);
-  const [modules, setmodules] = useState([{ Id: 0 ,Name:'Walk In MoveOut',Address:'test address,London'},{ Id: 1 ,Name:'TEST CUSTOMER (TEST CUSTOMER) ',Address:'test address,London'}]);
+  const [modules, setmodules] = useState([{ Id: 0 ,Name:'Walk In MoveOut',Address:'test address,London'},
+    { Id: 1 ,Name:'TEST CUSTOMER (TEST CUSTOMER) ',Address:'test address,London'}]);
   const logout_Url= () => {
     setshowModalDelete(true)
   };
@@ -78,11 +79,15 @@ function PosScreen({navigation,navigation:{goBack}}) {
       navigation.navigate(Url);
   };
 const SeeDetail=()=>{
+  if(GLOBAL.Type==='Order')
+    navigation.navigate('WalkInCustomer')
+  else
+  navigation.navigate('CollectionDetail')
 }
   useEffect(() => {
   }, []);
   const renderItem=({ item ,index})=>(
-    <POS_List_Item data={GLOBAL.Pos_dyb} value={item} Type={'Pos'}  SeeDetail={SeeDetail}
+    <POS_List_Item data={GLOBAL.Pos_dyb} value={item} Type={GLOBAL.Type}  SeeDetail={SeeDetail}
                    Navigate_Url={Navigate_Url}/>
   )
 
@@ -92,7 +97,7 @@ const SeeDetail=()=>{
   return (
     <Container style={[Styles.Backcolor]}>
       <Header colors={['#ffc2b5','#fca795','#d1583b']} StatusColor={'#ffc6bb'} onPress={goBack}
-              Title={"Pos"} />
+              Title={ GLOBAL.Type} />
 
         <View style={[Styles.containerList]}>
           {
@@ -132,4 +137,4 @@ const SeeDetail=()=>{
     </Container>
   );
 }
-export default PosScreen;
+export default MainPage;

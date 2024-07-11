@@ -5,7 +5,7 @@ import {
   View,
   StyleSheet,
   Dimensions,
-  TouchableOpacity, Linking, Button, ImageBackground, Modal, Image, LogBox,
+  TouchableOpacity,Modal,Image,LogBox,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -53,8 +53,7 @@ let numOfLinesCompany = 0;
 const screen = Dimensions.get('window');
 const ASPECT_RATIO = (screen.width / screen.height)/4;
 const LATITUDE_DELTA = 4;
-let City=[]
-
+let City=[];
 const LONGITUDE_DELTA =( LATITUDE_DELTA * ASPECT_RATIO)/2;
 function TextInputI({ GeoAddressCity,
                       GeoAddressCountry,
@@ -89,7 +88,7 @@ function TextInputI({ GeoAddressCity,
                       selectparentname, setselectparentname,DirectoryUser,DirectoryUserName,setDirectoryUserName,setDirectoryUserId,
                       setOpenEnd,DateFormat,DateFormatEnd,Status,StatusName,setStatusName,setStatusId,selectFile,filename,Recipient,
                       RecipientName,setRecipientName,RecipientId,setRecipientId,setRelatedName,uploadType,setShowMessagetype,
-                      setTaskissuesId,selectedTaskissues, setselectedTaskissues,Taskissues
+                      setTaskissuesId,selectedTaskissues, setselectedTaskissues,Taskissues,CountryList,
                     }) {
   const { navigate } = useNavigation();
   const player = useRef(null);
@@ -141,6 +140,9 @@ function TextInputI({ GeoAddressCity,
   const [partialResults, setPartialResults] = useState([]);
   const [Title, setTitle] = useState('');
   const [RelatedNameListTask, setRelatedNameListTask] = useState([]);
+  const [TitleAddTask, setTitleAddTask] = useState('');
+  const [DescriptionAddTask, setDescriptionAddTask] = useState('');
+
   const videoError = error => {
 
   }
@@ -165,13 +167,13 @@ function TextInputI({ GeoAddressCity,
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.Task_subcategory + `userId=${GLOBAL.UserInformation?.userId}&categoryId=${value}`).then(json => {
         let A = [];
-
         const dataList=[];
         for (let item in json?.subCategories) {
           let obj = json?.subCategories?.[item];
           A.push({
             value: obj.categoryId,
             label: obj.categoryTitle,
+            Name: obj.categoryTitle,
             categoryEntityShow:obj.categoryEntityShow,
             categoryLevel:obj.categoryLevel,
             data:dataList,
@@ -200,19 +202,37 @@ function TextInputI({ GeoAddressCity,
           }
         }
         else if(value==='4'||value==='5') {
-          console.log(value==='4','value===\'4\'',value)
-          setRelatedNameListTask (A);
 
           if(value==='4'){
+            if(GLOBAL.Selected?.length!==0){
+              setRelatedNameListTask (GLOBAL.RelatedNameListTask);
+              setRelatedId(GLOBAL.RelatedIdTask)
+              setselectedrelatedname({label:GLOBAL.relatedName,value:'3',_index:0})
+            }
+            else {
+              getSites3(A)
+              setRelatedNameListTask (A);
+            }
 
-            getSites3(A);
           }
 
+          else {
+            setRelatedNameListTask (A);
+
+          }
         }
         else if(value==='1'||value==='2')
         {
-          setRelatedNameListTask (A);
-          console.log(A,'A: Task_subcategory')
+          if(GLOBAL.Selected?.length!==0){
+            setRelatedNameListTask (  GLOBAL.RelatedNameListTask);
+            setRelatedId(GLOBAL.RelatedIdTask)
+            setselectedrelatedname({label:GLOBAL.relatedName,value:'3',_index:0})
+            Task_WorkTypeList(GLOBAL?.categoryId);
+
+          }
+         else{
+            setRelatedNameListTask (A);
+          }
           const first = A?.find((_, index) => !index);
           Task_RelatedList(first?.value,A);
           // Task_RelatedList(Id,A);
@@ -239,7 +259,6 @@ function TextInputI({ GeoAddressCity,
       }
   }
   const getSites3=async (list)=>{
-    console.log('getSites3')
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.RentalUnits + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
         writeDataStorage(GLOBAL.RentalUnits_List, json?.allSiteInfo);
@@ -250,7 +269,7 @@ function TextInputI({ GeoAddressCity,
             label: obj.siteName,
             units:obj.units,
           });
-          console.log(list,'list')
+
           const first = list?.find((_, index) => !index);
           if(list?.length!==0) {
             list?.find((p) => p?.value ===first?.value)?.data?.push({
@@ -349,7 +368,7 @@ function TextInputI({ GeoAddressCity,
   }
   const validationSchema30 = Yup.object().shape({
     CompanyName: Yup.string().required("please! Company Name?"),
-    CustomerName: Yup.string().required("please! Customer Name?"),
+    CustomerName: Yup.string().required("please! MoveOut Name?"),
     TRNNo: Yup.string().required("please!  TRN Number?"),
     Phone: Yup.string().matches(new RegExp("[0-9]{7}")).required("please! PhoneNumber?"),
     Email: Yup.string()
@@ -576,14 +595,37 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
     fontFamily:'TisaSansProBoldItalic',
 
   };
-  const inputStyleCustomer = {
+  const inputStyle3 = {
     borderWidth: 1,
-    borderColor:GLOBAL.OFFICIAL_Button,
+    borderColor:GLOBAL.OFFICIAL_BLUE_COLOR,
     borderRadius: normalize(6),
     padding: 12,
     marginBottom: 5,
     width:'100%',
     paddingVertical: 4,
+    color: GLOBAL.OFFICIAL_BLUE_COLOR,
+    fontFamily:'TisaSansProBoldItalic',
+
+  };
+  const inputStyleOrder = {
+    borderWidth: 1,
+    borderColor:GLOBAL.OFFICIAL_BLUE_COLOR,
+    borderRadius: normalize(6),
+    padding: 12,
+    marginBottom: 5,
+    width:'100%',
+    paddingVertical: 2,
+    color: GLOBAL.OFFICIAL_BLUE_COLOR,
+    fontFamily:'TisaSansProBoldItalic',
+
+  };
+  const inputStyleCustomer = {
+    borderWidth: 1,
+    borderColor:GLOBAL.OFFICIAL_Button,
+    borderRadius: normalize(6),
+    padding: 12,
+    width:'100%',
+    paddingVertical: 3,
     color: GLOBAL.OFFICIAL_BLUE_COLOR,
     fontFamily:'TisaSansProBoldItalic',
     backgroundColor:GLOBAL.OFFICIAL_WITE_COLOR,
@@ -713,10 +755,11 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                 setShowMessage(true);
                 setShowButton(true)
                 setShowBtn(true)
+
                 setTimeout(function(){ setShowMessage(false)}, 4000)
               }
               else{
-                setMessage(json?.msg);
+                setMessage(json?.error?.relatedId?.replace(/<\/?span[^>]*>/g,""));
                 setShowMessage(true);
                 setShowButton(true)
                 setShowBtn(true)
@@ -729,8 +772,10 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
             else {
               values.TaskNote=''
               values.Title=''
-              setMessage("Your task successfully added");
-
+              if(relatedId==='')
+                setMessage("The Related field is required.");
+              else
+                setMessage("Your task successfully added");
               setShowMessage(true);
               setShowButton(true)
               setShowBtn(true)
@@ -760,7 +805,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                 setTimeout(function(){ setShowMessage(false)}, 4000)
               }
               else{
-                setMessage(json?.msg);
+                setMessage(json?.error?.relatedId?.replace(/<\/?span[^>]*>/g,""));
                 setShowMessage(true);
                 setShowButton(true)
                 setShowBtn(true)
@@ -771,7 +816,10 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
               }
             }
             else {
-              setMessage("Your task successfully added");
+              if(relatedId==='')
+                setMessage("The Related field is required.");
+              else
+                setMessage("Your task successfully added");
               values.TaskNote=''
               values.Title=''
               setShowMessage(true);
@@ -822,8 +870,6 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
             value: obj.relatedId,
             label: obj.relatedName,
           });
-          console.log(A,'A')
-          console.log(list,'list')
           if(list?.length!==0&&list!==undefined)
           {
             list.find((p) => p.value ===Id).data=[]
@@ -832,6 +878,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
               label: obj.relatedName,
             });
           }
+
         }
         if(GLOBAL.TaskRelatedNameId!==''||RelatedId_Info!=='') {
           let seacrhId=A?.find(p =>parseInt(p.value) ===parseInt( GLOBAL.ProjectId))?.value
@@ -847,6 +894,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
           else
             getSites(categoryId,seacrhId,SubCategory_List);
         }
+
         setTaskRelated(A);
       })
     }
@@ -860,7 +908,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
     {
       readOnlineApi(Api.Task_Project+`userId=${GLOBAL.UserInformation?.userId}&categoryId=${Id}`).then(json => {
         let A = [];
-        console.log(json?.relatedList,'json?.relatedList')
+
         for (let item in json?.relatedList) {
           let obj = json?.relatedList?.[item];
           A.push({
@@ -886,12 +934,10 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
 
   }
   const getLists=async(TaskRelatedNameId,value)=>{
-    let list=''
     const json=await getEntityInfo(TaskRelatedNameId,value)
     RelatedNameList.find((p)=>p.value===TaskRelatedNameId).data=[];
     for (let item in json?.relatedList) {
       let obj = json?.relatedList?.[item];
-
       RelatedNameList?.find((p)=>p.value===TaskRelatedNameId)?.data?.push({  value: obj.relatedId,
       label: obj.relatedName,})
     }
@@ -910,9 +956,6 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   if(GLOBAL.TaskRelatedNameId!==''||RelatedId_Info!=='') {
                     let seacrhId=A?.find(p =>parseInt(p.value) ===parseInt( GLOBAL.SiteId))?.value
                     const categoryId= SubCategory_List.find((p)=>p.categoryLevel==='3')?.value;
-                    console.log(A,'A')
-                    console.log(GLOBAL.SiteId,'GLOBAL.SiteId')
-                    console.log(A?.find(p => parseInt(p.value) ===parseInt(  GLOBAL.SiteId)),'A?.find(p => parseInt(p.value) ===parseInt(  GLOBAL.SiteId))')
                     setselectedTaskSiteName({
                       label:A?.find(p => parseInt(p.value) ===parseInt(  GLOBAL.SiteId))?.label,
                       value:A?.find(p =>parseInt(p.value) ===parseInt( GLOBAL.SiteId))?.value,
@@ -1009,11 +1052,11 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
         }
   };
   const getInfo=async ()=>{
+
     setCategoryId(GLOBAL?.categoryId);
     setSelectedcategory({label:"Subcontract",value:"1",_index:0});
     let SubCategory_List =JSON.parse(await AsyncStorage.getItem(GLOBAL.Task_SubCategory2))
     setRelatedNameList(SubCategory_List);
-    console.log(SubCategory_List,'SubCategory_List')
     setcategoryEntityShow('y');
     Task_WorkTypeList(GLOBAL?.categoryId);
     Task_RelatedList('1',[],SubCategory_List);
@@ -1096,9 +1139,6 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
   const getUnit2=(categoryId,value)=>{
     let A=[]
     let json=SiteList.find((p)=>p.value===value)?.units
-    console.log(json,'json',value,'value')
-    console.log(SiteList,'SiteList')
-    console.log(RelatedNameListTask,'RelatedNameListTask')
     //RelatedNameListTask.find((p)=>p.value===categoryId).data=[];
     json?.forEach((obj) => {
       A.push({
@@ -1138,13 +1178,14 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
       setswitchDYB2(Boolean);
     }
 
-    if( GLOBAL.TaskRelatedNameId!==''){
+    if(GLOBAL.TaskRelatedNameId!==''){
+      Task_subcategory('1');
       getInfo()
     }
     if(GLOBAL.TaskRelatedCheck===''||  GLOBAL.ScreenName!=='Snagging'&& GLOBAL.ScreenName!=='Subcontract'&&GLOBAL.ScreenName!=='Property Maintenance'&&GLOBAL.ScreenName!=='Support') {
       setcategoryEntityShow("y");
     }
-    if(  GLOBAL.ScreenName==='Snagging'|| GLOBAL.ScreenName==='Subcontract'||
+    if(GLOBAL.ScreenName==='Snagging'|| GLOBAL.ScreenName==='Subcontract'||
       GLOBAL.ScreenName==='Property Maintenance'||GLOBAL.ScreenName==='Support') {
       setCategoryId(GLOBAL?.categoryId);
       if(  GLOBAL.ScreenName==='Snagging'|| GLOBAL.ScreenName==='Subcontract') {
@@ -1155,19 +1196,15 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
         else
           Id='2'
         Task_subcategory(Id);
-
       }
       else if(GLOBAL.ScreenName==='Property Maintenance'){
         Task_subcategory('4')
         setcategoryEntityShow('n')
       }
     }
-
-    Task_subcategory('1');
     if(GLOBAL.ScreenName==='Support')
       setcategoryEntityShow("n")
     if(GLOBAL.TaskRelatedCheck!==''){
-
       Task_subcategory('4')
       setcategoryEntityShow("n")
       setCategoryId(GLOBAL?.categoryId);
@@ -1217,11 +1254,21 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
   };
 
   const onSpeechResults = (e) => {
+
     let result=e.value?.[0].toString();
     if(numberValue === 25&&GLOBAL.Type==='Description')
-      setResults(value?.taskDescription +' '+result)
-      else if(GLOBAL.Type==='Title')
-      setResultstitle(value?.Title +' '+result)
+      setResults(result)
+      // if(DescriptionAddTask!==''||DescriptionAddTask!==undefined)
+      // setResults(value?.taskDescription +' '+result)
+      //   else
+
+      else if(GLOBAL.Type==='Title') {
+      setResultstitle( result);
+      //   if(Title!==''||Title!==undefined)
+      // setResultstitle(Title + " " + result);
+      //   else
+
+    }
     else {
       setResults(result);
     }
@@ -1233,8 +1280,8 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
     setVolume(e.value);
   };
   const _startRecognizing = async (Title) => {
+
     GLOBAL.Type='Description'
-    setTitle(Title)
     _clearState();
     try {
       await Voice.start('en-US');
@@ -1242,9 +1289,11 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
 
     }
   };
+  // const [TitleAddTask, setTitleAddTask] = useState('');
+  // const [DescriptionAddTask, setDescriptionAddTask] = useState('');
+
   const _startRecognizingtitle = async (Title) => {
     GLOBAL.Type='Title'
-    setTitle(Title)
     _clearState();
     try {
       await Voice.start('en-US');
@@ -3340,7 +3389,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
         <View style={{width:'100%',justifyContent:'center',alignItems:'center'}}>
           <Formik
             initialValues={{
-              Title:Title,
+              Title:resultstitle,
               TaskNote:results,
             }}
             enableReinitialize
@@ -3388,6 +3437,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   {
                     startedtitle===''&&endtitle===''?
                       <TouchableOpacity onPress={()=> {
+                        setTitle(values.Title)
                         _startRecognizingtitle(values.Title);
                       }} style={[{}]}>
                         <MaterialIcons name={"keyboard-voice"} size={18} color={startedtitle===''&&endtitle===''?Colors.borderButton:Colors.Red} />
@@ -3810,7 +3860,6 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   //||GLOBAL.TaskRelatedCheck!==''
                       GLOBAL.ScreenName==='Property Maintenance'?
                         <>
-
                           {RelatedNameListTask?.map((value, key) => {
                             return (
                               <TaskFilterDropDown
@@ -3830,7 +3879,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
 
                             );
                           })}
-                          
+
                         </>:
                         GLOBAL.ScreenName==='Support'?
 <>
@@ -3912,7 +3961,6 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                                                 textStyle={Styles.txtLightColor22}  dropdownStyle={Styles.dropdowntask}   placeholderStyle={Styles.placeholderStyle}
                                                 selectedTextStyle={Styles.selectedTextStyle}  setShowBackBtn={ setShowBackBtn}
                                                 containerStyle={Styles.containerStyle} setRelatedName={setRelatedName}
-
                                   />
                                 );
                               })}
@@ -3961,7 +4009,8 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                   {
                     started===''&&end===''?
                       <TouchableOpacity onPress={()=> {
-                          _startRecognizing(values.Title);
+                        setDescriptionAddTask(values.TaskNote)
+                          _startRecognizing(values.TaskNote);
                       }} style={[{}]}>
                         <MaterialIcons name={"keyboard-voice"} size={18} color={started===''&&end===''?Colors.borderButton:Colors.Red} />
                       </TouchableOpacity>:
@@ -3991,9 +4040,9 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
 
                     <>
                       {
-                        ImageSourceviewarray.map((value,index) => {
+                        ImageSourceviewarray.map((value,key) => {
                           return (
-                            <TaskImages key={index} value={value} DeleteImage={DeleteImage} />
+                            <TaskImages key={key} value={value} DeleteImage={DeleteImage} />
                             // <View key={key} style={Styles.UnitDetailImageBoxFeatureStyle2}>
                             //   {
                             //     value.type==='video/mp4'?
@@ -4087,7 +4136,6 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                     </View>:null
                 }
               </View>
-
             )}
           </Formik>
 
@@ -4246,7 +4294,8 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                 {
                   started===''&&end===''?
                     <TouchableOpacity onPress={()=> {
-                      _startRecognizing(values.Title);
+                      setDescriptionAddTask(values.TaskNote)
+                      _startRecognizing(values.TaskNote);
                     }} style={[{}]}>
                       <MaterialIcons name={"keyboard-voice"} size={18} color={started===''&&end===''?Colors.borderButton:Colors.Red} />
                     </TouchableOpacity>:
@@ -4834,12 +4883,42 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                 </View>
                 <View style={Styles.dateBoxitems}>
                   <View style={Styles.InputeRowItems}>
-                    <DropDownItems labale={''} data={reasons}  setIsFocus={setIsFocus} name={TimeRelatedselct}
-                                   textStyle={Styles.txtLightColor22}  dropdownStyle={Styles.dropdownLocation}   placeholderStyle={Styles.placeholderStyle}
-                                   selectedTextStyle={Styles.selectedTextStyle}  searchBoolean={true} Onpres={Func}
-                                   containerStyle={Styles.containerStyle} inputSearchStyle={Styles.inputSearchStyle_dropdownLocation}
-                                   setId={setRelatedId} setname={setTimeRelatedselct} Function={Func}
+                    <Dropdown
+                      style={[Styles.dropdownLocation]}
+                      placeholderStyle={Styles.placeholderStyle}
+                      selectedTextStyle={Styles.selectedTextStyle}
+                      iconStyle={Styles.iconStyle}
+                      itemTextStyle={Styles.itemTextStyle}
+                      data={TimeRelated}
+                      maxHeight={150}
+                      labelField="label"
+                      valueField="value"
+                      inputSearchStyle={Styles.inputSearchStyle_dropdownLocation}
+                      placeholder={TimeRelatedselct}
+                      value={TimeRelatedselct}
+                      containerStyle={Styles.containerStyle}
+                      renderItem={renderItem_Location}
+                      onFocus={() => setIsFocus(true)}
+                      onBlur={() => setIsFocus(false)}
+                      onChange={item => {
+                        setTimeRelatedselct(item.label);
+                        setIsFocus(false);
+                      }}
+                      renderSelectedItem={(item, unSelect) => (
+                        <TouchableOpacity  onPress={() => unSelect && unSelect(item)}>
+                          <View style={Styles.selectedStyle2}>
+                            <Text style={Styles.selectedTextStyle2}>{item.label}</Text>
+                            <AntDesign color="#fff" name="delete" size={15} />
+                          </View>
+                        </TouchableOpacity>
+                      )}
                     />
+                    {/*<DropDownItems labale={''} data={reasons}  setIsFocus={setIsFocus} name={TimeRelatedselct}*/}
+                    {/*               textStyle={Styles.txtLightColor22}  dropdownStyle={Styles.dropdownLocation}   placeholderStyle={Styles.placeholderStyle}*/}
+                    {/*               selectedTextStyle={Styles.selectedTextStyle}  searchBoolean={true} Onpres={Func}*/}
+                    {/*               containerStyle={Styles.containerStyle} inputSearchStyle={Styles.inputSearchStyle_dropdownLocation}*/}
+                    {/*               setId={setRelatedId} setname={setTimeRelatedselct} Function={Func}*/}
+                    {/*/>*/}
                     {GeoAddressCountry==='' &&
                     <Text style={{ fontSize: 12, color: "#FF0D10" }}>"Country! Please?"</Text>
                     }
@@ -5269,42 +5348,43 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
         >
           {({ values, handleChange, errors, setFieldTouched, touched, isValid, handleSubmit }) => (
             <View style={{width:'90%'}}>
-              <Text style={[Styles.txtLightColor,{marginTop: normalize(20),}]}>Company Name</Text>
+              <Text style={[Styles.txtLightColor,{marginTop: normalize(20),}]}>Company</Text>
               <TextInput
                 value={values.CompanyName}
-                style={[inputStyleProfile,]}
+                style={[inputStyle,]}
                 onChangeText={handleChange("CompanyName")}
                 onFocus={() => setFieldTouched("CompanyName")}
                 placeholderTextColor={'#fff'} />
               {touched.CompanyName && errors.CompanyName &&
               <Text style={{ fontSize: 12, color: "#FF0D10",fontWeight:'bold' }}>{errors.CompanyName}</Text>
               }
-              <Text style={[Styles.txtLightColor,{marginTop: normalize(20),}]}>Customer Name</Text>
-              <TextInput
-                value={values.CustomerName}
-                style={[inputStyleProfile,]}
-                onChangeText={handleChange("CustomerName")}
-                onFocus={() => setFieldTouched("CustomerName")}
-                placeholderTextColor={'#fff'} />
-              {touched.CustomerName && errors.CustomerName &&
-              <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.CustomerName}</Text>
-              }
               <Text style={[Styles.txtLightColor,{marginTop: normalize(25),}]}>TRN No</Text>
               <TextInput
                 value={values.TRNNo}
-                style={[inputStyleProfile]}
+                style={[inputStyle]}
                 onChangeText={handleChange("TRNNo")}
                 onFocus={() => setFieldTouched("TRNNo")}
                 placeholderTextColor={'#fff'} />
               {touched.TRNNo && errors.TRNNo &&
               <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.TRNNo}</Text>
               }
+              <Text style={[Styles.txtLightColor,{marginTop: normalize(20),}]}>Name</Text>
+              <TextInput
+                value={values.CustomerName}
+                style={[inputStyle,]}
+                onChangeText={handleChange("CustomerName")}
+                onFocus={() => setFieldTouched("CustomerName")}
+                placeholderTextColor={'#fff'} />
+              {touched.CustomerName && errors.CustomerName &&
+              <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.CustomerName}</Text>
+              }
 
 
-            <Text style={[Styles.txtLightColor,{marginTop: normalize(25),}]}>Phone</Text>
+
+            <Text style={[Styles.txtLightColor,{marginTop: normalize(25),}]}>Telephone / Phone</Text>
             <TextInput
             value={values.Phone}
-            style={[inputStyleProfileNumber]}
+            style={[inputStyle]}
             onChangeText={handleChange("Phone")}
             onFocus={() => setFieldTouched("Phone")}
             placeholderTextColor={'#fff'} />
@@ -5314,7 +5394,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
             <Text style={[Styles.txtLightColor,{marginTop: normalize(25),}]}>Email</Text>
             <TextInput
             value={values.Email}
-            style={[inputStyleProfile]}
+            style={[inputStyle]}
             onChangeText={handleChange("Email")}
             onFocus={() => setFieldTouched("Email")}
             placeholderTextColor={'#fff'} />
@@ -5322,39 +5402,90 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
             <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.Email}</Text>
           }
               <View style={Styles.InputeRow}>
-                <DropDownItems labale={'Country'} data={Parentlist}  setIsFocus={setIsFocus} name={StatusName}
-                               textStyle={Styles.txtLightColor22}
-                               dropdownStyle={Styles.dropdownLocationCustomer}
-                               placeholderStyle={Styles.inputSearchStyle_dropdownLocation}
-                               selectedTextStyle={Styles.selectedTextStyle}  searchBoolean={true}
-                               Onpres={getCity}
-                               containerStyle={Styles.containerStyle}
-                               inputSearchStyle={Styles.inputSearchStyle_dropdownLocation}
-                               setId={setcountryId} setname={setGeoAddressCountry} Function={Func}
+                <Text style={[Styles.txtLightColor,{marginTop:normalize(10),textAlign:"left"}]}>Country</Text>
+                <Dropdown
+                  style={[Styles.dropdownLocation]}
+                  placeholderStyle={Styles.placeholderStyle}
+                  selectedTextStyle={Styles.selectedTextStyle}
+                  iconStyle={Styles.iconStyle}
+                  itemTextStyle={Styles.itemTextStyle}
+                  data={CountryList}
+                  maxHeight={150}
+                  labelField="label"
+                  valueField="value"
+                  search={true}
+                  searchPlaceholder="Search..."
+                  inputSearchStyle={Styles.inputSearchStyle_dropdownLocation}
+                  placeholder={GeoAddressCountry}
+                  value={GeoAddressCountry}
+                  containerStyle={Styles.containerStyle}
+                  renderItem={renderItem_Location}
+                  onFocus={() => setIsFocus(true)}
+                  onBlur={() => setIsFocus(false)}
+                  onChange={item => {
+                    setGeoAddressCountry(item.label);
+                    setIsFocus(false);
+                    setcountryId(item.value);
+                    getCity(item.value);
+                  }}
+                  renderSelectedItem={(item, unSelect) => (
+                    <TouchableOpacity  onPress={() => unSelect && unSelect(item)}>
+                      <View style={Styles.selectedStyle2}>
+                        <Text style={Styles.selectedTextStyle2}>{item.label}</Text>
+                        <AntDesign color="#fff" name="delete" size={15} />
+                      </View>
+                    </TouchableOpacity>
+                  )}
                 />
-                  {GeoAddressCountry==='' &&
-                  <Text style={{ fontSize: 12, color: "#FF0D10" }}>"Country! Please?"</Text>
-                  }
+                {/*{GeoAddressCountry==='' &&*/}
+                {/*<Text style={{ fontSize: 12, color: "#FF0D10" }}>"Country! Please?"</Text>*/}
+                {/*}*/}
 
-                <DropDownItems labale={'City'} data={Parentlist}  setIsFocus={setIsFocus} name={StatusName}
-                               textStyle={Styles.txtLightColor22}  dropdownStyle={GeoAddressCity!==''?Styles.dropdownLocationCustomer:Styles.dropdownLocationError}
-                               placeholderStyle={Styles.inputSearchStyle_dropdownLocation}
-                               selectedTextStyle={Styles.selectedTextStyle}  searchBoolean={true}
-                               Onpres={Func}
-                               containerStyle={Styles.containerStyle}
-                               inputSearchStyle={Styles.inputSearchStyle_dropdownLocation}
-                               setId={setcityId} setname={setGeoAddressCity} Function={Func}
+
+                <Text style={[Styles.txtLightColor,{marginTop:normalize(10),textAlign:"left"}]}>City</Text>
+                <Dropdown
+                  // style={GeoAddressCity!==''?Styles.dropdownLocationCustomer:Styles.dropdownLocationError}
+                   style={Styles.dropdownLocation}
+                  placeholderStyle={Styles.placeholderStyle}
+                  selectedTextStyle={Styles.selectedTextStyle}
+                  iconStyle={Styles.iconStyle}
+                  itemTextStyle={Styles.itemTextStyle}
+                  data={CityList}
+                  maxHeight={150}
+                  labelField="label"
+                  valueField="value"
+                  search={true}
+                  searchPlaceholder="Search..."
+                  inputSearchStyle={Styles.inputSearchStyle_dropdownLocation}
+                  placeholder={GeoAddressCity}
+                  value={GeoAddressCity}
+                  containerStyle={Styles.containerStyle}
+                  renderItem={renderItem_Location}
+                  onFocus={() => setIsFocus(true)}
+                  onBlur={() => setIsFocus(false)}
+                  onChange={item => {
+                    setcityId(item.value)
+                    setGeoAddressCity(item.label);
+                    setIsFocus(false);
+                  }}
+                  renderSelectedItem={(item, unSelect) => (
+                    <TouchableOpacity  onPress={() => unSelect && unSelect(item)}>
+                      <View style={Styles.selectedStyle2}>
+                        <Text style={Styles.selectedTextStyle2}>{item.label}</Text>
+                        <AntDesign color="#fff" name="delete" size={15} />
+                      </View>
+                    </TouchableOpacity>
+                  )}
                 />
-
-                  {GeoAddressCity==='' &&
-                  <Text style={{ fontSize: 12, color: "#FF0D10" }}>"City! Please?"</Text>
-                  }
+                {/*{GeoAddressCity==='' &&*/}
+                {/*<Text style={{ fontSize: 12, color: "#FF0D10" }}>"City! Please?"</Text>*/}
+                {/*}*/}
                 </View>
 
             <Text style={[Styles.txtLightColor,{marginTop: normalize(25),}]}>Street</Text>
             <TextInput
             value={values.Street}
-            style={[inputStyleProfile]}
+            style={[inputStyle]}
             onChangeText={handleChange("Street")}
             onFocus={() => setFieldTouched("Street")}
             placeholderTextColor={'#fff'} />
@@ -5384,6 +5515,375 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
 
   ///////////////////Customer////////////////
 
+  if (numberValue === 40) {
+    return (
+      <View style={{width:'100%',justifyContent:'center',alignItems:'center'}}>
+        <Formik
+          initialValues={{
+            CompanyName:'',
+            CustomerName:'',
+            TRNNo:'',
+            Phone:'',
+            Email:'',
+            Street:'',
+            GeoAddressCountry:'',
+            GeoAddressCity:''
+          }}
+          onSubmit={values => {
+            onChangeText(values);
+
+          }}
+          validationSchema={validationSchema30}
+        >
+          {({ values, handleChange, errors, setFieldTouched, touched, isValid, handleSubmit }) => (
+            <View style={{width:'90%'}}>
+              <View style={Styles.InputeRow}>
+                <View style={Styles.InputeRowItems}>
+              <Text style={[Styles.txtLightColor,{marginTop: normalize(10),}]}>Prefix</Text>
+              <Dropdown
+                style={[Styles.dropdownLocation]}
+                placeholderStyle={Styles.placeholderStyle}
+                selectedTextStyle={Styles.selectedTextStyle}
+                iconStyle={Styles.iconStyle}
+                itemTextStyle={Styles.itemTextStyle}
+                data={CountryList}
+                maxHeight={150}
+                labelField="label"
+                valueField="value"
+                search={true}
+                searchPlaceholder="Search..."
+                inputSearchStyle={Styles.inputSearchStyle_dropdownLocation}
+                placeholder={GeoAddressCountry}
+                value={GeoAddressCountry}
+                containerStyle={Styles.containerStyle}
+                renderItem={renderItem_Location}
+                onFocus={() => setIsFocus(true)}
+                onBlur={() => setIsFocus(false)}
+                onChange={item => {
+                  setGeoAddressCountry(item.label);
+                  setIsFocus(false);
+                  setcountryId(item.value);
+                  getCity(item.value);
+                }}
+                renderSelectedItem={(item, unSelect) => (
+                  <TouchableOpacity  onPress={() => unSelect && unSelect(item)}>
+                    <View style={Styles.selectedStyle2}>
+                      <Text style={Styles.selectedTextStyle2}>{item.label}</Text>
+                      <AntDesign color="#fff" name="delete" size={15} />
+                    </View>
+                  </TouchableOpacity>
+                )}
+              />
+              {touched.CompanyName && errors.CompanyName &&
+              <Text style={{ fontSize: 12, color: "#FF0D10",fontWeight:'bold' }}>{errors.CompanyName}</Text>
+              }
+                </View>
+                <View style={Styles.InputeRowItems}>
+              <Text style={[Styles.txtLightColor]}>Number</Text>
+              <TextInput
+                value={values.TRNNo}
+                style={[inputStyle3]}
+                onChangeText={handleChange("TRNNo")}
+                onFocus={() => setFieldTouched("TRNNo")}
+                placeholderTextColor={'#fff'} />
+              {touched.TRNNo && errors.TRNNo &&
+              <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.TRNNo}</Text>
+              }
+                </View>
+              </View>
+              <View style={Styles.InputeRow}>
+                <View style={Styles.InputeRowItems}>
+              <Text style={[Styles.txtLightColor]}>Date</Text>
+              <TextInput
+                value={values.CustomerName}
+                style={[inputStyle3,]}
+                onChangeText={handleChange("CustomerName")}
+                onFocus={() => setFieldTouched("CustomerName")}
+                placeholderTextColor={'#fff'} />
+              {touched.CustomerName && errors.CustomerName &&
+              <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.CustomerName}</Text>
+              }
+
+                </View>
+                <View style={Styles.InputeRowItems}>
+              <Text style={[Styles.txtLightColor]}>From Warehouse</Text>
+                  <Dropdown
+                    style={[Styles.dropdownLocation]}
+                    placeholderStyle={Styles.placeholderStyle}
+                    selectedTextStyle={Styles.selectedTextStyle}
+                    iconStyle={Styles.iconStyle}
+                    itemTextStyle={Styles.itemTextStyle}
+                    data={CountryList}
+                    maxHeight={150}
+                    labelField="label"
+                    valueField="value"
+                    search={true}
+                    searchPlaceholder="Search..."
+                    inputSearchStyle={Styles.inputSearchStyle_dropdownLocation}
+                    placeholder={GeoAddressCountry}
+                    value={GeoAddressCountry}
+                    containerStyle={Styles.containerStyle}
+                    renderItem={renderItem_Location}
+                    onFocus={() => setIsFocus(true)}
+                    onBlur={() => setIsFocus(false)}
+                    onChange={item => {
+                      setGeoAddressCountry(item.label);
+                      setIsFocus(false);
+                      setcountryId(item.value);
+                      getCity(item.value);
+                    }}
+                    renderSelectedItem={(item, unSelect) => (
+                      <TouchableOpacity  onPress={() => unSelect && unSelect(item)}>
+                        <View style={Styles.selectedStyle2}>
+                          <Text style={Styles.selectedTextStyle2}>{item.label}</Text>
+                          <AntDesign color="#fff" name="delete" size={15} />
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                  />
+              {touched.Phone && errors.Phone &&
+              <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.Phone}</Text>
+              }
+                </View>
+              </View>
+              <View style={Styles.InputeRow}>
+                <View style={Styles.InputeRowItems}>
+              <Text style={[Styles.txtLightColor]}>To Warehouse</Text>
+                  <Dropdown
+                    style={[Styles.dropdownLocation]}
+                    placeholderStyle={Styles.placeholderStyle}
+                    selectedTextStyle={Styles.selectedTextStyle}
+                    iconStyle={Styles.iconStyle}
+                    itemTextStyle={Styles.itemTextStyle}
+                    data={CountryList}
+                    maxHeight={150}
+                    labelField="label"
+                    valueField="value"
+                    search={true}
+                    searchPlaceholder="Search..."
+                    inputSearchStyle={Styles.inputSearchStyle_dropdownLocation}
+                    placeholder={GeoAddressCountry}
+                    value={GeoAddressCountry}
+                    containerStyle={Styles.containerStyle}
+                    renderItem={renderItem_Location}
+                    onFocus={() => setIsFocus(true)}
+                    onBlur={() => setIsFocus(false)}
+                    onChange={item => {
+                      setGeoAddressCountry(item.label);
+                      setIsFocus(false);
+                      setcountryId(item.value);
+                      getCity(item.value);
+                    }}
+                    renderSelectedItem={(item, unSelect) => (
+                      <TouchableOpacity  onPress={() => unSelect && unSelect(item)}>
+                        <View style={Styles.selectedStyle2}>
+                          <Text style={Styles.selectedTextStyle2}>{item.label}</Text>
+                          <AntDesign color="#fff" name="delete" size={15} />
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                  />
+              {touched.Email && errors.Email &&
+              <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.Email}</Text>
+              }
+                </View>
+                <View style={Styles.InputeRowItems}>
+
+                </View>
+              </View>
+              <Text style={[Styles.txtLightColor]}>Any Notes</Text>
+              <TextInput
+                value={values.Street}
+                style={[inputStyle3,{paddingVertical:5}]}
+                onChangeText={handleChange("Street")}
+                onFocus={() => setFieldTouched("Street")}
+                multiline={true}
+                onContentSizeChange={(e) => {
+                  numOfLinesCompany = e.nativeEvent.contentSize.height / 14;
+                }}
+                placeholderTextColor={'#fff'} />
+              {touched.Street && errors.Street &&
+              <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.Street}</Text>
+              }
+              <View style={[Styles.ViewItems_center_transparent]}>
+                <ButtonI style={[Styles.btnNOBackColor, {
+                  width: '100%',
+                  paddingVertical: 2,
+                  marginVertical: normalize(20),
+                }]}
+                         onpress={handleSubmit}
+                         categoriIcon={""}
+                         title={tittlebtn}
+                         colorsArray={['#a58cf8','#987aff','#7953FAFF']}
+                         styleTxt={[Styles.txtbtn,{fontSize: normalize(16),}]} sizeIcon={27} />
+              </View>
+            </View>
+
+          )}
+        </Formik>
+
+      </View>
+    );
+  }
+  // /////////////////MoveOut////////////////
+ if (numberValue === 41) {
+    return (
+      <View style={{width:'100%',justifyContent:'center',alignItems:'center'}}>
+        <Formik
+          initialValues={{
+            CompanyName:'',
+            GeoAddressCity:''
+          }}
+          onSubmit={values => {
+            onChangeText(values);
+
+          }}
+          validationSchema={validationSchema30}
+        >
+          {({ values, handleChange, errors, setFieldTouched, touched, isValid, handleSubmit }) => (
+            <View style={{width:'90%'}}>
+              <View style={Styles.InputeRow}>
+                <View style={Styles.InputeRowItems}>
+              <Text style={[Styles.txtLightColor,{marginTop: normalize(10),}]}>Set</Text>
+              <Dropdown
+                style={[Styles.dropdownLocation]}
+                placeholderStyle={Styles.placeholderStyle}
+                selectedTextStyle={Styles.selectedTextStyle}
+                iconStyle={Styles.iconStyle}
+                itemTextStyle={Styles.itemTextStyle}
+                data={CountryList}
+                maxHeight={150}
+                labelField="label"
+                valueField="value"
+                search={true}
+                searchPlaceholder="Search..."
+                inputSearchStyle={Styles.inputSearchStyle_dropdownLocation}
+                placeholder={GeoAddressCountry}
+                value={GeoAddressCountry}
+                containerStyle={Styles.containerStyle}
+                renderItem={renderItem_Location}
+                onFocus={() => setIsFocus(true)}
+                onBlur={() => setIsFocus(false)}
+                onChange={item => {
+                  setGeoAddressCountry(item.label);
+                  setIsFocus(false);
+                  setcountryId(item.value);
+                  getCity(item.value);
+                }}
+                renderSelectedItem={(item, unSelect) => (
+                  <TouchableOpacity  onPress={() => unSelect && unSelect(item)}>
+                    <View style={Styles.selectedStyle2}>
+                      <Text style={Styles.selectedTextStyle2}>{item.label}</Text>
+                      <AntDesign color="#fff" name="delete" size={15} />
+                    </View>
+                  </TouchableOpacity>
+                )}
+              />
+              {touched.CompanyName && errors.CompanyName &&
+              <Text style={{ fontSize: 12, color: "#FF0D10",fontWeight:'bold' }}>{errors.CompanyName}</Text>
+              }
+                </View>
+                <View style={Styles.InputeRowItems}>
+              <Text style={[Styles.txtLightColor]}>Delivery Date</Text>
+              <TextInput
+                value={values.TRNNo}
+                style={[inputStyleOrder]}
+                onChangeText={handleChange("TRNNo")}
+                onFocus={() => setFieldTouched("TRNNo")}
+                placeholderTextColor={'#fff'} />
+              {touched.TRNNo && errors.TRNNo &&
+              <Text style={{ fontSize: 12, color: "#FF0D10" }}>{errors.TRNNo}</Text>
+              }
+                </View>
+              </View>
+
+              <View style={[Styles.ViewItems_center_transparent]}>
+                <ButtonI style={[Styles.btnNOBackColor, {
+                  width: '100%',
+                  paddingVertical: 2,
+                  marginVertical: normalize(20),
+                }]}
+                         onpress={handleSubmit}
+                         categoriIcon={""}
+                         title={tittlebtn}
+                         colorsArray={['#a58cf8','#987aff','#7953FAFF']}
+                         styleTxt={[Styles.txtbtn,{fontSize: normalize(16),}]} sizeIcon={27} />
+              </View>
+            </View>
+
+          )}
+        </Formik>
+
+      </View>
+    );
+  }
+  // /////////////////Order////////////////
+  if (numberValue === 42) {
+    return (
+      <View style={{width:'100%',justifyContent:'center',alignItems:'center'}}>
+        <Formik
+          initialValues={{
+            CompanyName:'',
+            GeoAddressCity:''
+          }}
+          onSubmit={values => {
+            onChangeText(values);
+
+          }}
+          validationSchema={validationSchema30}
+        >
+          {({ values, handleChange, errors, setFieldTouched, touched, isValid, handleSubmit }) => (
+            <View style={{width:'90%'}}>
+
+
+                  <Text style={[Styles.txtLightColor,{marginTop: normalize(10),}]}>Set</Text>
+                  <Dropdown
+                    style={[Styles.dropdownLocation]}
+                    placeholderStyle={Styles.placeholderStyle}
+                    selectedTextStyle={Styles.selectedTextStyle}
+                    iconStyle={Styles.iconStyle}
+                    itemTextStyle={Styles.itemTextStyle}
+                    data={CountryList}
+                    maxHeight={150}
+                    labelField="label"
+                    valueField="value"
+                    search={true}
+                    searchPlaceholder="Search..."
+                    inputSearchStyle={Styles.inputSearchStyle_dropdownLocation}
+                    placeholder={GeoAddressCountry}
+                    value={GeoAddressCountry}
+                    containerStyle={Styles.containerStyle}
+                    renderItem={renderItem_Location}
+                    onFocus={() => setIsFocus(true)}
+                    onBlur={() => setIsFocus(false)}
+                    onChange={item => {
+                      setGeoAddressCountry(item.label);
+                      setIsFocus(false);
+                      setcountryId(item.value);
+                      getCity(item.value);
+                    }}
+                    renderSelectedItem={(item, unSelect) => (
+                      <TouchableOpacity  onPress={() => unSelect && unSelect(item)}>
+                        <View style={Styles.selectedStyle2}>
+                          <Text style={Styles.selectedTextStyle2}>{item.label}</Text>
+                          <AntDesign color="#fff" name="delete" size={15} />
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                  />
+                  {touched.CompanyName && errors.CompanyName &&
+                  <Text style={{ fontSize: 12, color: "#FF0D10",fontWeight:'bold' }}>{errors.CompanyName}</Text>
+                  }
+
+            </View>
+
+          )}
+        </Formik>
+
+      </View>
+    );
+  }
+  // /////////////////Pos////////////////
   if (numberValue === 34) {
     return (
       <View style={{width:'100%',justifyContent:'center',alignItems:'center'}}>
@@ -5824,10 +6324,11 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
                 onChangeText={handleChange("Message")}
                 onFocus={() => setFieldTouched("Message")}
                 multiline={true}
-                style={[inputStyle,{paddingVertical:'4%'}]}
                 onContentSizeChange={(e) => {
                   numOfLinesCompany = e.nativeEvent.contentSize.height / 14;
                 }}
+                style={[inputStyle,{paddingVertical:'4%'}]}
+
                 placeholderTextColor={GLOBAL.OFFICIAL_BLUE_COLOR} />
 
               <View style={[Styles.ViewItems_center]}>

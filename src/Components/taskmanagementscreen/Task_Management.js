@@ -79,6 +79,12 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       id: 2,
       Filtername: "Normal",
       Icon: "podium",
+    }]);
+  const [FilterListWorkshop, setFilterListFilterListWorkshop] = useState([{ id: 0, Filtername: "Date: َAll", Icon: "calendar-month" },
+    { id: 1, Filtername: "Status", Icon: "checkbox-marked-circle-outline" }, {
+      id: 2,
+      Filtername: "Normal",
+      Icon: "podium",
     }, { id: 3, Filtername: "Category", Icon: "feature-search-outline" }]);
   const [reasons, setreasons] = useState([]);
   const [RelatedNameList, setRelatedNameList] = useState([]);
@@ -107,25 +113,12 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   const [RelatedNameListTask, setRelatedNameListTask] = useState([]);
   const [value2, setValue] = useState('');
   useEffect(() => {
-    console.log(GLOBAL.ScreenName,'GLOBAL.ScreenName')
-    if(GLOBAL.ScreenName==='Subcontract'){
-      GLOBAL.categoryId='1'
-    }
-    else   if(GLOBAL.ScreenName==='Snagging'){
-      GLOBAL.categoryId='2'
-    }
-    else   if(GLOBAL.ScreenName==='Property Maintenance'){
-      GLOBAL.categoryId='4'
-      //getSites2()
 
-    }
-    else   if(GLOBAL.ScreenName==='Support'){
-      GLOBAL.categoryId='5'
-    }
     const unsubscribe = navigation.addListener("focus", () => {
       if (GLOBAL.selectItem === 1 && GLOBAL.TaskName === "") {
         My_TaskList();
       } else if (GLOBAL.selectItem === 2 && GLOBAL.TaskName === "") {
+        setFilterList(FilterListWorkshop)
         Assigned_TaskList();
       } else if (GLOBAL.TaskName !== "") {
         getrelatedTask();
@@ -144,13 +137,15 @@ function Task_Management({ navigation, navigation: { goBack } }) {
         Id='1'
       else
         Id='2'
-
+      GLOBAL.categoryId=Id
       Task_subcategory(Id)
     }
     else if(GLOBAL.ScreenName==='Property Maintenance'){
+      GLOBAL.categoryId='4'
       Task_subcategory('4')
     }
     else if(GLOBAL.ScreenName==='Support'){
+      GLOBAL.categoryId='5'
       Task_subcategory('5')
     }
     else
@@ -554,8 +549,10 @@ function Task_Management({ navigation, navigation: { goBack } }) {
         }
       }
     }
+
     else {
       let json = JSON.parse(await AsyncStorage.getItem(GLOBAL.All_Task));
+
       let Task_List = [];
       for (let item in json) {
         let obj = json?.[item];
@@ -587,9 +584,25 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       if (Task_List?.length !== 0) {
         Task_List?.sort(dateComparison_data);
         setMudolList(Task_List);
+        GLOBAL.MudolList=Task_List;
+
         Make_Week_Filter_List(Task_List);
           if(GLOBAL.Url_Navigate==='InspectionUnits')
             setmodules(Task_List?.filter((p) => p?.taskRelatedName === GLOBAL.relatedName&&p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"))
+          else if(GLOBAL.Selected?.length!==0){
+            for (let item in GLOBAL.Selected) {
+              let obj = GLOBAL.Selected?.[item];
+              let index =  GLOBAL.RelatedNameListTask?.findIndex((p) => p?.value ===obj?.Id);
+              GLOBAL.RelatedNameListTask[index] = {
+                ... GLOBAL.RelatedNameListTask[index], label:GLOBAL.Selected?.find((p)=>p.Id===obj?.Id).Name,
+              };
+              setRelatedNameListTask( GLOBAL.RelatedNameListTask)
+            }
+            const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
+            const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
+            const Item={label:GLOBAL.RelatedNameListTask?.[Index]?.label,value:"0",_index:0}
+            FilterTaskEntityDropDown2(Item,categoryId2,Task_List)
+          }
           else
            setmodules(Task_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
         }
@@ -699,6 +712,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       let json = JSON.parse(await AsyncStorage.getItem(GLOBAL.Assigned_TaskList));
       let Task_List = [];
       let taskStatusName = "";
+
       for (let item in json) {
         let obj = json?.[item];
         const Year = obj?.taskCreatedOn?.split(" ");
@@ -723,8 +737,8 @@ function Task_Management({ navigation, navigation: { goBack } }) {
           taskPriorityName: obj.taskPriorityName,
           taskDescription: obj.taskDescription,
           taskParentTaskId: obj.taskParentTaskId,
-          taskPlanStartDate: taskPlanStar?.[0],
-          taskPlanDueDate: taskPlanDue?.[0],
+          taskPlanStartDate: obj?.taskPlanStartDate,
+          taskPlanDueDate: obj?.taskPlanDueDate,
           taskStatusColor: obj.taskStatusColor,
           taskCreatedOn: obj.taskCreatedOn,
           taskStatusName: taskStatusName,
@@ -743,6 +757,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
           taskCategoryName: obj.taskCategoryName,
           taskRelatedNameRef: obj.taskRelatedNameRef,
           taskWorkType: obj.taskWorkType,
+
         });
       }
       if (Task_List?.length !== 0) {
@@ -772,6 +787,14 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   };
   ///LogOut Function///
   const LogOut = () => {
+    GLOBAL.FilterTime = false
+    GLOBAL.FilterStatus = false
+    GLOBAL.FilterPriority = false
+    GLOBAL.FilterCategory = false
+    GLOBAL.TaskRelatedCheck=''
+    GLOBAL.ScreenName=''
+    GLOBAL.TaskRelatedNameId=''
+    GLOBAL.Selected=[]
     removeDataStorage(GLOBAL.PASSWORD_KEY);
     setshowModalDelete(false);
     navigation.navigate("LogIn");
@@ -781,10 +804,14 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     setshowModalDelete(true);
   };
   const Navigate_Url = (Url) => {
-    GLOBAL.FilterTime === false
-    GLOBAL.FilterStatus === false
-    GLOBAL.FilterPriority === false
-    GLOBAL.FilterCategory === false
+    GLOBAL.FilterTime = false
+    GLOBAL.FilterStatus = false
+    GLOBAL.FilterPriority = false
+    GLOBAL.FilterCategory = false
+    GLOBAL.TaskRelatedCheck=''
+    GLOBAL.ScreenName=''
+    GLOBAL.TaskRelatedNameId=''
+    GLOBAL.Selected=[]
     if (Url === "ProfileStack") {
       navigation.navigate(Url);
     } else {
@@ -793,6 +820,11 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       GLOBAL.List = MudolList;
     }
   };
+  const Navigate_Url2=(Url)=>{
+    navigation.navigate(Url);
+    GLOBAL.FilterList = modules;
+    GLOBAL.List = MudolList;
+  }
   ///update task when app is offline///
   const Update_Off = async (taskId) => {
     let List_Item = JSON.parse(await AsyncStorage.getItem(GLOBAL.All_Task));
@@ -859,7 +891,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
                           key={index}
                           modules={modules?.length} My_TaskList={My_TaskList} dataassigned2={GLOBAL.Task_data_assigned}
                           Assigned_TaskList={Assigned_TaskList} Update_Off_Reopen={Update_Off_Reopen}
-                          value={item} Navigate_Url={Navigate_Url} Cheked={Cheked} Update_Off={Update_Off}
+                          value={item} Navigate_Url={Navigate_Url2} Cheked={Cheked} Update_Off={Update_Off}
                           Taskpriority={Taskpriority} My_TaskList_server={My_TaskList_server}
                           Assigned_TaskList_server={Assigned_TaskList_server} Update_Off_Assigned={Update_Off_Assigned}
                           DeleteImage={DeleteImage} Taskstatus={Taskstatus} DeleteAttachment={DeleteAttachment}
@@ -986,7 +1018,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     }
   };
   const getSites3=async (list)=>{
-console.log('getSites3')
+
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.RentalUnits + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
         writeDataStorage(GLOBAL.RentalUnits_List, json?.allSiteInfo);
@@ -1003,11 +1035,13 @@ console.log('getSites3')
             list?.find((p) => p?.value ===first?.value)?.data?.push({
               value: obj.siteId,
               label: obj.siteName,
+              Name: obj.siteName,
             });
           }
         })
 
         setRelatedNameListTask (list);
+        GLOBAL.RelatedNameListTask=list
         setSiteList(A);
       });
     }
@@ -1026,6 +1060,7 @@ console.log('getSites3')
   }
 
   const Task_subcategory =async (value) => {
+
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.Task_subcategory + `userId=${GLOBAL.UserInformation?.userId}&categoryId=${value}`).then(json => {
         let A = [];
@@ -1038,6 +1073,7 @@ console.log('getSites3')
             categoryEntityShow:obj.categoryEntityShow,
             categoryLevel:obj.categoryLevel,
             data:dataList,
+            Name:obj.categoryTitle,
           });
         }
           if(value==='4'||value==='5') {
@@ -1053,6 +1089,7 @@ console.log('getSites3')
           }
         setRelatedNameList(A);
         setRelatedNameListTask (A);
+        GLOBAL.RelatedNameListTask=A
         writeDataStorage(GLOBAL.Task_SubCategory, json);
       })
     }
@@ -1086,18 +1123,14 @@ console.log('getSites3')
     let Task_List = [];
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.My_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+
         for (let item in json?.tasks) {
           let obj = json?.tasks?.[item];
           let taskPriorityColor = "";
           const Year = obj.taskCreatedOn.split(" ");
           const Day = Year?.[0]?.split("-");
           const W = Day?.[2]?.split(" ");
-          if (obj?.taskPriorityName === "Low")
-            taskPriorityColor = "#fcd274";
-          else if (obj?.taskPriorityName === "Medium")
-            taskPriorityColor = "#fefe77";
-          else
-            taskPriorityColor = "#d2fd77";
+
           Task_List.push({
             taskId: obj.taskId,
             taskTitle: obj.taskTitle,
@@ -1111,7 +1144,7 @@ console.log('getSites3')
             WeekDay: getDayOfWeek(Year?.[0]),
             Day: W?.[0],
             Month: Day?.[1],
-            taskPriorityColor: taskPriorityColor,
+            taskPriorityColor: obj?.taskPriorityColor,
             attachments: obj?.attachments,
             taskUpdated: obj?.taskNotify,
             taskRelatedName: obj?.taskRelatedName,
@@ -1121,11 +1154,13 @@ console.log('getSites3')
           });
         }
         writeDataStorage(GLOBAL.All_Task, json?.tasks);
+
         if (Task_List?.length !== 0) {
           Task_List?.sort(dateComparison_data);
           setMudolList(Task_List);
           Make_Week_Filter_List(Task_List);
           if (GLOBAL?.FilterTime === true || GLOBAL?.FilterStatus === true || GLOBAL?.FilterPriority === true) {
+            setShowMessage(false);
             setDateAll(GLOBAL.FilterTime_name);
             setStatusAll(GLOBAL.FilterStatus_name);
             setpriorityAll(GLOBAL.FilterPriority_name);
@@ -1154,7 +1189,9 @@ console.log('getSites3')
             } else if (GLOBAL.FilterTime_name === "Week" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name !== "All") {
               FilterWeek();
             }
-          } else {
+          }
+          else {
+            setShowMessage(false);
             setmodules(Task_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
           }
 
@@ -1173,18 +1210,11 @@ console.log('getSites3')
       readOnlineApi(Api.Assigned_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
         for (let item in json?.tasks) {
           let obj = json?.tasks?.[item];
-          let taskPriorityColor = "";
           const Year = obj?.taskCreatedOn.split(" ");
-          const taskPlanStar = obj?.taskPlanStartDate.split(" ");
-          const taskPlanDue = obj?.taskPlanDueDate.split(" ");
+          const taskPlanStar = obj?.taskPlanStartDate?.split(" ");
+          const taskPlanDue = obj?.taskPlanDueDate?.split(" ");
           const Day = Year?.[0]?.split("-");
           const W = Day?.[2]?.split(" ");
-          if (obj?.taskPriorityName === "Low")
-            taskPriorityColor = "#fcd274";
-          else if (obj?.taskPriorityName === "Medium")
-            taskPriorityColor = "#fefe77";
-          else
-            taskPriorityColor = "#d2fd77";
           if (obj.taskStatusName === "Accepted")
             taskStatusName = "In Progress";
           else
@@ -1196,8 +1226,8 @@ console.log('getSites3')
             taskPriorityName: obj.taskPriorityName,
             taskDescription: obj.taskDescription,
             taskParentTaskId: obj.taskParentTaskId,
-            taskPlanStartDate: taskPlanStar?.[0],
-            taskPlanDueDate: taskPlanDue?.[0],
+            taskPlanStartDate: obj?.taskPlanStartDate,
+            taskPlanDueDate: obj?.taskPlanDueDate,
             taskStatusColor: obj.taskStatusColor,
             taskCreatedOn: obj.taskCreatedOn,
             taskStatusName: taskStatusName,
@@ -1205,7 +1235,7 @@ console.log('getSites3')
             WeekDay: getDayOfWeek(Year?.[0]),
             Day: W?.[0],
             Month: Day?.[1],
-            taskPriorityColor: taskPriorityColor,
+            taskPriorityColor: obj?.taskPriorityColor,
             taskUpdated: obj?.taskUpdated,
             attachments: obj?.attachments,
             taskRequestNotes: obj?.taskRequestNotes,
@@ -1251,8 +1281,9 @@ console.log('getSites3')
             } else if (GLOBAL.FilterTime_name === "Week" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name !== "All") {
               FilterWeek();
             }
-          } else {
-            setmodules(Assigned_TaskList.filter((p) => p?.taskPriorityName === priorityAll && p?.taskStatusName === StatusAll));
+          }
+          else {
+            setmodules(Assigned_TaskList.filter((p) => p?.taskPriorityName === priorityAll && p?.taskStatusName !=='Completed' ));
           }
         } else {
           setmodules("");
@@ -1638,8 +1669,8 @@ console.log('getSites3')
                     <MaterialCommunityIcons name={value.Icon} size={20}
                                             color={GLOBAL.header_backgroundColor} /> :
                     value.id === 1 ?
-                      <View style={[Styles.btntaskCircel, { backgroundColor: ColorChangestatus }]} /> :
-                      <View style={[Styles.triangle, { borderBottomColor: ColorChangePriority }]} />
+                      <View style={[Styles.btntaskCircel,{backgroundColor:ColorChangestatus}]} /> :
+                      <View style={[Styles.triangle,{borderBottomColor:ColorChangePriority}]} />
                 }
                 {
                   value.id === 0 || value.id === 3 ?
@@ -1707,7 +1738,7 @@ console.log('getSites3')
                   setStatus(false);
                   GLOBAL.FilterStatus_name = value.label;
                 }}
-                                  style={[SelectDetailItemStatus === value.value ? [Styles.FilterBoxItemsSelecttasl,{backgroundColor:GLOBAL.footertext_backgroundColor}] : Styles.FilterBoxItemstask]}>
+                style={[SelectDetailItemStatus === value.value ? [Styles.FilterBoxItemsSelecttasl,{backgroundColor:GLOBAL.footertext_backgroundColor}] : Styles.FilterBoxItemstask]}>
                   <View style={[Styles.btntask,{backgroundColor:value.statusColorCode}]}/>
                   <Text
                     style={[SelectDetailItemStatus === value.value ? [Styles.txtCenter_filter]:Styles.txtCenter_filter2]}>
@@ -1762,28 +1793,32 @@ console.log('getSites3')
           </View>
         </TouchableOpacity> : null
       }
-      <View  style={Styles.TaskEntityDropDown}>
-        {RelatedNameListTask?.map((value, key) => {
-          return (
-            <TaskFilterDropDown
-              categoryLevellist={RelatedNameListTask}  value={value} key={key} getLists={getListsTask} SubCategory_List={categoryLevellist} setRelatedId={setRelatedId} entityIdList={entityIdList}  setEntityIdList={setEntityIdList}
-              dropdownStyle={Styles.dropdownModalFilter} textStyle={Styles.txt_leftModalFilter} placeholderStyle={Styles.placeholderStyleModalFilter}
-              selectedTextStyle={Styles.selectedTextModalFilter} containerStyle={Styles.containerModalFilter} setRelatedName={setRelatedName}
-              TypeName={GLOBAL.ScreenName} getSection={getSection}  getUnit2={getUnit2}
-              selectedrelated={selectedrelated} setSelectedrelated={setSelectedrelated}
-              categoryId={categoryId} TypeName2={''}
-              Taskcategory={Taskcategory} setCategoryId={setCategoryId}
-              TaskRelated={TaskRelated}
-              RelatedNameList={RelatedNameListTask}
-              TaskRelatedNameId={TaskRelatedNameId} setTaskRelatedNameId={setTaskRelatedNameId}
-              selectedrelatedname={selectedrelatedname} setselectedrelatedname={setselectedrelatedname}
-              relatedId={relatedId} FilterTaskEntityDropDown={FilterTaskEntityDropDown}
-              value2={value2} setValue={setValue}
-            />
 
-          );
-        })}
-      </View>
+      {
+
+        modules !== ""&&
+        <View  style={Styles.TaskEntityDropDown}>
+          {RelatedNameListTask?.map((value, key) => {
+            return (
+              <TaskFilterDropDown
+                categoryLevellist={RelatedNameListTask}  value={value} key={key} getLists={getListsTask} SubCategory_List={categoryLevellist} setRelatedId={setRelatedId} entityIdList={entityIdList}  setEntityIdList={setEntityIdList}
+                dropdownStyle={Styles.dropdownModalFilter} textStyle={Styles.txt_leftModalFilter} placeholderStyle={Styles.placeholderStyleModalFilter}
+                selectedTextStyle={Styles.selectedTextModalFilter} containerStyle={Styles.containerModalFilter} setRelatedName={setRelatedName}
+                TypeName={GLOBAL.ScreenName} getSection={getSection}  getUnit2={getUnit2}
+                selectedrelated={selectedrelated} setSelectedrelated={setSelectedrelated}
+                categoryId={categoryId} TypeName2={''}
+                Taskcategory={Taskcategory} setCategoryId={setCategoryId}
+                TaskRelated={TaskRelated}
+                RelatedNameList={RelatedNameListTask}
+                TaskRelatedNameId={TaskRelatedNameId} setTaskRelatedNameId={setTaskRelatedNameId}
+                selectedrelatedname={selectedrelatedname} setselectedrelatedname={setselectedrelatedname}
+                relatedId={relatedId} FilterTaskEntityDropDown={FilterTaskEntityDropDown}
+                value2={value2} setValue={setValue}
+              />
+            );
+          })}
+        </View>
+      }
 
       <View style={Styles.SectionHeader} />
     </>
@@ -1804,10 +1839,12 @@ console.log('getSites3')
             list?.find((p) => p?.value ===first?.value)?.data?.push({
               value: obj.siteId,
               label: obj.siteName,
+              Name:obj.siteName,
             });
           }
         })
         setRelatedNameListTask (list);
+        GLOBAL.RelatedNameListTask=list
         setSiteList(A);
       });
     }
@@ -1832,6 +1869,7 @@ console.log('getSites3')
       A.push({
         value: obj.unitId,
         label: obj.unitName,
+        Name: obj.unitName,
       });
     })
     let List_Item =RelatedNameListTask;
@@ -1841,6 +1879,7 @@ console.log('getSites3')
       ...markers[index],data:A
     };
     setRelatedNameListTask(markers);
+    GLOBAL.RelatedNameListTask=markers
 
   }
   const getUnit3=async(categoryId,value)=>{
@@ -1857,8 +1896,29 @@ console.log('getSites3')
       });
     })
   }
+  const FilterTaskEntityDropDown2=(Item,categoryId2,Task_List)=>{
+    GLOBAL.RelatedNameListTask.find((p) => p.value ===categoryId2).label=Item.label
+
+    if  (GLOBAL.ScreenName==='Property Maintenance'){
+
+      if(GLOBAL.SiteName==='site')
+      {
+        setmodules(Task_List.filter((p)=>p.taskRelatedName==='site'&&p.taskCategoryName==='Maintenance'))
+      }
+      else if(GLOBAL.SiteName==='unit')
+      {
+        setmodules(Task_List.filter((p)=>p.taskRelatedName==='unit'&&p.taskCategoryName==='Maintenance'))
+      }
+    }
+
+    else {
+      setmodules(Task_List.filter((p)=>p.taskRelatedNameRef===Item.label))
+
+    }
+
+  }
   const FilterTaskEntityDropDown=(Item,categoryId2)=>{
-    RelatedNameListTask.find((p) => p.value ===categoryId2).label=Item.label
+    GLOBAL.RelatedNameListTask.find((p) => p.value ===categoryId2).label=Item.label
 
     if  (GLOBAL.ScreenName==='Property Maintenance'){
 
@@ -1871,6 +1931,7 @@ console.log('getSites3')
         setmodules(MudolList.filter((p)=>p.taskRelatedName==='unit'&&p.taskCategoryName==='Maintenance'))
       }
       }
+
       else {
       setmodules(MudolList.filter((p)=>p.taskRelatedNameRef===Item.label))
 
@@ -2064,6 +2125,7 @@ console.log('getSites3')
     GLOBAL.categoryId = ""
     GLOBAL.ScreenName=''
     GLOBAL.TaskRelatedCheck=''
+    GLOBAL.Selected=[];
     if (GLOBAL.TaskName !== "") {
       GLOBAL.TaskName = "";
       Navigate_Url(GLOBAL.Url_Navigate);
@@ -2204,14 +2266,11 @@ console.log('getSites3')
     }
     setvisiblFilter(false);
   };
-
-
   const FindCategoryId=async(item)=>{
     const list =RelatedNameList.filter((p)=>p?.categoryLevel<=item?.categoryLevel)
     setcategoryLevellist(RelatedNameList.filter((p)=>p?.categoryLevel<=item?.categoryLevel))
     const first = list.find((_, index) => !index);
     Task_RelatedList(first.value,list);
-
   }
   const getLists=async(TaskRelatedNameId,value)=>{
     const json=await getEntityInfo(TaskRelatedNameId,value)

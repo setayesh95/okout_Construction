@@ -5,16 +5,14 @@ import normalize from "react-native-normalize/src/index";
 import React, { useEffect, useState } from "react";
 import Video from "react-native-video";
 const GLOBAL = require("../Global");
-function TaskImages({ index,value,DeleteImage
+function TaskImages({ index,value,DeleteImage,key
                     }) {
-
   const [SelectItem,setSelectItem]=useState('');
   const videoError = error => {
 
   }
   return(
-
-      <View index={key} style={Styles.UnitDetailImageBoxFeatureStyle2}>
+      <View key={key} style={Styles.UnitDetailImageBoxFeatureStyle2}>
         {
           value.type==='video/mp4'?
             <>
@@ -52,10 +50,6 @@ function TaskImages({ index,value,DeleteImage
         }
 
       </View>
-
-
-
   )
-
 }
 export { TaskImages };

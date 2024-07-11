@@ -16,13 +16,16 @@ const Photoes=require('../Photoes')
 function Doshboardscreen({ navigation }) {
   const [showModalDelete, setshowModalDelete] = useState(false);
   const [showWarning, setshowWarning] = useState(false);
-  const [doshboardlist, setdoshboardlist] = useState([{constModule_Id:0,constModule_Name:'Customer',Icon:require("../../Picture/png/customer.png"),IconColor:['#BCE7FC','#38AECC','#022F40']},
+  const [doshboardlist, setdoshboardlist] = useState([{constModule_Id:0,constModule_Name:' New customer',Icon:require("../../Picture/png/customer.png"),IconColor:['#BCE7FC','#38AECC','#022F40']},
     {constModule_Id:1,constModule_Name:'Pos',Icon:require("../../Picture/png/shop.png"),IconColor:['#BCE7FC','#38AECC','#022F40']},
-    {constModule_Name:'Sales',Icon:require("../../Picture/png/sales.png"),IconColor:['#BCE7FC','#38AECC','#022F40']},
-    {constModule_Name:'Invoice',Icon:require("../../Picture/png/invoice.png"),IconColor:['#BCE7FC','#38AECC','#022F40']},
-    {constModule_Name:'Move In',Icon:require("../../Picture/png/movin.png"),IconColor:['#BCE7FC','#38AECC','#022F40']},
-    {constModule_Name:'move Out',Icon:require("../../Picture/png/moveout.png"),IconColor:['#BCE7FC','#38AECC','#022F40']}
+    {constModule_Id:2,constModule_Name:'Order',Icon:require("../../Picture/png/Order.png"),IconColor:['#BCE7FC','#38AECC','#022F40']},
+    {constModule_Id:3,constModule_Name:'Move In',Icon:require("../../Picture/png/movin.png"),IconColor:['#BCE7FC','#38AECC','#022F40']},
+    {constModule_Id:4,constModule_Name:'Move Out',Icon:require("../../Picture/png/moveout.png"),IconColor:['#BCE7FC','#38AECC','#022F40']},
+    {constModule_Id:5,constModule_Name:'Billing',Icon:require("../../Picture/png/Belling.png"),IconColor:['#BCE7FC','#38AECC','#022F40']},
+    {constModule_Id:6,constModule_Name:'Collection',Icon:require("../../Picture/png/Collection.png"),IconColor:['#BCE7FC','#38AECC','#022F40']}
   ]);
+  // {constModule_Name:'Sales',Icon:require("../../Picture/png/sales.png"),IconColor:['#BCE7FC','#38AECC','#022F40']},
+  // {constModule_Name:'Invoice',Icon:require("../../Picture/png/invoice.png"),IconColor:['#BCE7FC','#38AECC','#022F40']},
   const Navigate_Url= (Url) => {
     if(Url==='ProfileStack') {
       UserPermission(GLOBAL.UserPermissionsList?.Profile).then(res => {
@@ -87,11 +90,17 @@ function Doshboardscreen({ navigation }) {
       </View>
     </View>
   );
-  const Navigate_Between_Modules=(constModule_Id)=>{
+  const Navigate_Between_Modules=(constModule_Id,constModule_Name)=>{
     if(constModule_Id===0)
       navigation.navigate('CustomerStack');
     else if(constModule_Id===1)
       navigation.navigate('PosStack');
+  else if(constModule_Id===4)
+      navigation.navigate('MoveOutStack');
+ else if(constModule_Id===2||constModule_Id===6) {
+   GLOBAL.Type=constModule_Name
+      navigation.navigate("MainPageStack");
+    }
 
 
   }
@@ -113,7 +122,7 @@ function Doshboardscreen({ navigation }) {
 
         </View>
         <View style={Styles.ViewAbsolutedoshboard}>
-          <Text style={Styles.DoshbordAmonttext}>Total Amount:101010</Text>
+          <Text style={Styles.DoshbordAmonttext}>TODAY CASH:101010</Text>
         </View>
       </View>
         <Content contentContainerStyle={{alignItems:'center',justifyContent:'center'}}>
@@ -131,7 +140,7 @@ function Doshboardscreen({ navigation }) {
               doshboardlist?.map((value, key) => {
                 return (
                   <View  key={key} style={Styles.ModuleBox2}>
-                    <TouchableOpacity onPress={() => Navigate_Between_Modules(value.constModule_Id)} style={{
+                    <TouchableOpacity onPress={() => Navigate_Between_Modules(value.constModule_Id,value.constModule_Name)} style={{
                       width:"100%",alignItems:"center",justifyContent:'center'
                     }}>
                       <Image resizeMode={"contain"} source={value.Icon}

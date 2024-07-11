@@ -39,13 +39,11 @@ function ForgotPasswordOTP({ navigation, navigation: { goBack } }) {
     formData.append("orgKey",GLOBAL.OrgKeyValue );
     formData.append("emailId", GLOBAL.Email);
     formData.append("userId",GLOBAL.UserInformation?.userId);
-    console.log(formData,'formData')
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "multipart/form-data" },
       body:formData
     };
-    console.log(GLOBAL.OrgAppLink_value+Api.Update_Password,'GLOBAL.OrgAppLink_value+Api.Reset_Password')
     isNetworkConnected().then(status => {
       if (status) {
         fetch( GLOBAL.OrgAppLink_value+Api.Update_Password,requestOptions)
@@ -53,7 +51,7 @@ function ForgotPasswordOTP({ navigation, navigation: { goBack } }) {
             return resp.json();
           })
           .then(json => {
-            console.log(json,'json')
+
             if (json.status === true)
             {
               setShowButton(true)

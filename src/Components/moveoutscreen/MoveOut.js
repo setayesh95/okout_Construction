@@ -13,16 +13,16 @@ import { TextInputI } from "../component/TextInputI";
 let City=[]
 const GLOBAL = require("../Global");
 const Photoes=require('../Photoes')
-function Customer({navigation,navigation:{goBack}}) {
+function MoveOut({navigation,navigation:{goBack}}) {
   const [showModalDelete, setshowModalDelete] = useState(false);
   const [showWarning, setshowWarning] = useState(false);
-
+  const [Cheked,setCheked] = useState(false);
+  const [CountryList,setCountryList] = useState([]);
+  const [categorylist,setcategorylist] = useState([]);
   const [CityList,setCityList] = useState([]);
   const [cityId,setcityId] = useState('');
   const [countryId,setcountryId] = useState('');
   const [GeoAddressCountry, setGeoAddressCountry] = useState('');
-  const [Cheked,setCheked] = useState(false);
-  const [CountryList,setCountryList] = useState([]);
   const [GeoAddressCity, setGeoAddressCity] = useState('');
   const logout_Url= () => {
     setshowModalDelete(true)
@@ -129,11 +129,10 @@ function Customer({navigation,navigation:{goBack}}) {
       setcityId(Default_cityId)
     }
   };
-
   return (
     <Container style={[Styles.Backcolor]}>
       <Header colors={['#ffc2b5','#fca795','#d1583b']} StatusColor={'#ffc6bb'} onPress={goBack}
-              Title={"Customer"} />
+              Title={"Product Transfer Request"} />
       <Content style={{zIndex:1000}}>
       <View style={[Styles.containerList]}>
         {
@@ -146,11 +145,30 @@ function Customer({navigation,navigation:{goBack}}) {
         }
         {showWarning===true&& <Warningmessage/>}
         <View style={Styles.mainSystemDesigner}>
-          <TextInputI onChangeText={(value)=>CreateCustomer(value)}  numberValue={30} CountryList={CountryList} CityList={CityList}
-                      ChangeChecked={(value)=>ChangeChecked(value)}  tittlebtn={'Submit'} getCity={getCity}
+          <TextInputI onChangeText={(value)=>CreateCustomer(value)}  numberValue={40} CountryList={CountryList} CityList={CityList}
+                      ChangeChecked={(value)=>ChangeChecked(value)}  tittlebtn={'UploadSpreadSheet'} getCity={getCity}
                       GeoAddressCountry={GeoAddressCountry} setGeoAddressCountry={setGeoAddressCountry}
                       GeoAddressCity={GeoAddressCity} setGeoAddressCity={setGeoAddressCity}
           />
+          <View style={Styles.greenView2}>
+            <Text style={[Styles.txtGreenView ,{flex:1}]}>Transfer Qty</Text>
+            <Text style={[Styles.txtGreenView ,{flex:1}]}>Available Qty</Text>
+            <Text style={[Styles.txtGreenView, {flex: 1.5}]}>Transfer Description</Text>
+            <Text style={[Styles.txtGreenView, {flex: 0.5}]}>Product
+            </Text>
+          </View>
+          {categorylist.map((item, key) => {
+            return (
+              <View style={Styles.greenView3}>
+                <Text style={[Styles.CatText4 ,{flex:1}]}>{item.CreatedBy}</Text>
+                <Text style={[Styles.CatText4 ,{flex:1}]}>{item.CreatedOn}</Text>
+                <Text style={[Styles.CatText4 ,{flex:1}]}>{item.Notes}</Text>
+                <Text style={[Styles.CatText4 ,{flex:1}]}>{item.Reference}</Text>
+                <Text style={[Styles.CatText4 ,{flex:1}]}>{item.Code}</Text>
+                <Text style={[Styles.CatText4 ,{flex:1}]}>{item.name}</Text>
+              </View>
+            )})
+          }
         </View>
       </View>
       </Content>
@@ -158,4 +176,4 @@ function Customer({navigation,navigation:{goBack}}) {
     </Container>
   );
 }
-export default Customer;
+export default MoveOut;

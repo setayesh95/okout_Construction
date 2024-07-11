@@ -65,7 +65,6 @@ function DocCategoryScreen({ navigation, navigation: { goBack } }) {
   const get_document= async () => {
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.get_document + `userId=${GLOBAL.UserInformation?.userId}&sectionId=${GLOBAL.DocID}`).then(json => {
-        console.log(json)
         let getDoc = [];
         let data = [];
         let data_New = [];
@@ -256,7 +255,6 @@ else {
             //some headers ..
           })
           .then((res) => {
-            console.log(res,'resresresres')
             // the path should be dirs.DocumentDir + 'path-to-file.anything'
             android.actionViewIntent(
               res.path(),
@@ -266,7 +264,7 @@ else {
           });
       }
       else if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-        console.log('Storage Permission Denied with Never Ask Again.');
+
         Alert.alert(
           'Storage Permission Required',
           'App needs access to your storage to read files. Please go to app settings and grant permission.',
