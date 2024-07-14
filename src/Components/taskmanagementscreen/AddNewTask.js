@@ -187,9 +187,24 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
   }
   ///get  task list when user come from project or Dyb///
   const My_TaskList_server = async () => {
-      readOnlineApi(Api.My_TaskList+`userId=${GLOBAL.UserInformation?.userId}`).then(json => {
-        DataStorage(json?.tasks)
-      });
+    if(GLOBAL.ScreenName==='Support')
+    {
+        if (GLOBAL.isConnected === true) {
+          readOnlineApi(Api.Assigned_TaskList + `userId=${GLOBAL.UserInformation?.userId}&categoryId=3&relatedName=support`).then(json => {
+            writeDataStorage(GLOBAL.All_Task, json?.tasks);
+            navigation.navigate("Task_Management");
+          });
+        }
+
+    }
+    else{
+      if (GLOBAL.isConnected === true) {
+        readOnlineApi(Api.My_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+          DataStorage(json?.tasks)
+        });
+      }
+    }
+
   };
   const getDayOfWeek = (date) => {
     const dayOfWeek = new Date(date).getDay();
@@ -198,9 +213,22 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
   };
   ///get  task list ///
   const My_TaskList_server2 = async () => {
-    readOnlineApi(Api.My_TaskList+`userId=${GLOBAL.UserInformation?.userId}`).then(json => {
-       writeDataStorage(GLOBAL.All_Task,json?.tasks);
-    });
+    if(GLOBAL.ScreenName==='Support')
+    {
+      if (GLOBAL.isConnected === true) {
+        readOnlineApi(Api.Assigned_TaskList + `userId=${GLOBAL.UserInformation?.userId}&categoryId=3&relatedName=support`).then(json => {
+          writeDataStorage(GLOBAL.All_Task, json?.tasks);
+          navigation.navigate("Task_Management");
+        });
+      }
+
+    }
+    else {
+      if (GLOBAL.isConnected === true) {
+      readOnlineApi(Api.My_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+        writeDataStorage(GLOBAL.All_Task, json?.tasks);
+      });
+    }}
   };
   const AddTask = (value) => {
 

@@ -118,7 +118,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       if (GLOBAL.selectItem === 1 && GLOBAL.TaskName === "") {
         My_TaskList();
       } else if (GLOBAL.selectItem === 2 && GLOBAL.TaskName === "") {
-        setFilterList(FilterListWorkshop)
+        //setFilterList(FilterListWorkshop)
         Assigned_TaskList();
       } else if (GLOBAL.TaskName !== "") {
         getrelatedTask();
@@ -552,7 +552,6 @@ function Task_Management({ navigation, navigation: { goBack } }) {
 
     else {
       let json = JSON.parse(await AsyncStorage.getItem(GLOBAL.All_Task));
-
       let Task_List = [];
       for (let item in json) {
         let obj = json?.[item];
@@ -582,29 +581,60 @@ function Task_Management({ navigation, navigation: { goBack } }) {
         });
       }
       if (Task_List?.length !== 0) {
-        Task_List?.sort(dateComparison_data);
-        setMudolList(Task_List);
-        GLOBAL.MudolList=Task_List;
-
-        Make_Week_Filter_List(Task_List);
-          if(GLOBAL.Url_Navigate==='InspectionUnits')
-            setmodules(Task_List?.filter((p) => p?.taskRelatedName === GLOBAL.relatedName&&p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"))
-          else if(GLOBAL.Selected?.length!==0){
-            for (let item in GLOBAL.Selected) {
-              let obj = GLOBAL.Selected?.[item];
-              let index =  GLOBAL.RelatedNameListTask?.findIndex((p) => p?.value ===obj?.Id);
-              GLOBAL.RelatedNameListTask[index] = {
-                ... GLOBAL.RelatedNameListTask[index], label:GLOBAL.Selected?.find((p)=>p.Id===obj?.Id).Name,
-              };
-              setRelatedNameListTask( GLOBAL.RelatedNameListTask)
-            }
-            const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
-            const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
-            const Item={label:GLOBAL.RelatedNameListTask?.[Index]?.label,value:"0",_index:0}
-            FilterTaskEntityDropDown2(Item,categoryId2,Task_List)
+        if(GLOBAL.Selected?.length!==0){
+          for (let item in GLOBAL.Selected) {
+            let obj = GLOBAL.Selected?.[item];
+            let index =  GLOBAL.RelatedNameListTask?.findIndex((p) => p?.value ===obj?.Id);
+            GLOBAL.RelatedNameListTask[index] = {
+              ... GLOBAL.RelatedNameListTask[index], label:GLOBAL.Selected?.find((p)=>p.Id===obj?.Id).Name,
+            };
+            setRelatedNameListTask( GLOBAL.RelatedNameListTask)
           }
-          else
-           setmodules(Task_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+          const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
+          const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
+          const Item={label:GLOBAL.RelatedNameListTask?.[Index]?.label,value:"0",_index:0}
+          FilterTaskEntityDropDown2(Item,categoryId2,Task_List)
+        }
+
+      if(GLOBAL.ScreenName==='Property Maintenance'){
+        let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Maintenance')
+
+        Final_List?.sort(dateComparison_data);
+        setMudolList(Final_List);
+        GLOBAL.MudolList=Final_List;
+        Make_Week_Filter_List(Final_List);
+        setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+
+        }
+        else if(GLOBAL.ScreenName==='Snagging'){
+        let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Snag')
+        Final_List?.sort(dateComparison_data);
+        setMudolList(Final_List);
+        GLOBAL.MudolList=Final_List;
+        Make_Week_Filter_List(Final_List);
+        setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+
+        }
+        else if(GLOBAL.ScreenName==='Subcontract'){
+        let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Subcontract')
+        Final_List?.sort(dateComparison_data);
+        setMudolList(Final_List);
+        GLOBAL.MudolList=Final_List;
+        Make_Week_Filter_List(Final_List);
+        setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+
+        }
+      else  if(GLOBAL.Url_Navigate==='InspectionUnits')
+        setmodules(Task_List?.filter((p) => p?.taskRelatedName === GLOBAL.relatedName&&p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"))
+        else {
+          Task_List?.sort(dateComparison_data);
+          setMudolList(Task_List);
+          GLOBAL.MudolList=Task_List;
+          Make_Week_Filter_List(Task_List);
+        setmodules(Task_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+
+      }
+
         }
        else {
         setmodules("");
@@ -885,10 +915,18 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     };
     writeDataStorage(GLOBAL.Task_Detail, markers_Listdetail);
   };
+  const Assigned_TaskList_Support = async () => {
+    if (GLOBAL.isConnected === true) {
+      readOnlineApi(Api.Assigned_TaskList + `userId=${GLOBAL.UserInformation?.userId}&categoryId=3&relatedName=support`).then(json => {
 
+        writeDataStorage(GLOBAL.All_Task, json?.tasks);
+        navigation.navigate("Task_Management");
+      });
+    }
+  };
   const renderItem = ({ item, index }) => (
     <Task_management_Item data={GLOBAL?.selectItem === 1 ? GLOBAL.Task_data : dataassigned} data2={data2} index={index}
-                          key={index}
+                          key={index} Assigned_TaskList_Support={Assigned_TaskList_Support}
                           modules={modules?.length} My_TaskList={My_TaskList} dataassigned2={GLOBAL.Task_data_assigned}
                           Assigned_TaskList={Assigned_TaskList} Update_Off_Reopen={Update_Off_Reopen}
                           value={item} Navigate_Url={Navigate_Url2} Cheked={Cheked} Update_Off={Update_Off}
@@ -1076,10 +1114,12 @@ function Task_Management({ navigation, navigation: { goBack } }) {
             Name:obj.categoryTitle,
           });
         }
+
           if(value==='4'||value==='5') {
             setcategoryLevellist(A);
             if(value==='4')
               getSites3(A);
+            // else
           }
           else if(value==='1'||value==='2')
           {
@@ -1121,86 +1161,269 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     const Day = date.getDate();
     const Month = date.getMonth();
     let Task_List = [];
-    if (GLOBAL.isConnected === true) {
-      readOnlineApi(Api.My_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+    if(GLOBAL.ScreenName==='Support')
+    {
+      if (GLOBAL.isConnected === true) {
+        readOnlineApi(Api.Assigned_TaskList + `userId=${GLOBAL.UserInformation?.userId}&categoryId=3&relatedName=support`).then(json => {
+          for (let item in json?.tasks) {
+            let obj = json?.tasks?.[item];
+            let taskPriorityColor = "";
+            const Year = obj.taskCreatedOn.split(" ");
+            const Day = Year?.[0]?.split("-");
+            const W = Day?.[2]?.split(" ");
 
-        for (let item in json?.tasks) {
-          let obj = json?.tasks?.[item];
-          let taskPriorityColor = "";
-          const Year = obj.taskCreatedOn.split(" ");
-          const Day = Year?.[0]?.split("-");
-          const W = Day?.[2]?.split(" ");
+            Task_List.push({
+              taskId: obj.taskId,
+              taskTitle: obj.taskTitle,
+              taskPriorityName: obj.taskPriorityName,
+              taskDescription: obj.taskDescription,
+              taskParentTaskId: obj.taskParentTaskId,
+              taskStatusColor: obj.taskStatusColor,
+              taskCreatedOn: obj.taskCreatedOn,
+              taskStatusName: obj.taskStatusName,
+              Year: Year?.[0],
+              WeekDay: getDayOfWeek(Year?.[0]),
+              Day: W?.[0],
+              Month: Day?.[1],
+              taskPriorityColor: obj?.taskPriorityColor,
+              attachments: obj?.attachments,
+              taskUpdated: obj?.taskNotify,
+              taskRelatedName: obj?.taskRelatedName,
+              taskCategoryName: obj.taskCategoryName,
+              taskRelatedNameRef: obj.taskRelatedNameRef,
+              taskWorkType: obj.taskWorkType,
+            });
+          }
+          writeDataStorage(GLOBAL.All_Task, json?.tasks);
 
-          Task_List.push({
-            taskId: obj.taskId,
-            taskTitle: obj.taskTitle,
-            taskPriorityName: obj.taskPriorityName,
-            taskDescription: obj.taskDescription,
-            taskParentTaskId: obj.taskParentTaskId,
-            taskStatusColor: obj.taskStatusColor,
-            taskCreatedOn: obj.taskCreatedOn,
-            taskStatusName: obj.taskStatusName,
-            Year: Year?.[0],
-            WeekDay: getDayOfWeek(Year?.[0]),
-            Day: W?.[0],
-            Month: Day?.[1],
-            taskPriorityColor: obj?.taskPriorityColor,
-            attachments: obj?.attachments,
-            taskUpdated: obj?.taskNotify,
-            taskRelatedName: obj?.taskRelatedName,
-            taskCategoryName: obj.taskCategoryName,
-            taskRelatedNameRef: obj.taskRelatedNameRef,
-            taskWorkType: obj.taskWorkType,
-          });
-        }
-        writeDataStorage(GLOBAL.All_Task, json?.tasks);
-
-        if (Task_List?.length !== 0) {
-          Task_List?.sort(dateComparison_data);
-          setMudolList(Task_List);
-          Make_Week_Filter_List(Task_List);
-          if (GLOBAL?.FilterTime === true || GLOBAL?.FilterStatus === true || GLOBAL?.FilterPriority === true) {
-            setShowMessage(false);
-            setDateAll(GLOBAL.FilterTime_name);
-            setStatusAll(GLOBAL.FilterStatus_name);
-            setpriorityAll(GLOBAL.FilterPriority_name);
-            if (GLOBAL.FilterTime_name === "All" && GLOBAL.FilterPriority_name === "All" && GLOBAL.FilterStatus_name === "All") {
-              setmodules(Task_List);
-            } else if (GLOBAL.FilterTime_name === "All" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name !== "All") {
-              setmodules(Task_List?.filter((p) => p?.taskPriorityName === GLOBAL.FilterPriority_name && p?.taskStatusName === GLOBAL.FilterStatus_name));
-            } else if (GLOBAL.FilterTime_name === "All" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name === "All") {
-              setmodules(Task_List?.filter((p) => p?.taskStatusName === GLOBAL.FilterStatus_name));
-            } else if (GLOBAL.FilterTime_name === "All" && GLOBAL.FilterStatus_name === "All" && GLOBAL.FilterPriority_name !== "All") {
-              setmodules(Task_List?.filter((p) => p?.taskPriorityName === GLOBAL.FilterPriority_name));
-            } else if (GLOBAL.FilterTime_name === "Today" && GLOBAL.FilterStatus_name === "All" && GLOBAL.FilterPriority_name === "All") {
-              setmodules(Task_List?.filter((p) => parseInt(p.Day) === Day && parseInt(p.Month) === Month + 1));
-            } else if (GLOBAL.FilterTime_name === "Today" && GLOBAL.FilterStatus_name === "All" && GLOBAL.FilterPriority_name !== "All") {
-              setmodules(Task_List?.filter((p) => parseInt(p.Day) === Day && parseInt(p.Month) === Month + 1 && p?.taskPriorityName === GLOBAL.FilterPriority_name));
-            } else if (GLOBAL.FilterTime_name === "Today" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name === "All") {
-              setmodules(Task_List?.filter((p) => parseInt(p.Day) === Day && parseInt(p.Month) === Month + 1 && p?.taskStatusName === GLOBAL.FilterStatus_name));
-            } else if (GLOBAL.FilterTime_name === "Today" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name !== "All") {
-              setmodules(Task_List?.filter((p) => parseInt(p.Day) === Day && parseInt(p.Month) === Month + 1 && p?.taskStatusName === GLOBAL.FilterStatus_name && p?.taskPriorityName === GLOBAL.FilterPriority_name));
-            } else if (GLOBAL.FilterTime_name === "Week" && GLOBAL.FilterStatus_name === "All" && GLOBAL.FilterPriority_name === "All") {
-              SortByWeek(GLOBAL.selectedRange.firstDate, GLOBAL.selectedRange.secondDate);
-            } else if (GLOBAL.FilterTime_name === "Week" && GLOBAL.FilterStatus_name === "All" && GLOBAL.FilterPriority_name !== "All") {
-              FilterWeekstatus();
-            } else if (GLOBAL.FilterTime_name === "Week" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name === "All") {
-              FilterWeekPriority();
-            } else if (GLOBAL.FilterTime_name === "Week" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name !== "All") {
-              FilterWeek();
+          if (Task_List?.length !== 0) {
+            if(GLOBAL.Selected?.length!==0){
+              for (let item in GLOBAL.Selected) {
+                let obj = GLOBAL.Selected?.[item];
+                let index =  GLOBAL.RelatedNameListTask?.findIndex((p) => p?.value ===obj?.Id);
+                GLOBAL.RelatedNameListTask[index] = {
+                  ... GLOBAL.RelatedNameListTask[index], label:GLOBAL.Selected?.find((p)=>p.Id===obj?.Id).Name,
+                };
+                setRelatedNameListTask( GLOBAL.RelatedNameListTask)
+              }
+              const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
+              const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
+              const Item={label:GLOBAL.RelatedNameListTask?.[Index]?.label,value:"0",_index:0}
+              FilterTaskEntityDropDown2(Item,categoryId2,Task_List)
             }
-          }
-          else {
-            setShowMessage(false);
-            setmodules(Task_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+            if (GLOBAL?.FilterTime === true || GLOBAL?.FilterStatus === true || GLOBAL?.FilterPriority === true) {
+              setShowMessage(false);
+              setDateAll(GLOBAL.FilterTime_name);
+              setStatusAll(GLOBAL.FilterStatus_name);
+              setpriorityAll(GLOBAL.FilterPriority_name);
+              if (GLOBAL.FilterTime_name === "All" && GLOBAL.FilterPriority_name === "All" && GLOBAL.FilterStatus_name === "All") {
+                setmodules(Task_List);
+              } else if (GLOBAL.FilterTime_name === "All" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name !== "All") {
+                setmodules(Task_List?.filter((p) => p?.taskPriorityName === GLOBAL.FilterPriority_name && p?.taskStatusName === GLOBAL.FilterStatus_name));
+              } else if (GLOBAL.FilterTime_name === "All" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name === "All") {
+                setmodules(Task_List?.filter((p) => p?.taskStatusName === GLOBAL.FilterStatus_name));
+              } else if (GLOBAL.FilterTime_name === "All" && GLOBAL.FilterStatus_name === "All" && GLOBAL.FilterPriority_name !== "All") {
+                setmodules(Task_List?.filter((p) => p?.taskPriorityName === GLOBAL.FilterPriority_name));
+              } else if (GLOBAL.FilterTime_name === "Today" && GLOBAL.FilterStatus_name === "All" && GLOBAL.FilterPriority_name === "All") {
+                setmodules(Task_List?.filter((p) => parseInt(p.Day) === Day && parseInt(p.Month) === Month + 1));
+              } else if (GLOBAL.FilterTime_name === "Today" && GLOBAL.FilterStatus_name === "All" && GLOBAL.FilterPriority_name !== "All") {
+                setmodules(Task_List?.filter((p) => parseInt(p.Day) === Day && parseInt(p.Month) === Month + 1 && p?.taskPriorityName === GLOBAL.FilterPriority_name));
+              } else if (GLOBAL.FilterTime_name === "Today" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name === "All") {
+                setmodules(Task_List?.filter((p) => parseInt(p.Day) === Day && parseInt(p.Month) === Month + 1 && p?.taskStatusName === GLOBAL.FilterStatus_name));
+              } else if (GLOBAL.FilterTime_name === "Today" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name !== "All") {
+                setmodules(Task_List?.filter((p) => parseInt(p.Day) === Day && parseInt(p.Month) === Month + 1 && p?.taskStatusName === GLOBAL.FilterStatus_name && p?.taskPriorityName === GLOBAL.FilterPriority_name));
+              } else if (GLOBAL.FilterTime_name === "Week" && GLOBAL.FilterStatus_name === "All" && GLOBAL.FilterPriority_name === "All") {
+                SortByWeek(GLOBAL.selectedRange.firstDate, GLOBAL.selectedRange.secondDate);
+              } else if (GLOBAL.FilterTime_name === "Week" && GLOBAL.FilterStatus_name === "All" && GLOBAL.FilterPriority_name !== "All") {
+                FilterWeekstatus();
+              } else if (GLOBAL.FilterTime_name === "Week" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name === "All") {
+                FilterWeekPriority();
+              } else if (GLOBAL.FilterTime_name === "Week" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name !== "All") {
+                FilterWeek();
+              }
+            }
+            else if(GLOBAL.ScreenName==='Property Maintenance'){
+
+              let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Maintenance')
+
+              Final_List?.sort(dateComparison_data);
+              setMudolList(Final_List);
+              GLOBAL.MudolList=Final_List;
+              Make_Week_Filter_List(Final_List);
+              setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+
+            }
+            else if(GLOBAL.ScreenName==='Snagging'){
+              let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Snag')
+              Final_List?.sort(dateComparison_data);
+              setMudolList(Final_List);
+              GLOBAL.MudolList=Final_List;
+              Make_Week_Filter_List(Final_List);
+              setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+
+            }
+            else if(GLOBAL.ScreenName==='Subcontract'){
+              let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Subcontract')
+              Final_List?.sort(dateComparison_data);
+              setMudolList(Final_List);
+              GLOBAL.MudolList=Final_List;
+              Make_Week_Filter_List(Final_List);
+              setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+
+            }
+            else  if(GLOBAL.Url_Navigate==='InspectionUnits')
+              setmodules(Task_List?.filter((p) => p?.taskRelatedName === GLOBAL.relatedName&&p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"))
+
+            else {
+              Task_List?.sort(dateComparison_data);
+              setMudolList(Task_List);
+              GLOBAL.MudolList=Task_List;
+              Make_Week_Filter_List(Task_List);
+              setShowMessage(false);
+              setmodules(Task_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+            }
+
           }
 
-        } else {
-          setmodules("");
-        }
-        setShowMessage(false);
-      });
+
+
+          else {
+            setmodules("");
+          }
+          setShowMessage(false);
+        });
+      }
     }
+      else{
+      if (GLOBAL.isConnected === true) {
+        readOnlineApi(Api.My_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+
+          for (let item in json?.tasks) {
+            let obj = json?.tasks?.[item];
+            let taskPriorityColor = "";
+            const Year = obj.taskCreatedOn.split(" ");
+            const Day = Year?.[0]?.split("-");
+            const W = Day?.[2]?.split(" ");
+
+            Task_List.push({
+              taskId: obj.taskId,
+              taskTitle: obj.taskTitle,
+              taskPriorityName: obj.taskPriorityName,
+              taskDescription: obj.taskDescription,
+              taskParentTaskId: obj.taskParentTaskId,
+              taskStatusColor: obj.taskStatusColor,
+              taskCreatedOn: obj.taskCreatedOn,
+              taskStatusName: obj.taskStatusName,
+              Year: Year?.[0],
+              WeekDay: getDayOfWeek(Year?.[0]),
+              Day: W?.[0],
+              Month: Day?.[1],
+              taskPriorityColor: obj?.taskPriorityColor,
+              attachments: obj?.attachments,
+              taskUpdated: obj?.taskNotify,
+              taskRelatedName: obj?.taskRelatedName,
+              taskCategoryName: obj.taskCategoryName,
+              taskRelatedNameRef: obj.taskRelatedNameRef,
+              taskWorkType: obj.taskWorkType,
+            });
+          }
+          writeDataStorage(GLOBAL.All_Task, json?.tasks);
+
+          if (Task_List?.length !== 0) {
+            if(GLOBAL.Selected?.length!==0){
+              for (let item in GLOBAL.Selected) {
+                let obj = GLOBAL.Selected?.[item];
+                let index =  GLOBAL.RelatedNameListTask?.findIndex((p) => p?.value ===obj?.Id);
+                GLOBAL.RelatedNameListTask[index] = {
+                  ... GLOBAL.RelatedNameListTask[index], label:GLOBAL.Selected?.find((p)=>p.Id===obj?.Id).Name,
+                };
+                setRelatedNameListTask( GLOBAL.RelatedNameListTask)
+              }
+              const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
+              const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
+              const Item={label:GLOBAL.RelatedNameListTask?.[Index]?.label,value:"0",_index:0}
+              FilterTaskEntityDropDown2(Item,categoryId2,Task_List)
+            }
+            if (GLOBAL?.FilterTime === true || GLOBAL?.FilterStatus === true || GLOBAL?.FilterPriority === true) {
+              setShowMessage(false);
+              setDateAll(GLOBAL.FilterTime_name);
+              setStatusAll(GLOBAL.FilterStatus_name);
+              setpriorityAll(GLOBAL.FilterPriority_name);
+              if (GLOBAL.FilterTime_name === "All" && GLOBAL.FilterPriority_name === "All" && GLOBAL.FilterStatus_name === "All") {
+                setmodules(Task_List);
+              } else if (GLOBAL.FilterTime_name === "All" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name !== "All") {
+                setmodules(Task_List?.filter((p) => p?.taskPriorityName === GLOBAL.FilterPriority_name && p?.taskStatusName === GLOBAL.FilterStatus_name));
+              } else if (GLOBAL.FilterTime_name === "All" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name === "All") {
+                setmodules(Task_List?.filter((p) => p?.taskStatusName === GLOBAL.FilterStatus_name));
+              } else if (GLOBAL.FilterTime_name === "All" && GLOBAL.FilterStatus_name === "All" && GLOBAL.FilterPriority_name !== "All") {
+                setmodules(Task_List?.filter((p) => p?.taskPriorityName === GLOBAL.FilterPriority_name));
+              } else if (GLOBAL.FilterTime_name === "Today" && GLOBAL.FilterStatus_name === "All" && GLOBAL.FilterPriority_name === "All") {
+                setmodules(Task_List?.filter((p) => parseInt(p.Day) === Day && parseInt(p.Month) === Month + 1));
+              } else if (GLOBAL.FilterTime_name === "Today" && GLOBAL.FilterStatus_name === "All" && GLOBAL.FilterPriority_name !== "All") {
+                setmodules(Task_List?.filter((p) => parseInt(p.Day) === Day && parseInt(p.Month) === Month + 1 && p?.taskPriorityName === GLOBAL.FilterPriority_name));
+              } else if (GLOBAL.FilterTime_name === "Today" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name === "All") {
+                setmodules(Task_List?.filter((p) => parseInt(p.Day) === Day && parseInt(p.Month) === Month + 1 && p?.taskStatusName === GLOBAL.FilterStatus_name));
+              } else if (GLOBAL.FilterTime_name === "Today" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name !== "All") {
+                setmodules(Task_List?.filter((p) => parseInt(p.Day) === Day && parseInt(p.Month) === Month + 1 && p?.taskStatusName === GLOBAL.FilterStatus_name && p?.taskPriorityName === GLOBAL.FilterPriority_name));
+              } else if (GLOBAL.FilterTime_name === "Week" && GLOBAL.FilterStatus_name === "All" && GLOBAL.FilterPriority_name === "All") {
+                SortByWeek(GLOBAL.selectedRange.firstDate, GLOBAL.selectedRange.secondDate);
+              } else if (GLOBAL.FilterTime_name === "Week" && GLOBAL.FilterStatus_name === "All" && GLOBAL.FilterPriority_name !== "All") {
+                FilterWeekstatus();
+              } else if (GLOBAL.FilterTime_name === "Week" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name === "All") {
+                FilterWeekPriority();
+              } else if (GLOBAL.FilterTime_name === "Week" && GLOBAL.FilterStatus_name !== "All" && GLOBAL.FilterPriority_name !== "All") {
+                FilterWeek();
+              }
+            }
+            else if(GLOBAL.ScreenName==='Property Maintenance'){
+
+              let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Maintenance')
+
+              Final_List?.sort(dateComparison_data);
+              setMudolList(Final_List);
+              GLOBAL.MudolList=Final_List;
+              Make_Week_Filter_List(Final_List);
+              setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+
+            }
+            else if(GLOBAL.ScreenName==='Snagging'){
+              let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Snag')
+              Final_List?.sort(dateComparison_data);
+              setMudolList(Final_List);
+              GLOBAL.MudolList=Final_List;
+              Make_Week_Filter_List(Final_List);
+              setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+
+            }
+            else if(GLOBAL.ScreenName==='Subcontract'){
+              let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Subcontract')
+              Final_List?.sort(dateComparison_data);
+              setMudolList(Final_List);
+              GLOBAL.MudolList=Final_List;
+              Make_Week_Filter_List(Final_List);
+              setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+
+            }
+            else  if(GLOBAL.Url_Navigate==='InspectionUnits')
+              setmodules(Task_List?.filter((p) => p?.taskRelatedName === GLOBAL.relatedName&&p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"))
+
+            else {
+              Task_List?.sort(dateComparison_data);
+              setMudolList(Task_List);
+              GLOBAL.MudolList=Task_List;
+              Make_Week_Filter_List(Task_List);
+              setShowMessage(false);
+              setmodules(Task_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+            }
+
+          } else {
+            setmodules("");
+          }
+          setShowMessage(false);
+        });
+      }
+    }
+
   };
   ///get Technician task list from server///
   const Assigned_TaskList_server = async () => {
@@ -1898,44 +2121,38 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   }
   const FilterTaskEntityDropDown2=(Item,categoryId2,Task_List)=>{
     GLOBAL.RelatedNameListTask.find((p) => p.value ===categoryId2).label=Item.label
-
-    if  (GLOBAL.ScreenName==='Property Maintenance'){
-
-      if(GLOBAL.SiteName==='site')
-      {
-        setmodules(Task_List.filter((p)=>p.taskRelatedName==='site'&&p.taskCategoryName==='Maintenance'))
-      }
-      else if(GLOBAL.SiteName==='unit')
-      {
-        setmodules(Task_List.filter((p)=>p.taskRelatedName==='unit'&&p.taskCategoryName==='Maintenance'))
-      }
-    }
-
-    else {
+    // if  (GLOBAL.ScreenName==='Property Maintenance'){
+    //
+    //   if(GLOBAL.SiteName==='site')
+    //   {
+    //     setmodules(Task_List.filter((p)=>p.taskRelatedName==='site'&&p.taskCategoryName==='Maintenance'))
+    //   }
+    //   else if(GLOBAL.SiteName==='unit')
+    //   {
+    //     setmodules(Task_List.filter((p)=>p.taskRelatedName==='unit'&&p.taskCategoryName==='Maintenance'))
+    //   }
+    // }
+    //
+    // else {
       setmodules(Task_List.filter((p)=>p.taskRelatedNameRef===Item.label))
-
-    }
-
   }
   const FilterTaskEntityDropDown=(Item,categoryId2)=>{
     GLOBAL.RelatedNameListTask.find((p) => p.value ===categoryId2).label=Item.label
 
-    if  (GLOBAL.ScreenName==='Property Maintenance'){
-
-      if(GLOBAL.SiteName==='site')
-      {
-        setmodules(MudolList.filter((p)=>p.taskRelatedName==='site'&&p.taskCategoryName==='Maintenance'))
-      }
-        else if(GLOBAL.SiteName==='unit')
-      {
-        setmodules(MudolList.filter((p)=>p.taskRelatedName==='unit'&&p.taskCategoryName==='Maintenance'))
-      }
-      }
-
-      else {
+    // if  (GLOBAL.ScreenName==='Property Maintenance'){
+    //
+    //   if(GLOBAL.SiteName==='site')
+    //   {
+    //     setmodules(MudolList.filter((p)=>p.taskRelatedName==='site'))
+    //   }
+    //     else if(GLOBAL.SiteName==='unit')
+    //   {
+    //     setmodules(MudolList.filter((p)=>p.taskRelatedName==='unit'))
+    //   }
+    //   }
+    //
+    //   else {
       setmodules(MudolList.filter((p)=>p.taskRelatedNameRef===Item.label))
-
-    }
 
   }
   /// sort Task by week ///

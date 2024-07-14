@@ -67,6 +67,7 @@ function Home_meno({ navigation }) {
     if(GLOBAL.isConnected===true) {
       readOnlineApi(Api.getModulesInfoMin + `roleId=${GLOBAL.UserInformation?.roleId}&moduleType=${GLOBAL.UserInformation?.MenuType
       }`).then(json => {
+
         json?.modules?.forEach((obj) => {
           if (obj.constModule_Id === 1 || obj.constModule_Id === "1") {
             Icon = Photoes.ProjectStructure;
@@ -169,6 +170,7 @@ function Home_meno({ navigation }) {
       });
     }
   };
+
   const get_document= async () => {
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.get_document + `userId=${GLOBAL.UserInformation?.userId}&sectionId=${null}`).then(json => {

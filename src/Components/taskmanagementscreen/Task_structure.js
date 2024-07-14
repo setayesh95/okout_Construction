@@ -56,6 +56,7 @@ function Taskstructure({ navigation, navigation: { goBack } }) {
   const writeDataStorage = async (key, obj) => {
     try {
       await AsyncStorage.setItem(key, JSON.stringify(obj));
+
     }
     catch (e) {}
   };
@@ -63,6 +64,25 @@ function Taskstructure({ navigation, navigation: { goBack } }) {
     GLOBAL.Addtask='Add New Task';
     goBack()
   }
+  const Assigned_TaskList_Support = async () => {
+    if (GLOBAL.isConnected === true) {
+      readOnlineApi(Api.Assigned_TaskList + `userId=${GLOBAL.UserInformation?.userId}&categoryId=3&relatedName=support`).then(json => {
+
+        writeDataStorage(GLOBAL.All_Task, json?.tasks);
+        navigation.navigate("Task_Management");
+      });
+    }
+  };
+  const My_TaskList = async () => {
+
+    if (GLOBAL.isConnected === true) {
+      readOnlineApi(Api.My_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+
+        writeDataStorage(GLOBAL.All_Task, json?.tasks);
+        navigation.navigate("Task_Management");
+      });
+    }
+  };
   return (
     <Container  style={{backgroundColor:GLOBAL.backgroundColor}}>
       <Header colors={["#a39898", "#786b6b", "#382e2e"]} StatusColor={"#a39897"} onPress={back}
@@ -104,7 +124,18 @@ function Taskstructure({ navigation, navigation: { goBack } }) {
                           GLOBAL.TaskRelatedCheck=''
                           GLOBAL.Url_Navigate=''
                           GLOBAL.TaskRelatedNameId=''
-                          navigation.navigate("Task_Management");
+                          if(value?.constModule_Name==='Support')
+                          {
+
+                            Assigned_TaskList_Support()
+                          }
+                          else {
+
+                            My_TaskList()
+
+                          }
+
+
                         }
                       }
 

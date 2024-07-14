@@ -54,6 +54,7 @@ module.exports = {
   All_City:'@MySuperStore:All_City',
   AllProjectInfo_dyb:'@MySuperStore:AllProjectInfo_dyb',
   Assigned_TaskList:'@MySuperStore:Assigned_TaskList',
+  Assigned_TaskList_Suppost:'@MySuperStore:Assigned_TaskList_Suppost',
   RentalUnits_List:'@MySuperStore:RentalUnits_List',
   RentalSite_List:'@MySuperStore:RentalSite_List',
   Get_Docmanage:'@MySuperStore:Get_Docmanage',

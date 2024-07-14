@@ -788,23 +788,46 @@ function TaskDetail({ navigation, navigation: { goBack } }) {
   };
   ///get Technician task list from server///
   const My_TaskList_server = async () => {
-    if (GLOBAL.isConnected === true) {
-      readOnlineApi(Api.Assigned_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+    if(GLOBAL.ScreenName==='Support')
+    {
+      if (GLOBAL.isConnected === true) {
+        readOnlineApi(Api.Assigned_TaskList + `userId=${GLOBAL.UserInformation?.userId}&categoryId=3&relatedName=support`).then(json => {
+          writeDataStorage(GLOBAL.All_Task, json?.tasks);
+          navigation.navigate("Task_Management");
+        });
+      }
 
-        GLOBAL.buttonName = "Assigned_TaskList";
-        writeDataStorage(GLOBAL.Assigned_TaskList, json?.tasks);
-      });
+    }
+    else {
+      if (GLOBAL.isConnected === true) {
+        readOnlineApi(Api.Assigned_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+
+          GLOBAL.buttonName = "Assigned_TaskList";
+          writeDataStorage(GLOBAL.Assigned_TaskList, json?.tasks);
+        });
+      }
     }
   };
   ///get user add task list from server///
   const My_TaskList_server2 = async () => {
+    if(GLOBAL.ScreenName==='Support')
+    {
+      if (GLOBAL.isConnected === true) {
+        readOnlineApi(Api.Assigned_TaskList + `userId=${GLOBAL.UserInformation?.userId}&categoryId=3&relatedName=support`).then(json => {
+          writeDataStorage(GLOBAL.All_Task, json?.tasks);
+          navigation.navigate("Task_Management");
+        });
+      }
+
+    }
+    else{
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.My_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
 
         GLOBAL.buttonName = "My_TaskList";
         writeDataStorage(GLOBAL.All_Task, json?.tasks);
       });
-    }
+    }}
   };
   const Reject_Task = async () => {
     let List_Item = JSON.parse(await AsyncStorage.getItem(GLOBAL.Assigned_TaskList));
