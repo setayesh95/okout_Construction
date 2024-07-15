@@ -113,7 +113,6 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   const [RelatedNameListTask, setRelatedNameListTask] = useState([]);
   const [value2, setValue] = useState('');
   useEffect(() => {
-
     const unsubscribe = navigation.addListener("focus", () => {
       if (GLOBAL.selectItem === 1 && GLOBAL.TaskName === "") {
         My_TaskList();
@@ -581,6 +580,12 @@ function Task_Management({ navigation, navigation: { goBack } }) {
         });
       }
       if (Task_List?.length !== 0) {
+      if(GLOBAL.ScreenName==='Property Maintenance'){
+        let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Maintenance')
+        Final_List?.sort(dateComparison_data);
+        setMudolList(Final_List);
+        GLOBAL.MudolList=Final_List;
+        Make_Week_Filter_List(Final_List);
         if(GLOBAL.Selected?.length!==0){
           for (let item in GLOBAL.Selected) {
             let obj = GLOBAL.Selected?.[item];
@@ -594,16 +599,12 @@ function Task_Management({ navigation, navigation: { goBack } }) {
           const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
           const Item={label:GLOBAL.RelatedNameListTask?.[Index]?.label,value:"0",_index:0}
           FilterTaskEntityDropDown2(Item,categoryId2,Task_List)
+          setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"&&p?.taskRelatedNameRef === GLOBAL.taskRelatedNameRef));
         }
-
-      if(GLOBAL.ScreenName==='Property Maintenance'){
-        let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Maintenance')
-
-        Final_List?.sort(dateComparison_data);
-        setMudolList(Final_List);
-        GLOBAL.MudolList=Final_List;
-        Make_Week_Filter_List(Final_List);
-        setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+        else
+        {
+          setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+        }
 
         }
         else if(GLOBAL.ScreenName==='Snagging'){
@@ -612,6 +613,22 @@ function Task_Management({ navigation, navigation: { goBack } }) {
         setMudolList(Final_List);
         GLOBAL.MudolList=Final_List;
         Make_Week_Filter_List(Final_List);
+        if(GLOBAL.Selected?.length!==0){
+          for (let item in GLOBAL.Selected) {
+            let obj = GLOBAL.Selected?.[item];
+            let index =  GLOBAL.RelatedNameListTask?.findIndex((p) => p?.value ===obj?.Id);
+            GLOBAL.RelatedNameListTask[index] = {
+              ... GLOBAL.RelatedNameListTask[index], label:GLOBAL.Selected?.find((p)=>p.Id===obj?.Id).Name,
+            };
+            setRelatedNameListTask( GLOBAL.RelatedNameListTask)
+          }
+          const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
+          const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
+          const Item={label:GLOBAL.RelatedNameListTask?.[Index]?.label,value:"0",_index:0}
+          FilterTaskEntityDropDown2(Item,categoryId2,Task_List)
+          setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"&&p?.taskRelatedNameRef === GLOBAL.taskRelatedNameRef));
+        }
+        else
         setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
 
         }
@@ -621,9 +638,49 @@ function Task_Management({ navigation, navigation: { goBack } }) {
         setMudolList(Final_List);
         GLOBAL.MudolList=Final_List;
         Make_Week_Filter_List(Final_List);
+        if(GLOBAL.Selected?.length!==0){
+          for (let item in GLOBAL.Selected) {
+            let obj = GLOBAL.Selected?.[item];
+            let index =  GLOBAL.RelatedNameListTask?.findIndex((p) => p?.value ===obj?.Id);
+            GLOBAL.RelatedNameListTask[index] = {
+              ... GLOBAL.RelatedNameListTask[index], label:GLOBAL.Selected?.find((p)=>p.Id===obj?.Id).Name,
+            };
+            setRelatedNameListTask( GLOBAL.RelatedNameListTask)
+          }
+          const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
+          const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
+          const Item={label:GLOBAL.RelatedNameListTask?.[Index]?.label,value:"0",_index:0}
+          FilterTaskEntityDropDown2(Item,categoryId2,Task_List)
+          setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"&&p?.taskRelatedNameRef === GLOBAL.taskRelatedNameRef));
+        }
+        else
         setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
 
         }
+      else if(GLOBAL.ScreenName==='Support'){
+        let Final_List=Task_List?.filter((p) =>p?.taskCategoryName ==='Software & Support')
+        Final_List?.sort(dateComparison_data);
+        setMudolList(Final_List);
+        GLOBAL.MudolList=Final_List;
+        Make_Week_Filter_List(Final_List);
+        // if(GLOBAL.Selected?.length!==0){
+        //   for (let item in GLOBAL.Selected) {
+        //     let obj = GLOBAL.Selected?.[item];
+        //     let index =  GLOBAL.RelatedNameListTask?.findIndex((p) => p?.value ===obj?.Id);
+        //     GLOBAL.RelatedNameListTask[index] = {
+        //       ... GLOBAL.RelatedNameListTask[index], label:GLOBAL.Selected?.find((p)=>p.Id===obj?.Id).Name,
+        //     };
+        //     setRelatedNameListTask( GLOBAL.RelatedNameListTask)
+        //   }
+        //   const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
+        //   const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
+        //   const Item={label:GLOBAL.RelatedNameListTask?.[Index]?.label,value:"0",_index:0}
+        //   FilterTaskEntityDropDown2(Item,categoryId2,Task_List)
+        //   setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"&&p?.taskPriorityName === GLOBAL.taskRelatedNameRef));
+        // }
+        // else
+          setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+      }
       else  if(GLOBAL.Url_Navigate==='InspectionUnits')
         setmodules(Task_List?.filter((p) => p?.taskRelatedName === GLOBAL.relatedName&&p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"))
         else {
@@ -1197,20 +1254,6 @@ function Task_Management({ navigation, navigation: { goBack } }) {
           writeDataStorage(GLOBAL.All_Task, json?.tasks);
 
           if (Task_List?.length !== 0) {
-            if(GLOBAL.Selected?.length!==0){
-              for (let item in GLOBAL.Selected) {
-                let obj = GLOBAL.Selected?.[item];
-                let index =  GLOBAL.RelatedNameListTask?.findIndex((p) => p?.value ===obj?.Id);
-                GLOBAL.RelatedNameListTask[index] = {
-                  ... GLOBAL.RelatedNameListTask[index], label:GLOBAL.Selected?.find((p)=>p.Id===obj?.Id).Name,
-                };
-                setRelatedNameListTask( GLOBAL.RelatedNameListTask)
-              }
-              const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
-              const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
-              const Item={label:GLOBAL.RelatedNameListTask?.[Index]?.label,value:"0",_index:0}
-              FilterTaskEntityDropDown2(Item,categoryId2,Task_List)
-            }
             if (GLOBAL?.FilterTime === true || GLOBAL?.FilterStatus === true || GLOBAL?.FilterPriority === true) {
               setShowMessage(false);
               setDateAll(GLOBAL.FilterTime_name);
@@ -1242,15 +1285,31 @@ function Task_Management({ navigation, navigation: { goBack } }) {
                 FilterWeek();
               }
             }
-            else if(GLOBAL.ScreenName==='Property Maintenance'){
-
+            if(GLOBAL.ScreenName==='Property Maintenance'){
               let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Maintenance')
-
               Final_List?.sort(dateComparison_data);
               setMudolList(Final_List);
               GLOBAL.MudolList=Final_List;
               Make_Week_Filter_List(Final_List);
-              setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+              if(GLOBAL.Selected?.length!==0){
+                for (let item in GLOBAL.Selected) {
+                  let obj = GLOBAL.Selected?.[item];
+                  let index =  GLOBAL.RelatedNameListTask?.findIndex((p) => p?.value ===obj?.Id);
+                  GLOBAL.RelatedNameListTask[index] = {
+                    ... GLOBAL.RelatedNameListTask[index], label:GLOBAL.Selected?.find((p)=>p.Id===obj?.Id).Name,
+                  };
+                  setRelatedNameListTask( GLOBAL.RelatedNameListTask)
+                }
+                const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
+                const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
+                const Item={label:GLOBAL.RelatedNameListTask?.[Index]?.label,value:"0",_index:0}
+                FilterTaskEntityDropDown2(Item,categoryId2,Task_List)
+                setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"&&p?.taskRelatedNameRef === GLOBAL.taskRelatedNameRef));
+              }
+              else
+              {
+                setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+              }
 
             }
             else if(GLOBAL.ScreenName==='Snagging'){
@@ -1259,7 +1318,23 @@ function Task_Management({ navigation, navigation: { goBack } }) {
               setMudolList(Final_List);
               GLOBAL.MudolList=Final_List;
               Make_Week_Filter_List(Final_List);
-              setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+              if(GLOBAL.Selected?.length!==0){
+                for (let item in GLOBAL.Selected) {
+                  let obj = GLOBAL.Selected?.[item];
+                  let index =  GLOBAL.RelatedNameListTask?.findIndex((p) => p?.value ===obj?.Id);
+                  GLOBAL.RelatedNameListTask[index] = {
+                    ... GLOBAL.RelatedNameListTask[index], label:GLOBAL.Selected?.find((p)=>p.Id===obj?.Id).Name,
+                  };
+                  setRelatedNameListTask( GLOBAL.RelatedNameListTask)
+                }
+                const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
+                const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
+                const Item={label:GLOBAL.RelatedNameListTask?.[Index]?.label,value:"0",_index:0}
+                FilterTaskEntityDropDown2(Item,categoryId2,Task_List)
+                setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"&&p?.taskRelatedNameRef === GLOBAL.taskRelatedNameRef));
+              }
+              else
+                setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
 
             }
             else if(GLOBAL.ScreenName==='Subcontract'){
@@ -1268,8 +1343,48 @@ function Task_Management({ navigation, navigation: { goBack } }) {
               setMudolList(Final_List);
               GLOBAL.MudolList=Final_List;
               Make_Week_Filter_List(Final_List);
-              setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+              if(GLOBAL.Selected?.length!==0){
+                for (let item in GLOBAL.Selected) {
+                  let obj = GLOBAL.Selected?.[item];
+                  let index =  GLOBAL.RelatedNameListTask?.findIndex((p) => p?.value ===obj?.Id);
+                  GLOBAL.RelatedNameListTask[index] = {
+                    ... GLOBAL.RelatedNameListTask[index], label:GLOBAL.Selected?.find((p)=>p.Id===obj?.Id).Name,
+                  };
+                  setRelatedNameListTask( GLOBAL.RelatedNameListTask)
+                }
+                const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
+                const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
+                const Item={label:GLOBAL.RelatedNameListTask?.[Index]?.label,value:"0",_index:0}
+                FilterTaskEntityDropDown2(Item,categoryId2,Task_List)
+                setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"&&p?.taskRelatedNameRef === GLOBAL.taskRelatedNameRef));
+              }
+              else
+                setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
 
+            }
+            else if(GLOBAL.ScreenName==='Support'){
+              let Final_List=Task_List?.filter((p) =>p?.taskCategoryName ==='Software & Support')
+              Final_List?.sort(dateComparison_data);
+              setMudolList(Final_List);
+              GLOBAL.MudolList=Final_List;
+              Make_Week_Filter_List(Final_List);
+              // if(GLOBAL.Selected?.length!==0){
+              //   for (let item in GLOBAL.Selected) {
+              //     let obj = GLOBAL.Selected?.[item];
+              //     let index =  GLOBAL.RelatedNameListTask?.findIndex((p) => p?.value ===obj?.Id);
+              //     GLOBAL.RelatedNameListTask[index] = {
+              //       ... GLOBAL.RelatedNameListTask[index], label:GLOBAL.Selected?.find((p)=>p.Id===obj?.Id).Name,
+              //     };
+              //     setRelatedNameListTask( GLOBAL.RelatedNameListTask)
+              //   }
+              //   const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
+              //   const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
+              //   const Item={label:GLOBAL.RelatedNameListTask?.[Index]?.label,value:"0",_index:0}
+              //   FilterTaskEntityDropDown2(Item,categoryId2,Task_List)
+              //   setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"&&p?.taskPriorityName === GLOBAL.taskRelatedNameRef));
+              // }
+              // else
+              setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
             }
             else  if(GLOBAL.Url_Navigate==='InspectionUnits')
               setmodules(Task_List?.filter((p) => p?.taskRelatedName === GLOBAL.relatedName&&p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"))
@@ -2121,6 +2236,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   }
   const FilterTaskEntityDropDown2=(Item,categoryId2,Task_List)=>{
     GLOBAL.RelatedNameListTask.find((p) => p.value ===categoryId2).label=Item.label
+    GLOBAL.taskRelatedNameRef=Item.label
     // if  (GLOBAL.ScreenName==='Property Maintenance'){
     //
     //   if(GLOBAL.SiteName==='site')
@@ -2138,7 +2254,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   }
   const FilterTaskEntityDropDown=(Item,categoryId2)=>{
     GLOBAL.RelatedNameListTask.find((p) => p.value ===categoryId2).label=Item.label
-
+        GLOBAL.taskRelatedNameRef=Item.label
     // if  (GLOBAL.ScreenName==='Property Maintenance'){
     //
     //   if(GLOBAL.SiteName==='site')

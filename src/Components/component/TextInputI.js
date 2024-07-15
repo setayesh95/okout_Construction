@@ -708,7 +708,7 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
         formData.append("userId",  GLOBAL.UserInformation?.userId);
         formData.append("categoryId", categoryId);
         formData.append("workTypeId", WorkTypeId);
-        if(categoryId==='1'||categoryId==='2') {
+        if(categoryId==='1'||categoryId==='2'||categoryId==='4') {
           formData.append("relatedId", relatedId);
           formData.append("relatedName", selectedrelatedname.label);
         }
@@ -790,12 +790,11 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
             if (json) {
               setShowMessagetype(json?.status);
               if (json?.status === true) {
+                My_TaskList_server2();
                 values.TaskNote=''
                 values.Title='';
                 setResults('');
                 setTitle('')
-
-                My_TaskList_server2();
                 getAllProjectInfo();
                 getAllProjectInfo_dyb();
                 setMessage(json?.msg);

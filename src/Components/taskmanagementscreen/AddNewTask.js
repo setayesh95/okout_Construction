@@ -187,48 +187,23 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
   }
   ///get  task list when user come from project or Dyb///
   const My_TaskList_server = async () => {
-    if(GLOBAL.ScreenName==='Support')
-    {
-        if (GLOBAL.isConnected === true) {
-          readOnlineApi(Api.Assigned_TaskList + `userId=${GLOBAL.UserInformation?.userId}&categoryId=3&relatedName=support`).then(json => {
-            writeDataStorage(GLOBAL.All_Task, json?.tasks);
-            navigation.navigate("Task_Management");
-          });
-        }
-
-    }
-    else{
       if (GLOBAL.isConnected === true) {
         readOnlineApi(Api.My_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+          console.log(json?.tasks,'json?.tasks')
           DataStorage(json?.tasks)
         });
       }
-    }
 
   };
-  const getDayOfWeek = (date) => {
-    const dayOfWeek = new Date(date).getDay();
-    return isNaN(dayOfWeek) ? null :
-      ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][dayOfWeek];
-  };
+
   ///get  task list ///
   const My_TaskList_server2 = async () => {
-    if(GLOBAL.ScreenName==='Support')
-    {
-      if (GLOBAL.isConnected === true) {
-        readOnlineApi(Api.Assigned_TaskList + `userId=${GLOBAL.UserInformation?.userId}&categoryId=3&relatedName=support`).then(json => {
-          writeDataStorage(GLOBAL.All_Task, json?.tasks);
-          navigation.navigate("Task_Management");
-        });
-      }
-
-    }
-    else {
       if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.My_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+        console.log(json?.tasks,'json?.tasks')
         writeDataStorage(GLOBAL.All_Task, json?.tasks);
       });
-    }}
+    }
   };
   const AddTask = (value) => {
 
@@ -270,6 +245,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
       if (GLOBAL.isConnected=== false) {
         Add_Task_Offline(value,TodayDate);
       }
+      console.log(formData,'formData')
       if (ImageSourceviewarray.length !== 0) {
         for (let i = 0; i < ImageSourceviewarray?.length; i++) {
           idsArray = ImageSourceviewarray[i];
@@ -325,6 +301,7 @@ function AddNewTask({ navigation, navigation: { goBack } }) {
       }
       else {
         writePostApi("POST", Api.AddTask, formData).then(json => {
+          console.log(json,'json')
           setShowMessagetype(json?.status);
           if (json) {
             if (json?.status === true) {

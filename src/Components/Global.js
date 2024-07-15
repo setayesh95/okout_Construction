@@ -249,7 +249,7 @@ module.exports = {
   RelatedIdTask:0,
   RelatedNameListTask:[],
   MudolList:[],
-
+  taskRelatedNameRef:''
 
 
 };
