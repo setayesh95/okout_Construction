@@ -60,6 +60,9 @@ function Profile( { navigation, navigation: { goBack }}) {
       await AsyncStorage.removeItem(GLOBAL.UserPermissions);
       await AsyncStorage.removeItem(GLOBAL.OrgAppKey);
       await AsyncStorage.removeItem(GLOBAL.Category_Last_Info);
+      await AsyncStorage.removeItem(GLOBAL.All_Task);
+      await AsyncStorage.removeItem(GLOBAL.AllProjectInfo_dyb);
+      await AsyncStorage.removeItem(GLOBAL.AllProjectInfo_dyb);
       GLOBAL.UserInformation='';
       setshowModalDelete(false)
       navigation.navigate('LogIn');

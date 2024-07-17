@@ -51,28 +51,53 @@ function TaskFilterDropDown({value,TypeName,setRelatedId,sectionList,
             onFocus={() => setIsFocusrelated(true)}
             onBlur={() => setIsFocusrelated(false)}
             onChange={item=> {
-              //setValue(item.label)
+              let markers =[]
               const Index = categoryLevellist.findIndex((p)=>parseInt(p.value)===parseInt(value.value))
               const categoryId2 = categoryLevellist?.[Index]?.value;
               const categoryId = categoryLevellist?.[Index+1]?.value;
-             FilterTaskEntityDropDown(item,categoryId2)
-              getLists(categoryId,item.value);
-              setRelatedId(item.value)
               let index = GLOBAL.Selected?.findIndex((p) => p?.Id === categoryId2);
               if(index!==-1) {
-                GLOBAL.Selected[index] = {
-                  ...GLOBAL.Selected[index], Name: item.label,
-                };
+                if(item.value===null)
+                {
+                  let List_Item = GLOBAL.Selected;
+                  let index = List_Item?.findIndex((p) =>p?.Id === categoryId2);
+                   markers = [...List_Item];
+                  markers?.splice(index, 1);
+                  GLOBAL.Selected=markers
+                }
+                else{
+                  GLOBAL.Selected[index] = {
+                    ...GLOBAL.Selected[index], Name: item.label,
+                  };
+                }
+
               }
               else {
                 GLOBAL.Selected.push({
                   Name:item.label,
-                  Id:categoryId2
+                  Id:categoryId2,
+                  value:item.value
                 })
               }
-              setselectedrelatedname({label:categoryLevellist?.[Index]?.Name,value:"0",_index:0})
-              GLOBAL.RelatedIdTask=item.value
-              GLOBAL.relatedName=categoryLevellist?.[Index]?.Name
+             console.log(markers,'markers')
+              getLists(categoryId,item.value);
+              if(item.value===null) {
+                if(markers?.length!==0){
+                  const Index2 = categoryLevellist.findIndex((p)=>parseInt(p.value)===parseInt(markers?.[markers.length-1]?.Id))
+                  setRelatedId(item.value);
+                  setselectedrelatedname({ label: categoryLevellist?.[Index2]?.Name, value: "0", _index: 0 });
+                  GLOBAL.RelatedIdTask = markers?.[markers.length-1]?.value;
+                  GLOBAL.relatedName = categoryLevellist?.[Index2]?.Name;
+                }
+
+              }
+              else{
+                setRelatedId(item.value);
+                setselectedrelatedname({ label: categoryLevellist?.[Index]?.Name, value: "0", _index: 0 });
+                GLOBAL.RelatedIdTask = item.value;
+                GLOBAL.relatedName = categoryLevellist?.[Index]?.Name;
+              }
+              FilterTaskEntityDropDown(item,categoryId2,markers)
             }}
           />
         </>

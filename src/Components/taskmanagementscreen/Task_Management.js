@@ -88,6 +88,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     }, { id: 3, Filtername: "Category", Icon: "feature-search-outline" }]);
   const [reasons, setreasons] = useState([]);
   const [RelatedNameList, setRelatedNameList] = useState([]);
+  const [RelatedNameList2, setRelatedNameList2] = useState([]);
   const [TaskRelatedNameId, setTaskRelatedNameId] = useState("");
   const [selectedrelatedname, setselectedrelatedname] = useState("");
   const [SiteList, setSiteList] = useState([]);
@@ -394,19 +395,26 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     if (GLOBAL.isConnected === true) {
       readOnlineApi(Api.Task_Project + `userId=${GLOBAL.UserInformation?.userId}&categoryId=${value}`).then(json => {
         let RelatedList = [];
+        let B=[];
         for (let item in json?.relatedList) {
           let obj = json?.relatedList?.[item];
           RelatedList.push({
             value: obj.relatedId,
             label: obj.relatedName,
           });
-
+          let Filter = {
+            value: null,
+            label: 'Select All',
+          };
+            B.push({
+            value: obj.relatedId,
+            label: obj.relatedName,
+          })
+          let List_copy = [Filter, ...B];
           if(list?.length!==0&&list!==undefined) {
             list.find((p) => p.value ===value).data=[]
-            list?.find((p) => p?.value ===value)?.data?.push({
-              value: obj.relatedId,
-              label: obj.relatedName,
-            });
+            //list?.find((p) => p?.value ===value)?.data?.push(List_copy);
+            list.find((p) => p.value ===value).data=List_copy;
           }
         }
         if(GLOBAL.categoryId==='4'){
@@ -579,6 +587,8 @@ function Task_Management({ navigation, navigation: { goBack } }) {
           taskWorkType: obj.taskWorkType,
         });
       }
+      console.log(Task_List,'Task_List')
+      console.log(GLOBAL.ScreenName,'GLOBAL.ScreenName')
       if (Task_List?.length !== 0) {
       if(GLOBAL.ScreenName==='Property Maintenance'){
         let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Maintenance')
@@ -608,7 +618,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
 
         }
         else if(GLOBAL.ScreenName==='Snagging'){
-        let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Snag')
+        let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Snagging'||p?.taskCategoryName==='Snag')
         Final_List?.sort(dateComparison_data);
         setMudolList(Final_List);
         GLOBAL.MudolList=Final_List;
@@ -1118,23 +1128,30 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       readOnlineApi(Api.RentalUnits + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
         writeDataStorage(GLOBAL.RentalUnits_List, json?.allSiteInfo);
         let A = [];
+        let B = [];
+        let Filter = {
+          value: null,
+          label: 'Select All',
+          Name:'',
+        };
         json?.allSiteInfo?.forEach((obj) => {
           A.push({
             value: obj.siteId,
             label: obj.siteName,
             units:obj.units,
           });
-
-          const first = list?.find((_, index) => !index);
-          if(list?.length!==0) {
-            list?.find((p) => p?.value ===first?.value)?.data?.push({
-              value: obj.siteId,
-              label: obj.siteName,
-              Name: obj.siteName,
-            });
-          }
+          B.push({
+            value: obj.siteId,
+            label: obj.siteName,
+            Name: obj.siteName,
+          });
         })
-
+        let List_copy = [Filter, ...B];
+        const first = list?.find((_, index) => !index);
+        if(list?.length!==0) {
+          //list?.find((p) => p?.value ===first?.value)?.data?.push(List_copy);
+          list.find((p) => p.value ===first.value).data=List_copy
+        }
         setRelatedNameListTask (list);
         GLOBAL.RelatedNameListTask=list
         setSiteList(A);
@@ -1187,6 +1204,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
         setRelatedNameList(A);
         setRelatedNameListTask (A);
         GLOBAL.RelatedNameListTask=A
+       setRelatedNameList2(A)
         writeDataStorage(GLOBAL.Task_SubCategory, json);
       })
     }
@@ -1325,7 +1343,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
                   GLOBAL.RelatedNameListTask[index] = {
                     ... GLOBAL.RelatedNameListTask[index], label:GLOBAL.Selected?.find((p)=>p.Id===obj?.Id).Name,
                   };
-                  setRelatedNameListTask( GLOBAL.RelatedNameListTask)
+                  setRelatedNameListTask(GLOBAL.RelatedNameListTask)
                 }
                 const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
                 const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
@@ -1335,7 +1353,6 @@ function Task_Management({ navigation, navigation: { goBack } }) {
               }
               else
                 setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
-
             }
             else if(GLOBAL.ScreenName==='Subcontract'){
               let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Subcontract')
@@ -1350,7 +1367,7 @@ function Task_Management({ navigation, navigation: { goBack } }) {
                   GLOBAL.RelatedNameListTask[index] = {
                     ... GLOBAL.RelatedNameListTask[index], label:GLOBAL.Selected?.find((p)=>p.Id===obj?.Id).Name,
                   };
-                  setRelatedNameListTask( GLOBAL.RelatedNameListTask)
+                  setRelatedNameListTask(GLOBAL.RelatedNameListTask)
                 }
                 const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
                 const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
@@ -1454,8 +1471,8 @@ function Task_Management({ navigation, navigation: { goBack } }) {
                 };
                 setRelatedNameListTask( GLOBAL.RelatedNameListTask)
               }
-              const Index = GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
-              const categoryId2 = GLOBAL.RelatedNameListTask?.[Index]?.value;
+              const Index=GLOBAL.RelatedNameListTask.findIndex((p)=>parseInt(p.value)===parseInt(GLOBAL.Selected?.[GLOBAL.Selected?.length-1]?.Id))
+              const categoryId2=GLOBAL.RelatedNameListTask?.[Index]?.value;
               const Item={label:GLOBAL.RelatedNameListTask?.[Index]?.label,value:"0",_index:0}
               FilterTaskEntityDropDown2(Item,categoryId2,Task_List)
             }
@@ -1491,15 +1508,12 @@ function Task_Management({ navigation, navigation: { goBack } }) {
               }
             }
             else if(GLOBAL.ScreenName==='Property Maintenance'){
-
               let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Maintenance')
-
               Final_List?.sort(dateComparison_data);
               setMudolList(Final_List);
               GLOBAL.MudolList=Final_List;
               Make_Week_Filter_List(Final_List);
               setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
-
             }
             else if(GLOBAL.ScreenName==='Snagging'){
               let Final_List=Task_List?.filter((p) =>p?.taskCategoryName==='Snag')
@@ -1975,14 +1989,23 @@ function Task_Management({ navigation, navigation: { goBack } }) {
     }
   };
   const getListsTask=async(TaskRelatedNameId,value)=>{
-    const json=await getEntityInfo(TaskRelatedNameId,value)
+     const json=await getEntityInfo(TaskRelatedNameId,value)
+    let Filter = {
+      value: null,
+      label: 'Select All',
+    };
+    let B=[]
     RelatedNameListTask.find((p)=>p.value===TaskRelatedNameId).data=[];
     for (let item in json.relatedList) {
       let obj = json.relatedList?.[item];
-      RelatedNameListTask.find((p)=>p.value===TaskRelatedNameId).data?.push({value: obj.relatedId,
+      B?.push({value: obj.relatedId,
         label: obj.relatedName,})
+      // RelatedNameList.find((p)=>p.value===TaskRelatedNameId).data?.push({value: obj.relatedId,
+      //   label: obj.relatedName,})
     }
+    let List_copy = [Filter, ...B];
 
+    RelatedNameListTask.find((p)=>p.value===TaskRelatedNameId).data=List_copy
   }
   const renderSectionHeader = () => (
     <>
@@ -2166,21 +2189,33 @@ function Task_Management({ navigation, navigation: { goBack } }) {
       readOnlineApi(Api.RentalUnits + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
         writeDataStorage(GLOBAL.RentalUnits_List, json?.allSiteInfo);
         let A = [];
+        let B=[]
+        let Filter = {
+          value: null,
+          label: 'Select All',
+        };
         json?.allSiteInfo?.forEach((obj) => {
           A.push({
             value: obj.siteId,
             label: obj.siteName,
             units:obj.units
           });
-          const first = list?.find((_, index) => !index);
-          if(list?.length!==0) {
-            list?.find((p) => p?.value ===first?.value)?.data?.push({
-              value: obj.siteId,
-              label: obj.siteName,
-              Name:obj.siteName,
-            });
-          }
+          B.push({
+            value: obj.siteId,
+            label: obj.siteName,
+            Name:obj.siteName,
+          });
         })
+        let List_copy = [Filter, ...B];
+        const first = list?.find((_, index) => !index);
+        if(list?.length!==0) {
+          // list?.find((p) => p?.value ===first?.value)?.data?.push({
+          //   value: obj.siteId,
+          //   label: obj.siteName,
+          //   Name:obj.siteName,
+          // });
+          list.find((p) => p.value ===first.value).data=List_copy
+        }
         setRelatedNameListTask (list);
         GLOBAL.RelatedNameListTask=list
         setSiteList(A);
@@ -2203,6 +2238,11 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   const getUnit2=(categoryId,value)=>{
     let json=SiteList.find((p)=>p.value===value)?.units
     RelatedNameListTask.find((p)=>p.value===categoryId).data=[];
+    let B=[]
+    let Filter = {
+      value: null,
+      label: 'Select All',
+    };
     json?.forEach((obj) => {
       A.push({
         value: obj.unitId,
@@ -2210,11 +2250,12 @@ function Task_Management({ navigation, navigation: { goBack } }) {
         Name: obj.unitName,
       });
     })
+    let List_copy = [Filter, ...A];
     let List_Item =RelatedNameListTask;
     let index = List_Item?.findIndex((p) =>  p.value === categoryId);
     let markers = [...List_Item];
     markers[index] = {
-      ...markers[index],data:A
+      ...markers[index],data:List_copy
     };
     setRelatedNameListTask(markers);
     GLOBAL.RelatedNameListTask=markers
@@ -2237,39 +2278,69 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   const FilterTaskEntityDropDown2=(Item,categoryId2,Task_List)=>{
     GLOBAL.RelatedNameListTask.find((p) => p.value ===categoryId2).label=Item.label
     GLOBAL.taskRelatedNameRef=Item.label
-    // if  (GLOBAL.ScreenName==='Property Maintenance'){
-    //
-    //   if(GLOBAL.SiteName==='site')
-    //   {
-    //     setmodules(Task_List.filter((p)=>p.taskRelatedName==='site'&&p.taskCategoryName==='Maintenance'))
-    //   }
-    //   else if(GLOBAL.SiteName==='unit')
-    //   {
-    //     setmodules(Task_List.filter((p)=>p.taskRelatedName==='unit'&&p.taskCategoryName==='Maintenance'))
-    //   }
-    // }
-    //
-    // else {
       setmodules(Task_List.filter((p)=>p.taskRelatedNameRef===Item.label))
   }
-  const FilterTaskEntityDropDown=(Item,categoryId2)=>{
-    GLOBAL.RelatedNameListTask.find((p) => p.value ===categoryId2).label=Item.label
-        GLOBAL.taskRelatedNameRef=Item.label
-    // if  (GLOBAL.ScreenName==='Property Maintenance'){
-    //
-    //   if(GLOBAL.SiteName==='site')
-    //   {
-    //     setmodules(MudolList.filter((p)=>p.taskRelatedName==='site'))
-    //   }
-    //     else if(GLOBAL.SiteName==='unit')
-    //   {
-    //     setmodules(MudolList.filter((p)=>p.taskRelatedName==='unit'))
-    //   }
-    //   }
-    //
-    //   else {
-      setmodules(MudolList.filter((p)=>p.taskRelatedNameRef===Item.label))
+  const FilterTaskEntityDropDown=(Item,categoryId2,markers)=>{
 
+    if(Item.label==='Select All'){
+
+      //GLOBAL.RelatedNameListTask.find((p) => p.value ===categoryId2).label=RelatedNameList2.find((p) => p.value ===categoryId2).label
+      if(GLOBAL.ScreenName==='Property Maintenance'){
+        let Final_List=MudolList;
+        Final_List?.sort(dateComparison_data);
+        setMudolList(Final_List);
+        GLOBAL.MudolList=Final_List;
+        Make_Week_Filter_List(Final_List);
+        if(markers?.length!==0){
+          setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"&&p.taskRelatedNameRef===markers?.[markers?.length-1]?.Name));
+        }
+        else
+          setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+      }
+      else if(GLOBAL.ScreenName==='Snagging'){
+        let Final_List=MudolList
+        Final_List?.sort(dateComparison_data);
+        setMudolList(Final_List);
+        GLOBAL.MudolList=Final_List;
+        Make_Week_Filter_List(Final_List);
+        if(markers?.length!==0){
+          setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"&&p.taskRelatedNameRef===markers?.[markers?.length-1]?.Name));
+        }
+        else
+          setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+      }
+      else if(GLOBAL.ScreenName==='Subcontract'){
+        let Final_List=MudolList
+        Final_List?.sort(dateComparison_data);
+        setMudolList(Final_List);
+        GLOBAL.MudolList=Final_List;
+        Make_Week_Filter_List(Final_List);
+        if(markers?.length!==0){
+          setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"&&p.taskRelatedNameRef===markers?.[markers?.length-1]?.Name));
+        }
+        else
+          setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+
+      }
+      else if(GLOBAL.ScreenName==='Support'){
+        let Final_List=MudolList
+        Final_List?.sort(dateComparison_data);
+        setMudolList(Final_List);
+        GLOBAL.MudolList=Final_List;
+        Make_Week_Filter_List(Final_List);
+        if(markers?.length!==0){
+          setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"&&p.taskRelatedNameRef===markers?.[markers?.length-1]?.Name));
+        }
+        else
+        setmodules(Final_List?.filter((p) => p?.taskPriorityName === "Normal" && p?.taskStatusName !== "Completed" && p?.taskStatusName !== "Cancelled"));
+      }
+    }
+      else{
+      GLOBAL.RelatedNameListTask.find((p) => p.value ===categoryId2).label=Item.label
+      GLOBAL.taskRelatedNameRef=Item.label
+      setmodules(MudolList.filter((p)=>p.taskRelatedNameRef===Item.label))
+      console.log(GLOBAL.RelatedNameListTask,'GLOBAL.RelatedNameListTask')
+    }
   }
   /// sort Task by week ///
   const SortByWeek = (startDate, endDate) => {
@@ -2607,9 +2678,12 @@ function Task_Management({ navigation, navigation: { goBack } }) {
   }
   const getLists=async(TaskRelatedNameId,value)=>{
     const json=await getEntityInfo(TaskRelatedNameId,value)
+
      RelatedNameList.find((p)=>p.value===TaskRelatedNameId).data=[];
     for (let item in json.relatedList) {
       let obj = json.relatedList?.[item];
+      B?.push({value: obj.relatedId,
+        label: obj.relatedName,})
       RelatedNameList.find((p)=>p.value===TaskRelatedNameId).data?.push({value: obj.relatedId,
         label: obj.relatedName,})
     }

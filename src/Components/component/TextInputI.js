@@ -1154,7 +1154,6 @@ else  if(values?.CaseNote?.split("\n")?.length===1){
     setRelatedNameListTask(markers);
   }
   useEffect(()=>{
-
     if(location===undefined||location?.latitude==='') {
       if(location?.latitude==='') {
         requestLocationPermission().then(res => {

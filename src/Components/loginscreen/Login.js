@@ -68,7 +68,23 @@ function LogIn({ navigation }) {
   const handleBackButtonClick=()=>{
     BackHandler.exitApp()
   }
+  const AsyncClecn=async ()=>{
+    await AsyncStorage.removeItem(GLOBAL.All_Task);
+    await AsyncStorage.removeItem(GLOBAL.AllProjectInfo_dyb);
+    await AsyncStorage.removeItem(GLOBAL.AllProjectInfo_dyb);
+  }
+  const My_TaskList = async () => {
+    console.log(GLOBAL.OrgAppLink_value ,'GLOBAL.OrgAppLink_value ',GLOBAL.UserInformation,'GLOBAL.UserInformation',GLOBAL.isConnected)
+    if (GLOBAL.isConnected === true) {
+      readOnlineApi(Api.My_TaskList + `userId=${GLOBAL.UserInformation?.userId}`).then(json => {
+        console.log(json?.tasks,'json?.tasks')
+        writeDataStorage(GLOBAL.All_Task, json?.tasks);
+      });
+    }
+  };
   const checkOrgCode = (value) => {
+    AsyncClecn()
+    GLOBAL.UserInformation='';
       var myHeaders = new Headers();
       const formData = new FormData();
       myHeaders.append("Content-Type", "application/json");
@@ -89,6 +105,7 @@ function LogIn({ navigation }) {
               setVerification(json.status);
               if (json.status === true)
               {
+                My_TaskList()
               seticoncheck('user-check')
                 GLOBAL.BASE_URL_User = json;
                 GLOBAL.OrgAppLink_value=json.OrgAppLink;
